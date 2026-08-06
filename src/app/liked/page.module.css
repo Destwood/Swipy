@@ -1,0 +1,53 @@
+@reference "../globals.css";
+
+.root {
+  @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
+}
+
+.topBarLeft {
+  @apply flex items-center gap-4;
+}
+
+.backLink {
+  @apply flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-white/40 transition-colors hover:text-sw-text;
+}
+
+.divider {
+  @apply h-5 w-px bg-white/[0.08];
+}
+
+.countBadge {
+  @apply font-mono text-xs tracking-[0.04em] text-sw-accent;
+}
+
+.content {
+  @apply min-h-0 flex-1 overflow-y-auto;
+}
+
+.inner {
+  @apply mx-auto max-w-[1200px] px-6 pt-10 pb-20 sm:px-10;
+}
+
+.header {
+  @apply mb-6 flex items-center justify-between;
+}
+
+.title {
+  @apply font-display text-[36px] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+}
+
+.count {
+  @apply font-mono text-xs text-white/25;
+}
+
+.list {
+  @apply m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2;
+}
+
+.footer {
+  @apply mt-10 text-center font-mono text-[11px] text-white/15;
+}
+
+.footerLink {
+  @apply text-white/25 underline-offset-2 hover:underline;
+}

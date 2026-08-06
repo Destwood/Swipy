@@ -1,0 +1,37 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply relative z-10 flex h-[60px] shrink-0 items-center justify-between border-b border-white/[0.06] bg-[rgba(12,14,18,0.8)] px-6 backdrop-blur-[12px] sm:px-10;
+}
+
+.left {
+  @apply flex min-w-0 items-center gap-5 sm:gap-8;
+}
+
+.nav {
+  @apply flex items-center gap-0.5 sm:gap-1;
+}
+
+.navLink {
+  @apply rounded-lg px-2.5 py-1.5 font-body text-sm tracking-[-0.01em] text-white/35 no-underline transition-colors hover:text-sw-text;
+}
+
+.navLinkActive {
+  @apply font-semibold text-sw-accent;
+}
+
+.right {
+  @apply flex shrink-0 items-center gap-3;
+}
+
+.likedLink {
+  @apply flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-white/35 transition-colors hover:text-sw-accent;
+}
+
+.likedIcon {
+  @apply h-[15px] w-[15px];
+}
+
+.remainingLabel {
+  @apply font-mono text-[13px] tracking-[0.02em] text-white/28;
+}

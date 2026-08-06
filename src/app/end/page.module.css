@@ -1,0 +1,58 @@
+@reference "../globals.css";
+
+.root {
+  @apply relative flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-sw-bg;
+}
+
+.heroImage {
+  @apply pointer-events-none object-cover brightness-[0.14] saturate-70;
+}
+
+.radialOverlay {
+  background: radial-gradient(
+    ellipse 65% 65% at 50% 50%,
+    rgba(12, 14, 18, 0.4) 0%,
+    rgba(12, 14, 18, 0.88) 100%
+  );
+  @apply absolute inset-0;
+}
+
+.content {
+  @apply relative z-[2] flex min-h-0 flex-1 flex-col items-center justify-center;
+}
+
+.badge {
+  @apply mb-8 flex items-center gap-2 rounded-full border border-[rgba(45,212,191,0.22)] bg-[rgba(45,212,191,0.1)] px-4 py-1.5;
+}
+
+.badgeIcon {
+  @apply text-sw-accent;
+}
+
+.badgeLabel {
+  @apply font-mono text-xs tracking-[0.04em] text-sw-accent;
+}
+
+.title {
+  @apply mb-4 font-display text-[clamp(48px,5.5vw,76px)] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+}
+
+.subtitle {
+  @apply mb-11 font-body text-lg font-normal tracking-[-0.01em] text-sw-text/50;
+}
+
+.actions {
+  @apply flex items-center gap-4;
+}
+
+.primaryLink {
+  @apply flex items-center gap-2 rounded-xl bg-sw-accent px-8 py-3.5 text-[15px] font-semibold tracking-[-0.01em] text-sw-bg shadow-[0_0_28px_rgba(45,212,191,0.2)] transition-all duration-[180ms] hover:bg-sw-like hover:shadow-[0_0_40px_rgba(45,212,191,0.32)];
+}
+
+.primaryIcon {
+  @apply text-sw-bg;
+}
+
+.secondaryLink {
+  @apply rounded-xl border border-white/10 bg-white/[0.06] px-8 py-3.5 text-[15px] font-medium tracking-[-0.01em] text-sw-text/70 transition-all duration-[180ms] hover:bg-white/10 hover:text-sw-text;
+}

@@ -1,0 +1,52 @@
+@reference "./globals.css";
+
+.root {
+  @apply relative flex h-full min-h-0 flex-1 flex-col items-center justify-center overflow-hidden bg-sw-bg;
+}
+
+.heroImage {
+  @apply object-cover object-center brightness-[0.28] saturate-90;
+}
+
+.radialOverlay {
+  background: radial-gradient(
+    ellipse 80% 80% at 50% 50%,
+    transparent 0%,
+    rgba(12, 14, 18, 0.55) 60%,
+    rgba(12, 14, 18, 0.92) 100%
+  );
+  @apply absolute inset-0;
+}
+
+.bottomGradient {
+  background: linear-gradient(to top, #0c0e12 0%, transparent 100%);
+  @apply absolute right-0 bottom-0 left-0 h-[35%];
+}
+
+.content {
+  @apply relative z-[2] flex max-w-[680px] flex-col items-center px-10 text-center;
+}
+
+.homeAuth {
+  @apply absolute top-5 right-8 z-[3];
+}
+
+.tagline {
+  @apply mt-5 mb-10 font-body text-lg leading-normal font-normal tracking-[-0.01em] text-sw-text/55;
+}
+
+.actions {
+  @apply flex flex-wrap items-center justify-center gap-3;
+}
+
+.primaryLink {
+  @apply flex items-center gap-2.5 rounded-xl bg-sw-accent px-8 py-3.5 text-base font-semibold tracking-[-0.01em] text-sw-bg shadow-[0_0_36px_rgba(45,212,191,0.22),0_2px_8px_rgba(0,0,0,0.4)] transition-all duration-200 hover:bg-sw-like hover:shadow-[0_0_48px_rgba(45,212,191,0.35),0_2px_8px_rgba(0,0,0,0.4)];
+}
+
+.primaryIcon {
+  @apply text-sw-bg;
+}
+
+.secondaryLink {
+  @apply rounded-xl border border-white/10 bg-white/[0.06] px-8 py-3.5 text-base font-medium tracking-[-0.01em] text-sw-text/70 transition-all duration-[180ms] hover:bg-white/10 hover:text-sw-text;
+}

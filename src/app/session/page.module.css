@@ -1,0 +1,14 @@
+@reference "../globals.css";
+
+.root {
+  @apply relative flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-sw-bg;
+}
+
+.radialOverlay {
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 30%,
+    rgba(45, 212, 191, 0.06) 0%,
+    transparent 70%
+  );
+  @apply pointer-events-none absolute inset-0;
+}

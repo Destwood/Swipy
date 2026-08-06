@@ -1,0 +1,9 @@
+@reference "../../globals.css";
+
+.root {
+  @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
+}
+
+.content {
+  @apply min-h-0 flex-1 overflow-y-auto;
+}

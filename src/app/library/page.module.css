@@ -1,0 +1,91 @@
+@reference "../globals.css";
+
+.root {
+  @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
+}
+
+.content {
+  @apply min-h-0 flex-1 overflow-y-auto;
+}
+
+.inner {
+  @apply mx-auto max-w-[1200px] px-6 pt-8 pb-20 sm:px-10;
+}
+
+.toolbar {
+  @apply mb-5;
+}
+
+.count {
+  @apply mb-5 font-mono text-xs text-white/30;
+}
+
+.error {
+  @apply mb-4 font-body text-sm text-sw-dislike;
+}
+
+.grid {
+  @apply m-0 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6;
+}
+
+.tile {
+  @apply block overflow-hidden rounded-xl border border-white/[0.06] bg-sw-surface text-inherit no-underline;
+}
+
+.tile:hover {
+  @apply border-white/12;
+}
+
+.coverWrap {
+  @apply relative aspect-[3/4] w-full overflow-hidden bg-sw-surface2;
+}
+
+.coverImage {
+  @apply object-cover transition-transform duration-300 ease-out;
+}
+
+.tile:hover .coverImage {
+  transform: scale(1.04);
+}
+
+.tileBody {
+  @apply relative px-2.5 pt-2.5 pb-3;
+}
+
+.gameTitle {
+  @apply m-0 mb-1 min-h-[2.6em] font-display text-[13px] leading-snug font-bold tracking-[-0.02em] text-sw-text;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.gameMeta {
+  @apply m-0 truncate font-body text-[11px] text-white/35;
+}
+
+.score {
+  @apply absolute top-2 right-2 z-[1] rounded-md bg-black/55 px-1.5 py-0.5 font-mono text-[11px] text-sw-accent backdrop-blur-[4px];
+}
+
+.empty {
+  @apply rounded-2xl border border-dashed border-white/10 px-6 py-16 text-center;
+}
+
+.emptyTitle {
+  @apply m-0 mb-2 font-display text-base font-bold text-sw-text;
+}
+
+.emptyText {
+  @apply m-0 font-body text-sm text-sw-muted;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coverImage {
+    transition: none;
+  }
+
+  .tile:hover .coverImage {
+    transform: none;
+  }
+}

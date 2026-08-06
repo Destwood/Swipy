@@ -1,0 +1,49 @@
+@reference "../../../app/globals.css";
+
+.row {
+  @apply flex items-center gap-5 rounded-xl px-4 py-3.5 transition-colors hover:bg-white/[0.035];
+}
+
+.thumbnail {
+  @apply relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[10px] bg-sw-surface;
+}
+
+.cover {
+  @apply object-cover;
+}
+
+.content {
+  @apply min-w-0 flex-1;
+}
+
+.titleRow {
+  @apply mb-1.5 flex items-center gap-3;
+}
+
+.title {
+  @apply truncate font-display text-base font-bold tracking-[-0.02em] text-sw-text;
+}
+
+.metacritic {
+  @apply shrink-0 font-mono text-[11px] text-[rgba(45,212,191,0.75)];
+}
+
+.metaRow {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+.developer {
+  @apply ml-0.5 font-mono text-[11px] text-white/22;
+}
+
+.removeButton {
+  @apply flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-white/30 opacity-0 transition-all hover:border-[rgba(251,113,133,0.3)] hover:bg-[rgba(251,113,133,0.08)] hover:text-sw-dislike;
+}
+
+.row:hover .removeButton {
+  @apply opacity-100;
+}
+
+.removeIcon {
+  @apply h-3 w-3;
+}

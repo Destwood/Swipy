@@ -1,11 +1,12 @@
-import { AppTopBar } from "@/components/AppTopBar";
-import { CreateDeckForm } from "@/components/CreateDeckForm";
+import { AppTopBar } from "@/features/shell/components/AppTopBar";
+import { CreateDeckForm } from "@/features/decks/components/CreateDeckForm";
+import styles from "./page.module.css";
 
 export default function NewDeckPage() {
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col bg-sw-bg">
+    <div className={styles.root}>
       <AppTopBar />
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className={styles.content}>
         <CreateDeckForm />
       </div>
     </div>

@@ -1,5 +1,10 @@
-import { SessionMatchesClient } from "@/components/SessionMatchesClient";
+import { SessionMatchesClient } from "@/features/session/components/SessionMatchesClient";
+import styles from "./page.module.css";
 
 export default function SessionMatchesPage() {
-  return <SessionMatchesClient />;
+  return (
+    <div className={styles.root}>
+      <SessionMatchesClient />
+    </div>
+  );
 }

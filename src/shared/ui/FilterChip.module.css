@@ -1,0 +1,25 @@
+@reference "../../app/globals.css";
+
+.chip {
+  @apply cursor-pointer rounded-lg border border-white/[0.08] bg-transparent px-3.5 py-1.5 font-body text-sm tracking-[-0.01em] text-sw-muted transition-[color,background-color,border-color,transform] duration-150 hover:border-white/15 hover:text-sw-text;
+}
+
+.chip:active {
+  transform: scale(0.97);
+}
+
+.active {
+  @apply border-[rgba(45,212,191,0.35)] bg-[rgba(45,212,191,0.1)] font-semibold text-sw-accent;
+}
+
+.active:hover {
+  @apply border-[rgba(45,212,191,0.45)] text-sw-accent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .chip:active {
+    transition: none;
+    transform: none;
+  }
+}

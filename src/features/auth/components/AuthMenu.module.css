@@ -1,0 +1,21 @@
+@reference "../../../app/globals.css";
+
+.placeholder {
+  @apply h-8 w-16;
+}
+
+.loginLink {
+  @apply rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-sw-text/70 transition-colors hover:border-sw-accent/35 hover:text-sw-accent;
+}
+
+.menu {
+  @apply flex items-center gap-3;
+}
+
+.name {
+  @apply max-w-[140px] truncate font-mono text-[12px] text-white/40;
+}
+
+.signOut {
+  @apply cursor-pointer rounded-lg border border-transparent px-2 py-1 text-sm text-white/35 transition-colors hover:text-sw-text;
+}
