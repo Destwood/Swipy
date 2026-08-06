@@ -1,0 +1,33 @@
+@reference "../globals.css";
+
+.root {
+  @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
+}
+
+.content {
+  @apply relative z-[2] mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col items-center justify-center px-10 text-center;
+}
+
+.eyebrow {
+  @apply mb-3 font-mono text-[11px] tracking-[0.08em] text-sw-accent uppercase;
+}
+
+.title {
+  @apply mb-3 font-display text-[clamp(32px,4vw,44px)] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+}
+
+.subtitle {
+  @apply mb-8 font-body text-base text-sw-text/50;
+}
+
+.error {
+  @apply mb-4 font-body text-sm text-sw-dislike;
+}
+
+.note {
+  @apply mt-8 font-body text-sm text-white/30;
+}
+
+.noteLink {
+  @apply text-sw-accent/80 transition-colors hover:text-sw-accent;
+}

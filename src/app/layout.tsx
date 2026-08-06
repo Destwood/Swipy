@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, DM_Sans, DM_Mono } from "next/font/google";
-import { FrameNav } from "@/components/FrameNav";
-import { Grain } from "@/components/Grain";
+import { Grain } from "@/features/shell/components/Grain";
 import "./globals.css";
+import styles from "./layout.module.css";
 
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
@@ -35,14 +35,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bricolage.variable} ${dmSans.variable} ${dmMono.variable} h-full antialiased`}
+      className={`${bricolage.variable} ${dmSans.variable} ${dmMono.variable} ${styles.html}`}
     >
-      <body className="flex min-h-full flex-col overflow-hidden bg-sw-bg font-body text-sw-text">
+      <body className={styles.body}>
         <Grain />
-        <FrameNav />
-        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-          {children}
-        </div>
+        <div className={styles.main}>{children}</div>
       </body>
     </html>
   );

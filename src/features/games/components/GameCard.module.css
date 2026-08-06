@@ -1,0 +1,48 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply absolute inset-0 overflow-hidden rounded-2xl bg-sw-surface shadow-[0_32px_80px_rgba(0,0,0,0.75),0_0_0_1px_rgba(255,255,255,0.06)];
+}
+
+.dimmed {
+  @apply opacity-60;
+}
+
+.cover {
+  @apply object-cover;
+}
+
+.gradient {
+  @apply pointer-events-none absolute inset-0;
+  background: linear-gradient(
+    to bottom,
+    transparent 30%,
+    rgba(12, 14, 18, 0.4) 55%,
+    rgba(12, 14, 18, 0.88) 75%,
+    rgba(12, 14, 18, 0.97) 100%
+  );
+}
+
+.footer {
+  @apply pointer-events-none absolute right-0 bottom-0 left-0 px-6 pb-7;
+}
+
+.meta {
+  @apply mb-2 font-mono text-[11px] tracking-[0.04em] text-sw-text/45;
+}
+
+.metacritic {
+  @apply ml-2.5 text-sw-accent;
+}
+
+.title {
+  @apply mb-2.5 font-display text-[28px] leading-[1.1] font-extrabold tracking-[-0.03em] text-sw-text;
+}
+
+.genres {
+  @apply mb-3 flex flex-wrap gap-1.5;
+}
+
+.description {
+  @apply line-clamp-2 font-body text-[13px] leading-[1.55] font-normal text-sw-text/52;
+}

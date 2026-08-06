@@ -1,0 +1,125 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
+}
+
+.loading {
+  @apply flex flex-1 items-center justify-center font-mono text-sm text-white/30;
+}
+
+.scroll {
+  @apply min-h-0 flex-1 overflow-y-auto;
+}
+
+.page {
+  @apply mx-auto max-w-[1200px] px-6 pt-10 pb-20 sm:px-10;
+}
+
+.header {
+  @apply mb-8;
+}
+
+.eyebrow {
+  @apply mb-2 font-mono text-[11px] tracking-[0.08em] text-sw-accent uppercase;
+}
+
+.title {
+  @apply font-display text-[36px] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+}
+
+.subtitle {
+  @apply mt-2 font-body text-sm text-sw-text/45;
+}
+
+.error {
+  @apply mb-4 font-body text-sm text-sw-dislike;
+}
+
+.empty {
+  @apply font-body text-sw-text/45;
+}
+
+.list {
+  @apply m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2;
+}
+
+.row {
+  @apply flex items-center gap-5 rounded-xl px-4 py-3.5 transition-colors hover:bg-white/[0.035];
+}
+
+.rank {
+  @apply w-6 shrink-0 font-mono text-sm text-white/25;
+}
+
+.thumbnail {
+  @apply relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[10px] bg-sw-surface;
+}
+
+.cover {
+  @apply object-cover;
+}
+
+.content {
+  @apply min-w-0 flex-1;
+}
+
+.gameTitle {
+  @apply mb-1.5 truncate font-display text-base font-bold tracking-[-0.02em] text-sw-text;
+}
+
+.metaRow {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+.likeCount {
+  @apply font-mono text-[11px] text-sw-accent;
+}
+
+.playLink {
+  @apply shrink-0 cursor-pointer rounded-lg border border-[rgba(45,212,191,0.28)] bg-sw-accent-d px-3 py-2 text-sm font-medium text-sw-accent transition-colors hover:bg-[rgba(45,212,191,0.22)];
+}
+
+.noSteam {
+  @apply shrink-0 font-mono text-[11px] text-white/25;
+}
+
+.shareHint {
+  @apply mb-4 font-body text-sm text-sw-accent;
+}
+
+.footer {
+  @apply mt-10 flex flex-wrap gap-3;
+}
+
+.shareButton {
+  @apply cursor-pointer rounded-xl border border-[rgba(45,212,191,0.28)] bg-sw-accent-d px-8 py-3.5 text-[15px] font-semibold tracking-[-0.01em] text-sw-accent transition-all hover:bg-[rgba(45,212,191,0.22)] disabled:cursor-not-allowed disabled:opacity-40;
+}
+
+.continueLink {
+  @apply rounded-xl bg-sw-accent px-8 py-3.5 text-[15px] font-semibold tracking-[-0.01em] text-sw-bg transition-all hover:bg-sw-like;
+}
+
+.keepSwipingLink {
+  @apply rounded-xl border border-white/10 bg-white/[0.06] px-8 py-3.5 text-[15px] font-medium text-sw-text/70 transition-all hover:bg-white/10 hover:text-sw-text;
+}
+
+.topBarLeft {
+  @apply flex items-center gap-4;
+}
+
+.backLink {
+  @apply flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-white/40 transition-colors hover:text-sw-text;
+}
+
+.backIcon {
+  @apply h-3.5 w-3.5;
+}
+
+.divider {
+  @apply h-5 w-px bg-white/[0.08];
+}
+
+.pickLink {
+  @apply rounded-lg px-2.5 py-1.5 text-sm text-sw-accent transition-colors hover:text-sw-like;
+}

@@ -1,0 +1,225 @@
+@reference "../../../app/globals.css";
+
+.page {
+  @apply mx-auto max-w-[1200px] px-6 pt-10 pb-20 sm:px-10;
+}
+
+.header {
+  @apply mb-2 flex flex-wrap items-end justify-between gap-4;
+}
+
+.title {
+  @apply mb-1.5 font-display text-[36px] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+}
+
+.subtitle {
+  @apply m-0 font-body text-sm text-sw-muted;
+}
+
+.newButton {
+  @apply inline-flex cursor-pointer items-center gap-2 rounded-xl bg-sw-accent px-6 py-3 text-[15px] font-semibold tracking-[-0.01em] text-sw-bg shadow-[0_0_24px_rgba(45,212,191,0.18)] transition-all hover:bg-sw-like hover:shadow-[0_0_32px_rgba(45,212,191,0.3)];
+}
+
+.plusIcon {
+  @apply text-lg leading-none font-bold;
+}
+
+.toolbar {
+  @apply my-7 flex flex-wrap items-center justify-between gap-4;
+}
+
+.tabs {
+  @apply flex gap-1;
+}
+
+.tabCount {
+  @apply ml-1.5 font-mono text-[10px] text-inherit opacity-70;
+}
+
+.searchWrap {
+  @apply relative block;
+}
+
+.searchIcon {
+  @apply pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-sw-muted;
+}
+
+.searchInput {
+  @apply w-[220px] rounded-[9px] border border-white/[0.08] bg-sw-surface py-2 pr-3.5 pl-[34px] font-body text-sm text-sw-text outline-none transition-colors placeholder:text-white/25 focus:border-sw-accent/40;
+}
+
+.grid {
+  @apply m-0 grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+.grid > li {
+  @apply flex;
+}
+
+.card {
+  @apply relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-sw-surface shadow-[0_4px_16px_rgba(0,0,0,0.3)];
+}
+
+.card:hover {
+  @apply border-white/10 shadow-[0_20px_48px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.08)];
+}
+
+.card:hover .mosaicImage {
+  filter: brightness(0.55);
+}
+
+.card:hover .hoverCta,
+.card:hover .cardActions {
+  @apply opacity-100;
+}
+
+.card:hover .cardActions {
+  transform: translateY(0);
+}
+
+.mosaic {
+  @apply relative grid h-40;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1px;
+  background: #0c0e12;
+}
+
+.mosaicCell {
+  @apply relative overflow-hidden bg-sw-bg;
+}
+
+.mosaicImage {
+  @apply object-cover;
+  filter: brightness(0.72);
+  transition: filter 0.22s ease;
+}
+
+.hoverCta {
+  @apply pointer-events-none absolute inset-0 z-[1] flex items-center justify-center opacity-0 transition-opacity duration-[180ms];
+}
+
+.card:hover .hoverCta {
+  @apply pointer-events-auto;
+}
+
+.useButton {
+  @apply cursor-pointer rounded-[10px] bg-sw-accent px-5 py-2.5 text-sm font-semibold tracking-[-0.01em] text-sw-bg shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-colors hover:bg-sw-like;
+}
+
+.cardActions {
+  @apply absolute top-2.5 right-2.5 z-[2] flex gap-1 opacity-0 transition-all duration-[180ms];
+  transform: translateY(-4px);
+}
+
+.iconButton {
+  @apply flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-[7px] border border-white/12 bg-[rgba(12,14,18,0.7)] text-sm text-white/65 backdrop-blur-[8px] transition-all;
+}
+
+.iconButtonFav {
+  @apply border-[rgba(52,211,153,0.4)] bg-[rgba(52,211,153,0.2)] text-sw-like;
+}
+
+.heartIcon {
+  @apply h-3 w-3;
+}
+
+.menuWrap {
+  @apply relative;
+}
+
+.menu {
+  @apply absolute top-9 right-0 z-50 w-[148px] rounded-[10px] border border-white/10 bg-sw-surface2 p-1 shadow-[0_16px_40px_rgba(0,0,0,0.5)];
+}
+
+.menuItem {
+  @apply block w-full cursor-pointer rounded-[7px] border-none bg-transparent px-2.5 py-1.5 text-left font-body text-[13px] text-sw-text no-underline transition-colors hover:bg-white/[0.06];
+}
+
+.menuDanger {
+  @apply w-full cursor-pointer rounded-[7px] border-none bg-transparent px-2.5 py-1.5 text-left font-body text-[13px] text-sw-dislike transition-colors hover:bg-[rgba(251,113,133,0.1)];
+}
+
+.cardBody {
+  @apply mt-auto block px-[18px] pt-4 pb-[18px] text-inherit no-underline;
+}
+
+.titleRow {
+  @apply mb-2 flex items-start justify-between gap-2;
+}
+
+.cardTitle {
+  @apply m-0 flex-1 font-display text-[17px] leading-tight font-bold tracking-[-0.025em] text-sw-text;
+}
+
+.favDot {
+  @apply mt-1 h-3 w-3 shrink-0 text-sw-like;
+}
+
+.tags {
+  @apply mb-3.5 flex flex-wrap gap-1.5;
+}
+
+.tag {
+  @apply rounded-[5px] border border-white/[0.07] bg-white/[0.05] px-1.5 py-0.5 font-body text-[11px] font-medium text-sw-muted;
+}
+
+.tagAccent {
+  @apply border-[rgba(45,212,191,0.22)] bg-[rgba(45,212,191,0.1)] text-sw-accent;
+}
+
+.cardDesc {
+  @apply mb-3.5 line-clamp-2 font-body text-[13px] text-white/35;
+}
+
+.cardFooter {
+  @apply border-t border-white/[0.05] pt-3;
+}
+
+.meta {
+  @apply font-mono text-[11px] text-white/35;
+}
+
+.createLift {
+  @apply h-full w-full;
+}
+
+.createCard {
+  @apply flex h-full min-h-[298px] w-full cursor-pointer flex-col items-center justify-center gap-3.5 rounded-2xl border-[1.5px] border-dashed border-white/10 bg-transparent text-center transition-[border-color,background-color] duration-200 hover:border-[rgba(45,212,191,0.4)] hover:bg-[rgba(45,212,191,0.04)];
+}
+
+.createIcon {
+  @apply flex h-12 w-12 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.05] text-xl text-white/35 transition-all;
+}
+
+.createCard:hover .createIcon {
+  @apply border-[rgba(45,212,191,0.28)] bg-[rgba(45,212,191,0.14)] text-sw-accent;
+}
+
+.createTitle {
+  @apply font-display text-[15px] font-bold tracking-[-0.02em] text-sw-muted transition-colors;
+}
+
+.createCard:hover .createTitle {
+  @apply text-sw-accent;
+}
+
+.createHint {
+  @apply font-body text-[13px] text-white/22;
+}
+
+.emptySearch {
+  @apply flex flex-col items-center gap-4 px-10 py-20 text-center;
+}
+
+.emptyTitle {
+  @apply m-0 font-display text-lg font-bold tracking-[-0.02em] text-sw-text;
+}
+
+.emptyText {
+  @apply m-0 font-body text-sm text-sw-muted;
+}
+
+.clearSearch {
+  @apply cursor-pointer rounded-lg border border-[rgba(45,212,191,0.2)] bg-[rgba(45,212,191,0.08)] px-4 py-1.5 font-body text-[13px] font-medium text-sw-accent;
+}

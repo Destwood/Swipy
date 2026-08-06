@@ -1,45 +1,32 @@
-import { ActionButton } from "@/components/ActionButton";
-import { AppTopBar } from "@/components/AppTopBar";
-import { GameCard } from "@/components/GameCard";
-import { GAMES } from "@/data/games";
+import { ActionButton } from "@/shared/ui/ActionButton";
+import { AppTopBar } from "@/features/shell/components/AppTopBar";
+import { GameCard } from "@/features/games/components/GameCard";
+import styles from "./page.module.css";
 
+/** Static layout preview — real swipe uses /session. */
 export default function DeckPage() {
-  const current = GAMES[0];
-  const next = GAMES[1];
-  const remaining = GAMES.length;
-
   return (
-    <div className="relative flex h-full min-h-0 flex-1 flex-col bg-sw-bg">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 60% at 50% 45%, rgba(45,212,191,0.04) 0%, transparent 70%)",
-        }}
-      />
+    <div className={styles.root}>
+      <div aria-hidden className={styles.radialOverlay} />
 
-      <AppTopBar showLikedLink remainingLabel={`${remaining} left`} />
+      <AppTopBar showLikedLink remainingLabel="0 left" />
 
-      <div className="relative flex min-h-0 flex-1 items-center justify-center">
-        <div className="flex items-center justify-center gap-16">
+      <div className={styles.stage}>
+        <div className={styles.cardRow}>
           <ActionButton type="dislike" />
 
-          <div className="relative h-[626px] w-[460px]">
-            {next && (
-              <div className="absolute inset-0 origin-bottom scale-[0.955] translate-y-3.5 overflow-hidden rounded-2xl bg-sw-surface shadow-[0_16px_48px_rgba(0,0,0,0.6)]">
-                <GameCard game={next} dimmed />
-              </div>
-            )}
-            <GameCard game={current} />
+          <div className={styles.cardStack}>
+            <div className={styles.emptyHint}>
+              Open a session to swipe real deck games.
+            </div>
           </div>
 
           <ActionButton type="like" />
         </div>
 
-        <div className="pointer-events-none absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-6 whitespace-nowrap font-mono text-[11px] tracking-[0.03em] text-white/20">
+        <div className={styles.hints}>
           <span>← Dislike</span>
-          <span className="text-white/[0.08]">·</span>
+          <span className={styles.hintDivider}>·</span>
           <span>Like →</span>
         </div>
       </div>

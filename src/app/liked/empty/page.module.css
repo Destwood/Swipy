@@ -1,0 +1,41 @@
+@reference "../../globals.css";
+
+.root {
+  @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
+}
+
+.topBarLeft {
+  @apply flex items-center gap-4;
+}
+
+.backLink {
+  @apply flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-white/40 transition-colors hover:text-sw-text;
+}
+
+.divider {
+  @apply h-5 w-px bg-white/[0.08];
+}
+
+.countBadge {
+  @apply font-mono text-xs tracking-[0.04em] text-white/25;
+}
+
+.emptyState {
+  @apply flex min-h-0 flex-1 flex-col items-center justify-center gap-5 text-center;
+}
+
+.iconWrap {
+  @apply flex h-[60px] w-[60px] items-center justify-center rounded-full border border-[rgba(52,211,153,0.15)] bg-[rgba(52,211,153,0.08)] text-sw-like;
+}
+
+.title {
+  @apply mb-1.5 font-display text-xl font-bold tracking-[-0.02em] text-sw-text;
+}
+
+.message {
+  @apply m-0 font-body text-sm text-sw-text/38;
+}
+
+.ctaLink {
+  @apply rounded-[10px] bg-sw-accent px-6 py-2.5 text-sm font-semibold tracking-[-0.01em] text-sw-bg;
+}

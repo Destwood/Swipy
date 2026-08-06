@@ -1,0 +1,78 @@
+@reference "../../globals.css";
+
+.root {
+  @apply relative flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-sw-bg;
+}
+
+.heroImage {
+  @apply pointer-events-none object-cover brightness-[0.14] saturate-70;
+}
+
+.radialOverlay {
+  background: radial-gradient(
+    ellipse 65% 65% at 50% 50%,
+    rgba(12, 14, 18, 0.35) 0%,
+    rgba(12, 14, 18, 0.9) 100%
+  );
+  @apply absolute inset-0;
+}
+
+.content {
+  @apply relative z-[2] flex min-h-0 flex-1 flex-col items-center justify-center px-10;
+}
+
+.eyebrow {
+  @apply mb-4 font-mono text-[11px] tracking-[0.08em] text-sw-accent uppercase;
+}
+
+.gameCard {
+  @apply mb-8 flex w-full max-w-xl items-center gap-6 rounded-2xl border border-white/[0.08] bg-[rgba(19,22,28,0.85)] p-5 backdrop-blur-md;
+}
+
+.cover {
+  @apply relative h-36 w-28 shrink-0 overflow-hidden rounded-xl bg-sw-surface;
+}
+
+.coverImage {
+  @apply object-cover;
+}
+
+.gameMeta {
+  @apply min-w-0;
+}
+
+.gameTitle {
+  @apply mb-2 font-display text-[clamp(28px,3vw,40px)] leading-[1.05] font-extrabold tracking-[-0.03em] text-sw-text;
+}
+
+.gameDetails {
+  @apply mb-3 font-mono text-[11px] text-white/35;
+}
+
+.genres {
+  @apply mb-3 flex flex-wrap gap-1.5;
+}
+
+.matchNote {
+  @apply font-body text-sm text-sw-text/45;
+}
+
+.avatars {
+  @apply mb-8 flex items-center gap-2;
+}
+
+.avatar {
+  @apply flex h-9 w-9 items-center justify-center rounded-full font-display text-[11px] font-bold text-sw-bg;
+}
+
+.actions {
+  @apply flex flex-wrap items-center justify-center gap-3;
+}
+
+.secondaryLink {
+  @apply rounded-xl border border-white/10 bg-white/[0.06] px-8 py-3.5 text-[15px] font-medium text-sw-text/70 transition-all hover:bg-white/10 hover:text-sw-text;
+}
+
+.primaryLink {
+  @apply rounded-xl bg-sw-accent px-8 py-3.5 text-[15px] font-semibold tracking-[-0.01em] text-sw-bg shadow-[0_0_28px_rgba(45,212,191,0.2)] transition-all hover:bg-sw-like;
+}
