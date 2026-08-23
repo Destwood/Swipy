@@ -25,7 +25,9 @@
 }
 
 .inner {
-  @apply mx-auto max-w-[1200px] px-6 pt-10 pb-20 sm:px-10;
+  @apply mx-auto max-w-[1200px] pb-16;
+  padding-inline: var(--sw-page-pad-x);
+  padding-top: var(--sw-page-pad-y);
 }
 
 .header {
@@ -33,7 +35,8 @@
 }
 
 .title {
-  @apply font-display text-[36px] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+  @apply font-display leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+  font-size: var(--sw-title);
 }
 
 .count {

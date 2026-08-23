@@ -1,19 +1,19 @@
 @reference "../../../app/globals.css";
 
 .page {
-  @apply relative z-[2] flex min-h-0 flex-1 flex-col items-center justify-center px-10;
+  @apply relative z-[2] flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-8 sm:px-10;
 }
 
 .eyebrow {
-  @apply mb-3 font-mono text-[11px] tracking-[0.08em] text-sw-accent uppercase;
+  @apply mb-2 font-mono text-[11px] tracking-[0.08em] text-sw-accent uppercase;
 }
 
 .title {
-  @apply mb-3 font-display text-[clamp(36px,4vw,52px)] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+  @apply mb-3 font-display text-[clamp(28px,3.2vw,40px)] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
 }
 
 .subtitle {
-  @apply mb-10 max-w-md text-center font-body text-base text-sw-text/50;
+  @apply mb-8 max-w-md text-center font-body text-sm text-sw-text/50 sm:mb-10 sm:text-base;
 }
 
 .form {

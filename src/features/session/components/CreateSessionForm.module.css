@@ -1,11 +1,11 @@
 @reference "../../../app/globals.css";
 
 .page {
-  @apply relative z-[2] flex min-h-0 flex-1 flex-col items-center justify-center px-10;
+  @apply relative z-[2] flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-6 sm:px-10;
 }
 
 .card {
-  @apply mb-8 flex w-full max-w-md flex-col gap-5 rounded-2xl border border-white/[0.08] bg-sw-surface px-8 py-7;
+  @apply mb-6 flex w-full max-w-md flex-col gap-4 rounded-2xl border border-white/[0.08] bg-sw-surface px-6 py-5 sm:px-8 sm:py-7;
 }
 
 .field {
@@ -37,7 +37,7 @@
 }
 
 .code {
-  @apply font-display text-3xl font-extrabold tracking-[0.12em] text-sw-text;
+  @apply font-display text-[clamp(1.5rem,3vw,1.875rem)] font-extrabold tracking-[0.12em] text-sw-text;
 }
 
 .codeHint {

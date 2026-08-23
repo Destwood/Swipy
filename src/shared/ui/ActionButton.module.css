@@ -1,11 +1,15 @@
 @reference "../../app/globals.css";
 
 .muted {
-  @apply h-[88px] w-[88px] shrink-0 rounded-full border-[1.5px] border-white/[0.06] bg-white/[0.03];
+  @apply shrink-0 rounded-full border-[1.5px] border-white/[0.06] bg-white/[0.03];
+  width: var(--sw-action);
+  height: var(--sw-action);
 }
 
 .root {
-  @apply flex h-[88px] w-[88px] shrink-0 cursor-pointer items-center justify-center rounded-full border-[1.5px] transition-all duration-[180ms] ease-out;
+  @apply flex shrink-0 cursor-pointer items-center justify-center rounded-full border-[1.5px] transition-all duration-[180ms] ease-out;
+  width: var(--sw-action);
+  height: var(--sw-action);
 }
 
 .like {
@@ -18,4 +22,6 @@
 
 .icon {
   @apply block;
+  width: 34%;
+  height: 34%;
 }

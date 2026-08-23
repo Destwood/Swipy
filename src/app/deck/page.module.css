@@ -14,15 +14,18 @@
 }
 
 .stage {
-  @apply relative flex min-h-0 flex-1 items-center justify-center;
+  @apply relative flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-4 py-2;
 }
 
 .cardRow {
-  @apply flex items-center justify-center gap-16;
+  @apply flex items-center justify-center;
+  gap: clamp(0.75rem, 2.5vw, 2.5rem);
 }
 
 .cardStack {
-  @apply relative flex h-[626px] w-[460px] items-center justify-center;
+  @apply relative flex items-center justify-center;
+  width: var(--sw-card-w);
+  height: var(--sw-card-h);
 }
 
 .emptyHint {
@@ -34,7 +37,13 @@
 }
 
 .hints {
-  @apply pointer-events-none absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-6 whitespace-nowrap font-mono text-[11px] tracking-[0.03em] text-white/20;
+  @apply pointer-events-none flex items-center gap-6 whitespace-nowrap font-mono text-[11px] tracking-[0.03em] text-white/20;
+}
+
+@media (max-height: 760px) {
+  .hints {
+    display: none;
+  }
 }
 
 .hintDivider {

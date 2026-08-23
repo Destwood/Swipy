@@ -1,15 +1,17 @@
 @reference "../../../app/globals.css";
 
 .page {
-  @apply mx-auto max-w-[1200px] px-6 pt-10 pb-20 sm:px-10;
+  @apply mx-auto max-w-[1200px] pb-16;
+  padding-inline: var(--sw-page-pad-x);
+  padding-top: var(--sw-page-pad-y);
 }
 
 .backLink {
-  @apply mb-6 inline-block font-mono text-[11px] tracking-[0.04em] text-white/35 uppercase transition-colors hover:text-sw-text;
+  @apply mb-4 inline-block font-mono text-[11px] tracking-[0.04em] text-white/35 uppercase transition-colors hover:text-sw-text;
 }
 
 .header {
-  @apply mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-white/[0.06] pb-6;
+  @apply mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-white/[0.06] pb-5;
 }
 
 .headerText {
@@ -17,7 +19,8 @@
 }
 
 .title {
-  @apply m-0 mb-1.5 font-display text-[36px] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+  @apply m-0 mb-1.5 font-display leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+  font-size: var(--sw-title);
 }
 
 .meta {
@@ -49,7 +52,7 @@
 }
 
 .grid {
-  @apply m-0 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6;
+  @apply m-0 grid list-none grid-cols-3 gap-2 p-0 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8;
 }
 
 .tile {

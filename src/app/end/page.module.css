@@ -22,7 +22,7 @@
 }
 
 .badge {
-  @apply mb-8 flex items-center gap-2 rounded-full border border-[rgba(45,212,191,0.22)] bg-[rgba(45,212,191,0.1)] px-4 py-1.5;
+  @apply mb-5 flex items-center gap-2 rounded-full border border-[rgba(45,212,191,0.22)] bg-[rgba(45,212,191,0.1)] px-4 py-1.5 sm:mb-8;
 }
 
 .badgeIcon {
@@ -34,11 +34,11 @@
 }
 
 .title {
-  @apply mb-4 font-display text-[clamp(48px,5.5vw,76px)] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+  @apply mb-3 font-display text-[clamp(36px,4.5vw,56px)] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
 }
 
 .subtitle {
-  @apply mb-11 font-body text-lg font-normal tracking-[-0.01em] text-sw-text/50;
+  @apply mb-8 font-body text-base font-normal tracking-[-0.01em] text-sw-text/50 sm:mb-11 sm:text-lg;
 }
 
 .actions {

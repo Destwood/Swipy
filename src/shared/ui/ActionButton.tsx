@@ -23,9 +23,9 @@ export function ActionButton({ type, muted = false, onClick }: Props) {
       className={`${styles.root} ${isLike ? styles.like : styles.dislike}`}
     >
       {isLike ? (
-        <HeartIcon width={28} height={28} className={styles.icon} aria-hidden />
+        <HeartIcon className={styles.icon} aria-hidden />
       ) : (
-        <CloseIcon width={24} height={24} className={styles.icon} aria-hidden />
+        <CloseIcon className={styles.icon} aria-hidden />
       )}
     </button>
   );

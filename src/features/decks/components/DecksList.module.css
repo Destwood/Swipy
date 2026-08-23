@@ -1,7 +1,9 @@
 @reference "../../../app/globals.css";
 
 .page {
-  @apply mx-auto max-w-[1200px] px-6 pt-10 pb-20 sm:px-10;
+  @apply mx-auto max-w-[1200px] pb-16;
+  padding-inline: var(--sw-page-pad-x);
+  padding-top: var(--sw-page-pad-y);
 }
 
 .header {
@@ -9,7 +11,8 @@
 }
 
 .title {
-  @apply mb-1.5 font-display text-[36px] leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+  @apply mb-1.5 font-display leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+  font-size: var(--sw-title);
 }
 
 .subtitle {
@@ -25,7 +28,7 @@
 }
 
 .toolbar {
-  @apply my-7 flex flex-wrap items-center justify-between gap-4;
+  @apply my-5 flex flex-wrap items-center justify-between gap-4;
 }
 
 .tabs {

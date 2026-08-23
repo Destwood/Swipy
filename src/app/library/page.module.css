@@ -9,7 +9,9 @@
 }
 
 .inner {
-  @apply mx-auto max-w-[1200px] px-6 pt-8 pb-20 sm:px-10;
+  @apply mx-auto max-w-[1200px] pb-16;
+  padding-inline: var(--sw-page-pad-x);
+  padding-top: var(--sw-page-pad-y);
 }
 
 .toolbar {
@@ -25,7 +27,7 @@
 }
 
 .grid {
-  @apply m-0 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6;
+  @apply m-0 grid list-none grid-cols-3 gap-2 p-0 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8;
 }
 
 .tile {
@@ -53,7 +55,7 @@
 }
 
 .gameTitle {
-  @apply m-0 mb-1 min-h-[2.6em] font-display text-[13px] leading-snug font-bold tracking-[-0.02em] text-sw-text;
+  @apply m-0 mb-1 min-h-[2.4em] font-display text-[12px] leading-snug font-bold tracking-[-0.02em] text-sw-text;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;

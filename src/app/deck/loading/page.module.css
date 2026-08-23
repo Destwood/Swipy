@@ -5,11 +5,14 @@
 }
 
 .stage {
-  @apply flex min-h-0 flex-1 items-center justify-center gap-16;
+  @apply flex min-h-0 flex-1 items-center justify-center;
+  gap: clamp(0.75rem, 2.5vw, 2.5rem);
 }
 
 .skeletonCard {
-  @apply relative h-[626px] w-[460px] overflow-hidden rounded-2xl border border-white/[0.06] bg-sw-surface;
+  @apply relative overflow-hidden rounded-2xl border border-white/[0.06] bg-sw-surface;
+  width: var(--sw-card-w);
+  height: var(--sw-card-h);
 }
 
 .shimmer {

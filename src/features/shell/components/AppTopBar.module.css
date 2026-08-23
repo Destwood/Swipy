@@ -1,7 +1,8 @@
 @reference "../../../app/globals.css";
 
 .root {
-  @apply relative z-10 flex h-[60px] shrink-0 items-center justify-between border-b border-white/[0.06] bg-[rgba(12,14,18,0.8)] px-6 backdrop-blur-[12px] sm:px-10;
+  @apply relative z-10 flex shrink-0 items-center justify-between border-b border-white/[0.06] bg-[rgba(12,14,18,0.8)] px-4 backdrop-blur-[12px] sm:px-8;
+  height: var(--sw-topbar-h);
 }
 
 .left {
