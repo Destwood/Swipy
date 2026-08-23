@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { igdbQuery } from "@/features/games/lib/igdb/client";
+import {
+  buildIgdbCatalogQuery,
+  parseCatalogFilters,
+  parseCatalogSort,
+} from "@/features/games/lib/igdb/catalog-query";
 import { mapIgdbGame, type IgdbGame } from "@/features/games/lib/igdb/map-game";
 
 export async function GET(request: Request) {
@@ -11,17 +16,9 @@ export async function GET(request: Request) {
       50,
       Math.max(1, Number(searchParams.get("page_size") ?? "24") || 24),
     );
-    const offset = (page - 1) * pageSize;
-
-    const fields =
-      "fields name, summary, first_release_date, aggregated_rating, total_rating_count, cover.image_id, genres.name, game_modes.name, platforms.name, platforms.abbreviation, multiplayer_modes.campaigncoop, multiplayer_modes.offlinecoop, multiplayer_modes.onlinecoop, multiplayer_modes.lancoop, multiplayer_modes.splitscreen, multiplayer_modes.offlinecoopmax, multiplayer_modes.onlinecoopmax, multiplayer_modes.onlinemax, multiplayer_modes.offlinemax, keywords.name, external_games.uid, external_games.external_game_source, screenshots.image_id, videos.video_id, involved_companies.developer, involved_companies.company.name;";
-    const limit = `limit ${pageSize}; offset ${offset};`;
-
-    // Default catalog: by popularity (rating volume). Search uses IGDB relevance.
-    const body = q
-      ? `search "${q.replace(/"/g, "")}"; ${fields} where game_type = 0 & cover != null; ${limit}`
-      : `${fields} where cover != null & game_type = 0 & total_rating_count >= 500; sort total_rating_count desc; ${limit}`;
-
+    const filters = parseCatalogFilters(searchParams);
+    const sort = parseCatalogSort(searchParams.get("sort"));
+    const body = buildIgdbCatalogQuery({ q, page, pageSize, filters, sort });
     const results = await igdbQuery<IgdbGame[]>(body);
 
     return NextResponse.json({

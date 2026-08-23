@@ -1,0 +1,125 @@
+@reference "../../../app/globals.css";
+
+.anchor {
+  @apply block h-full rounded-xl;
+}
+
+.anchor:hover,
+.hot {
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 191, 0.3),
+    0 10px 36px rgba(45, 212, 191, 0.24);
+}
+
+.anchor:hover > *,
+.hot > * {
+  border-color: rgba(45, 212, 191, 0.45);
+  background-color: #222833;
+}
+
+.anchor:hover img,
+.hot img {
+  filter: brightness(1.1);
+}
+
+.card {
+  @apply pointer-events-auto fixed z-[60] w-[min(272px,calc(100vw-24px))] overflow-visible rounded-[10px] border border-white/12 bg-sw-surface shadow-[0_14px_36px_rgba(0,0,0,0.55)];
+  animation: sw-preview-in 160ms ease both;
+}
+
+.arrow {
+  @apply pointer-events-none absolute z-[2] h-0 w-0;
+  transform: translateY(-50%);
+}
+
+.arrowStart {
+  left: -8px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #13161c;
+  filter: drop-shadow(-1px 0 0 rgba(255, 255, 255, 0.12));
+}
+
+.arrowEnd {
+  right: -8px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #13161c;
+  filter: drop-shadow(1px 0 0 rgba(255, 255, 255, 0.12));
+}
+
+.media {
+  @apply relative aspect-video w-full overflow-hidden rounded-t-[10px] bg-sw-surface2;
+}
+
+.image {
+  @apply object-cover;
+}
+
+.nav {
+  @apply absolute top-1/2 z-[1] flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/50 text-white/90 backdrop-blur-[4px] transition-colors hover:bg-black/75 hover:text-white;
+}
+
+.prev {
+  @apply left-1.5;
+}
+
+.next {
+  @apply right-1.5;
+}
+
+.navIcon {
+  @apply h-3 w-3;
+}
+
+.counter {
+  @apply absolute right-1.5 bottom-1.5 z-[1] rounded-md bg-black/55 px-1.5 py-0.5 font-mono text-[10px] text-white/80 backdrop-blur-[4px];
+}
+
+.body {
+  @apply px-3 py-2.5;
+}
+
+.title {
+  @apply m-0 mb-0.5 font-display text-[13px] leading-snug font-bold tracking-[-0.02em] text-sw-text;
+}
+
+.meta {
+  @apply m-0 mb-1.5 font-mono text-[10px] text-white/40;
+}
+
+.description {
+  @apply m-0 font-body text-[11px] leading-relaxed text-sw-text/70;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+
+@keyframes sw-preview-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+  }
+
+  .anchor:hover img,
+  .hot img {
+    filter: none;
+  }
+}
+
+@media (hover: none) {
+  .card {
+    @apply hidden;
+  }
+}

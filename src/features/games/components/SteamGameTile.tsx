@@ -33,7 +33,6 @@ export function SteamGameTile({
       amount={amount}
       className={className}
       href={steamStoreAppUrl(game.steamAppId)}
-      title={`Open ${game.title} in Steam`}
       aria-label={`Open ${game.title} in Steam`}
     >
       {children}
