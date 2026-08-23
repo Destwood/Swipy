@@ -22,6 +22,27 @@ export const EMPTY_CATALOG_FILTERS: CatalogFilterState = {
 
 export type ChipStat = { label: string; count: number };
 
+function unlabeled(labels: string[]): ChipStat[] {
+  return labels.map((label) => ({ label, count: 0 }));
+}
+
+/** Fixed chip labels for the catalog UI before live counts exist. */
+export const CATALOG_FILTER_SHELL = {
+  genres: unlabeled([
+    "Action",
+    "Adventure",
+    "RPG",
+    "Shooter",
+    "Strategy",
+    "Simulator",
+    "Indie",
+    "Puzzle",
+  ]),
+  modes: unlabeled(["Single", "Multiplayer", "Co-op"]),
+  players: unlabeled(["2", "3–4", "5+"]),
+  platforms: unlabeled(["PC", "PlayStation", "Xbox", "Nintendo"]),
+};
+
 export function playersBucket(max?: number): string | null {
   if (!max || max < 2) return null;
   if (max === 2) return "2";

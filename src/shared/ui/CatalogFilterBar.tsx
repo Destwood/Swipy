@@ -22,8 +22,8 @@ type Props = {
   modes: ChipStat[];
   players: ChipStat[];
   platforms: ChipStat[];
-  crossplayCount: number;
-  totalCount: number;
+  crossplayCount?: number;
+  totalCount?: number;
   sort: SortValue;
   onSortChange: (value: SortValue) => void;
   visibleCount?: number;
@@ -65,8 +65,8 @@ export function CatalogFilterBar({
   modes,
   players,
   platforms,
-  crossplayCount,
-  totalCount,
+  crossplayCount = 0,
+  totalCount = 0,
   sort,
   onSortChange,
   visibleCount = DEFAULT_VISIBLE,
