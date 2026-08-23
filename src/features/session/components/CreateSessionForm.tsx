@@ -14,7 +14,8 @@ export function CreateSessionForm() {
   const router = useRouter();
   const [decks, setDecks] = useState<Deck[]>([]);
   const [deckId, setDeckId] = useState("");
-  const { displayName, setDisplayName } = useSessionDisplayName("Host");
+  const { displayName, setDisplayName, ready, askForName } =
+    useSessionDisplayName("Host");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionCode, setSessionCode] = useState("SWPY-····");
@@ -52,6 +53,7 @@ export function CreateSessionForm() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
+        {askForName ? (
         <label className={styles.field}>
           <span className={styles.fieldLabel}>Your name</span>
           <input
@@ -61,6 +63,7 @@ export function CreateSessionForm() {
             autoComplete="nickname"
           />
         </label>
+        ) : null}
 
         <label className={styles.field}>
           <span className={styles.fieldLabel}>Deck</span>
@@ -100,7 +103,7 @@ export function CreateSessionForm() {
         <button
           type="button"
           onClick={() => void openLobby()}
-          disabled={!deckId || busy}
+          disabled={!deckId || busy || !ready}
           className={styles.primaryButton}
         >
           {busy ? "Creating…" : "Open lobby"}

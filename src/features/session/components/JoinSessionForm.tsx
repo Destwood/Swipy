@@ -11,7 +11,8 @@ import styles from "./JoinSessionForm.module.css";
 export function JoinSessionForm() {
   const router = useRouter();
   const [code, setCode] = useState("SWPY-");
-  const { displayName, setDisplayName } = useSessionDisplayName("Guest");
+  const { displayName, setDisplayName, ready, askForName } =
+    useSessionDisplayName("Guest");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,6 +39,7 @@ export function JoinSessionForm() {
       </p>
 
       <div className={styles.form}>
+        {askForName ? (
         <label className={styles.field}>
           <span className={styles.fieldLabel}>Your name</span>
           <input
@@ -47,6 +49,7 @@ export function JoinSessionForm() {
             autoComplete="nickname"
           />
         </label>
+        ) : null}
 
         <label className={styles.field}>
           <span className={styles.fieldLabel}>Code</span>
@@ -65,7 +68,7 @@ export function JoinSessionForm() {
         <button
           type="button"
           onClick={() => void joinLobby()}
-          disabled={busy || code.trim().length < 6}
+          disabled={busy || !ready || code.trim().length < 6}
           className={styles.primaryButton}
         >
           {busy ? "Joining…" : "Join lobby"}

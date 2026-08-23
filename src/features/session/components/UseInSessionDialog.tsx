@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { setActiveDeckId } from "@/features/decks/lib/deck-store";
-import { saveDisplayName } from "@/features/session/lib/display-names";
-import { useSessionDisplayName } from "@/features/session/lib/use-session-display-name";
+import { displayNameFromCurrentUser } from "@/features/session/lib/display-names";
 import {
   createGuestSession,
   startSessionSwiping,
@@ -23,8 +22,6 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
   const router = useRouter();
   const titleId = useId();
   const descId = useId();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { displayName, setDisplayName } = useSessionDisplayName();
   const [busyMode, setBusyMode] = useState<"solo" | "together" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const busy = busyMode !== null;
@@ -33,14 +30,12 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const t = window.setTimeout(() => inputRef.current?.focus(), 40);
 
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape" && !busy) onClose();
     }
     window.addEventListener("keydown", onKey);
     return () => {
-      window.clearTimeout(t);
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
@@ -56,15 +51,9 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
   function startTogether() {
     if (!deckId || busy) return;
     setBusyMode("together");
-    setError(null);
     setActiveDeckId(deckId);
-    saveDisplayName(displayName.trim() || pickFallbackName());
     onClose();
     router.push("/session");
-  }
-
-  function pickFallbackName() {
-    return displayName.trim() || "Host";
   }
 
   async function startSolo() {
@@ -73,9 +62,10 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
     setError(null);
     try {
       setActiveDeckId(deckId);
+      const displayName = (await displayNameFromCurrentUser()) ?? "You";
       const session = await createGuestSession({
         deckId,
-        displayName: pickFallbackName(),
+        displayName,
       });
       await startSessionSwiping(session.sessionId);
       onClose();
@@ -90,7 +80,7 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
 
   return createPortal(
     <div
-      className={styles.backdrop}
+      className={styles.overlay}
       role="presentation"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget && !busy) onClose();
@@ -101,7 +91,7 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
-        className={styles.panel}
+        className={styles.dialog}
       >
         <h2 id={titleId} className={styles.title}>
           Use in session
@@ -111,18 +101,6 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
             ? `Play “${deckName}” alone, or open a lobby for friends.`
             : "Play alone, or open a lobby for friends."}
         </p>
-
-        <label className={styles.field}>
-          <span className={styles.fieldLabel}>Your name for this session</span>
-          <input
-            ref={inputRef}
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            disabled={busy}
-            className={styles.input}
-            autoComplete="nickname"
-          />
-        </label>
 
         {error ? <p className={styles.error}>{error}</p> : null}
 

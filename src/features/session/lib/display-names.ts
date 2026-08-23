@@ -62,18 +62,23 @@ export function saveDisplayName(name: string) {
   }
 }
 
-/** Last session nick → account name → random funny nick. */
-export async function resolveSessionDisplayName(): Promise<string> {
-  const saved = readSavedDisplayName();
-  if (saved) return saved;
-
+export async function displayNameFromCurrentUser(): Promise<string | null> {
   try {
     const supabase = createBrowserSupabaseClient();
     const { data } = await supabase.auth.getUser();
-    const fromAccount = displayNameFromUser(data.user);
-    if (fromAccount) return fromAccount;
+    return displayNameFromUser(data.user);
   } catch {
-    /* guest */
+    return null;
   }
+}
+
+/** Account name if signed in, else last guest nick, else a random nick. */
+export async function resolveSessionDisplayName(): Promise<string> {
+  const fromAccount = await displayNameFromCurrentUser();
+  if (fromAccount) return fromAccount;
+
+  const saved = readSavedDisplayName();
+  if (saved) return saved;
+
   return pickRandomNickname();
 }

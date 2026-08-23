@@ -1,11 +1,11 @@
 @reference "../../../app/globals.css";
 
-.backdrop {
+.overlay {
   @apply fixed inset-0 z-[100] flex items-center justify-center bg-black/65 px-5 backdrop-blur-[6px];
   animation: sw-dialog-fade 180ms ease both;
 }
 
-.panel {
+.dialog {
   @apply w-full max-w-[400px] rounded-2xl border border-white/10 bg-sw-surface p-6 shadow-[0_24px_64px_rgba(0,0,0,0.55)];
   animation: sw-dialog-up 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -16,18 +16,6 @@
 
 .description {
   @apply m-0 mb-5 font-body text-sm leading-relaxed text-sw-muted;
-}
-
-.field {
-  @apply mb-5 flex flex-col gap-2;
-}
-
-.fieldLabel {
-  @apply font-mono text-[11px] tracking-[0.06em] text-white/30 uppercase;
-}
-
-.input {
-  @apply rounded-xl border border-white/10 bg-sw-bg px-4 py-3 font-body text-sw-text outline-none focus:border-sw-accent/40;
 }
 
 .error {
@@ -75,8 +63,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .backdrop,
-  .panel {
+  .overlay,
+  .dialog {
     animation: none;
   }
 }
