@@ -10,9 +10,21 @@ const nextConfig: NextConfig = {
     },
   },
   webpack(config) {
-    config.module.rules.push({
+    const excludeSvg = (rule: unknown) => {
+      if (!rule || typeof rule !== "object") return;
+      const nextRule = rule as {
+        test?: unknown;
+        exclude?: unknown;
+        oneOf?: unknown[];
+      };
+      if (nextRule.test instanceof RegExp && nextRule.test.test(".svg")) {
+        nextRule.exclude = /\.svg$/i;
+      }
+      nextRule.oneOf?.forEach(excludeSvg);
+    };
+    config.module?.rules?.forEach(excludeSvg);
+    config.module?.rules?.push({
       test: /\.svg$/i,
-      issuer: /\.[jt]sx?$/,
       use: ["@svgr/webpack"],
     });
     return config;
