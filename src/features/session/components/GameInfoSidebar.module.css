@@ -1,0 +1,88 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply hidden h-full min-h-0 w-[min(300px,28vw)] shrink-0 flex-col overflow-hidden border-l border-white/[0.06] bg-sw-surface/80 px-4 py-5 backdrop-blur-[12px] lg:flex;
+}
+
+.titleRow {
+  @apply mb-1 flex shrink-0 items-start gap-2 overflow-visible;
+}
+
+.title {
+  @apply m-0 min-w-0 flex-1 font-display text-[22px] leading-tight font-extrabold tracking-[-0.03em] text-sw-text;
+}
+
+.favorite {
+  @apply mt-0.5 flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center overflow-visible rounded-md border border-white/22 bg-white/[0.04] p-0 text-white/55 transition-colors hover:border-white/45 hover:bg-white/[0.08] hover:text-sw-text;
+}
+
+.favoriteOn {
+  @apply border-[#f5c451]/55 bg-[#f5c451]/14 text-[#f5c451] hover:border-[#f5c451]/80 hover:bg-[#f5c451]/22 hover:text-[#f5c451];
+}
+
+.favoriteIcon {
+  @apply block h-3.5 w-3.5 shrink-0 overflow-visible;
+}
+
+.scroll {
+  @apply min-h-0 flex-1 overflow-x-hidden overflow-y-auto;
+}
+
+.byline {
+  @apply m-0 mb-3 font-mono text-[11px] text-white/40;
+}
+
+.tags {
+  @apply m-0 mb-3 flex list-none flex-wrap gap-1.5 p-0;
+}
+
+.tag {
+  @apply rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 font-body text-[11px] text-sw-text/70;
+}
+
+.shots {
+  @apply mb-4 grid grid-cols-2 gap-1.5;
+}
+
+.shot {
+  @apply relative aspect-video cursor-pointer overflow-hidden rounded-md border border-white/[0.06] bg-black p-0;
+}
+
+.shot:hover .shotImage {
+  @apply opacity-90;
+}
+
+.shotImage {
+  @apply object-cover;
+}
+
+.about {
+  @apply m-0 mb-2 font-body text-[13px] leading-relaxed text-sw-text/55;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  overflow: hidden;
+}
+
+.steam {
+  @apply mt-3 inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-[3px] px-3 py-2.5 font-body text-[13px] font-semibold text-white no-underline;
+  background: linear-gradient(180deg, #1a232e 0%, #12161c 52%, #0c1015 100%);
+  border: 1px solid #07090c;
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.62),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.steam:hover {
+  color: #fff;
+  background: linear-gradient(180deg, #243447 0%, #1a232e 100%);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.steamIcon {
+  @apply h-[18px] w-[18px] shrink-0;
+}

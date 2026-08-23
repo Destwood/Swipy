@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ActionButton } from "@/shared/ui/ActionButton";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
-import { GameCard } from "@/features/games/components/GameCard";
 import { SwipyLogo } from "@/features/shell/components/SwipyLogo";
 import type { Game } from "@/features/games/data/games";
 import { getDeckById, setActiveDeckId } from "@/features/decks/lib/deck-store";
@@ -21,6 +19,7 @@ import {
   fetchSession,
   markMemberDone,
 } from "@/features/session/lib/sessions";
+import { DeckSwipeStage } from "@/features/session/components/DeckSwipeStage";
 import styles from "./SessionDeckClient.module.css";
 
 export function SessionDeckClient() {
@@ -32,6 +31,7 @@ export function SessionDeckClient() {
   const [members, setMembers] = useState<SessionMember[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [voting, setVoting] = useState(false);
+  const [swipeKey, setSwipeKey] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -86,6 +86,7 @@ export function SessionDeckClient() {
       setIndex((currentIndex) => currentIndex + 1);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Vote failed");
+      setSwipeKey((key) => key + 1);
     } finally {
       setVoting(false);
     }
@@ -93,12 +94,17 @@ export function SessionDeckClient() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
+      if (document.body.dataset.galleryOpen) return;
       if (e.key === "ArrowRight" || e.key === "l") void vote("like");
       if (e.key === "ArrowLeft" || e.key === "a") void vote("dislike");
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
+
+  const current = games[index];
+  const next = games[index + 1];
+  const remaining = games.length - index;
 
   if (!ready) {
     return <div className={styles.loading}>Loading deck…</div>;
@@ -115,7 +121,7 @@ export function SessionDeckClient() {
     );
   }
 
-  if (games.length === 0) {
+  if (games.length === 0 || !current) {
     return (
       <div className={styles.emptyPage}>
         <p className={styles.emptyText}>No games in this deck.</p>
@@ -125,10 +131,6 @@ export function SessionDeckClient() {
       </div>
     );
   }
-
-  const current = games[index];
-  const next = games[index + 1];
-  const remaining = games.length - index;
 
   return (
     <div className={styles.root}>
@@ -164,31 +166,14 @@ export function SessionDeckClient() {
 
       {error && <p className={styles.voteError}>{error}</p>}
 
-      <div className={styles.deckArea}>
-        <div className={styles.deckRow}>
-          <ActionButton
-            type="dislike"
-            onClick={() => void vote("dislike")}
-          />
-
-          <div className={styles.cardStack}>
-            {next && (
-              <div className={styles.nextCard}>
-                <GameCard game={next} dimmed />
-              </div>
-            )}
-            <GameCard key={current.id} game={current} />
-          </div>
-
-          <ActionButton type="like" onClick={() => void vote("like")} />
-        </div>
-
-        <div className={styles.hints}>
-          <span>← Skip</span>
-          <span className={styles.hintDivider}>·</span>
-          <span>Want to play →</span>
-        </div>
-      </div>
+      <DeckSwipeStage
+        current={current}
+        next={next}
+        enabled={!voting}
+        swipeKey={swipeKey}
+        onLike={() => void vote("like")}
+        onSkip={() => void vote("dislike")}
+      />
     </div>
   );
 }

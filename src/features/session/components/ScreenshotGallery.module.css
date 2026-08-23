@@ -1,0 +1,41 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply fixed inset-0 z-[80] flex items-center justify-center bg-black/82 p-4;
+}
+
+.close {
+  @apply absolute top-4 right-4 flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-white/15 bg-black/40 text-white/80 hover:bg-black/70 hover:text-white;
+}
+
+.closeIcon {
+  @apply h-4 w-4;
+}
+
+.nav {
+  @apply absolute top-1/2 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/85 hover:bg-black/70 hover:text-white;
+}
+
+.prev {
+  @apply left-4;
+}
+
+.next {
+  @apply right-4;
+}
+
+.navIcon {
+  @apply h-5 w-5;
+}
+
+.frame {
+  @apply relative max-h-[86dvh] max-w-[min(1100px,92vw)];
+}
+
+.image {
+  @apply h-auto max-h-[86dvh] w-auto max-w-full rounded-lg object-contain;
+}
+
+.counter {
+  @apply mt-3 m-0 text-center font-mono text-[12px] text-white/45;
+}
