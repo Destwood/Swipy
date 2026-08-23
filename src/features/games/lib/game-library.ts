@@ -2,7 +2,7 @@ import { SEED_IGDB_IDS } from "@/features/decks/data/decks";
 import { type Game } from "@/features/games/data/games";
 
 const LIBRARY_KEY = "swipy.gamesLibrary";
-const SEED_HYDRATE_KEY = "swipy.seedIgdb.v3";
+const SEED_HYDRATE_KEY = "swipy.seedIgdb.v7";
 
 function readLibrary(): Record<string, Game> {
   if (typeof window === "undefined") return {};

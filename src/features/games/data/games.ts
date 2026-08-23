@@ -9,6 +9,8 @@ export interface Game {
   metacritic?: number;
   /** IGDB total_rating_count — popularity proxy */
   ratingCount?: number;
+  /** ISO date (YYYY-MM-DD) from IGDB first_release_date */
+  releaseDate?: string;
   /** Steam store app id from IGDB external_games */
   steamAppId?: string;
   /** Normalized play modes: Single, Multiplayer, Co-op */
@@ -19,6 +21,10 @@ export interface Game {
   coopMaxPlayers?: number;
   /** Cross-play support (keywords / heuristic) */
   crossplay?: boolean;
+  /** IGDB screenshot URLs (fallback when Steam media is missing). */
+  screenshots?: string[];
+  /** First IGDB YouTube video id, if any. */
+  youtubeId?: string;
 }
 
 /** @deprecated Hardcoded catalog removed — games come from IGDB into local library. */

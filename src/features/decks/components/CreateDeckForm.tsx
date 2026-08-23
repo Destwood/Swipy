@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import CheckIcon from "@/assets/icons/check.svg";
 import type { Game } from "@/features/games/data/games";
+import { gameCoverSrc } from "@/features/games/lib/igdb/image";
 import {
   ensureSeedLibrary,
   getLibraryGamesByIds,
@@ -290,11 +291,11 @@ export function CreateDeckForm({ deckId }: Props) {
                   >
                     <div className={styles.coverWrap}>
                       <Image
-                        src={game.image}
+                        src={gameCoverSrc(game.image, "tile")}
                         alt=""
                         fill
                         className={styles.cover}
-                        sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 160px"
+                        sizes="(max-width: 640px) 33vw, (max-width: 1024px) 16vw, 12vw"
                         unoptimized={
                           game.image.includes("igdb") || game.image.includes("rawg")
                         }

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Game } from "@/features/games/data/games";
+import { gameCoverSrc } from "@/features/games/lib/igdb/image";
 import { GenreTag } from "./GenreTag";
 import styles from "./GameCard.module.css";
 
@@ -12,11 +13,12 @@ export function GameCard({ game, dimmed = false }: Props) {
   return (
     <div className={`${styles.root} ${dimmed ? styles.dimmed : ""}`}>
       <Image
-        src={game.image}
+        src={gameCoverSrc(game.image, "hero")}
         alt={`${game.title} cover`}
         fill
         className={styles.cover}
-        sizes="460px"
+        sizes="(max-height: 900px) 70vh, 420px"
+        quality={90}
         priority={!dimmed}
         draggable={false}
       />

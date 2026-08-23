@@ -16,6 +16,7 @@ import { FadeIn } from "@/shared/ui/FadeIn";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
 import { UseInSessionDialog } from "@/features/session/components/UseInSessionDialog";
 import { SteamGameTile } from "@/features/games/components/SteamGameTile";
+import { gameCoverSrc } from "@/features/games/lib/igdb/image";
 import { normalizeGenreLabel } from "@/features/games/lib/genre-label";
 import styles from "./DeckDetail.module.css";
 
@@ -153,11 +154,11 @@ export function DeckDetail({ deckId }: Props) {
               <SteamGameTile game={game} className={styles.tile}>
                 <div className={styles.coverWrap}>
                   <Image
-                    src={game.image}
+                    src={gameCoverSrc(game.image, "tile")}
                     alt=""
                     fill
                     className={styles.coverImage}
-                    sizes="(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 180px"
+                    sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 16vw, 12vw"
                     unoptimized={
                       game.image.includes("igdb") || game.image.includes("rawg")
                     }

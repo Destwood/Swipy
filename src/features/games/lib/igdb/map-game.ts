@@ -1,4 +1,7 @@
 import type { Game } from "@/features/games/data/games";
+import { igdbCoverUrl } from "./image";
+
+export { igdbCoverUrl } from "./image";
 
 /** IGDB external_game_source: 1 = Steam */
 const STEAM_SOURCE = 1;
@@ -35,11 +38,13 @@ export type IgdbGame = {
   multiplayer_modes?: IgdbMultiplayerMode[];
   keywords?: { name?: string }[];
   external_games?: IgdbExternalGame[];
+  screenshots?: { image_id?: string }[];
+  videos?: { video_id?: string }[];
+  involved_companies?: {
+    developer?: boolean;
+    company?: { name?: string };
+  }[];
 };
-
-export function igdbCoverUrl(imageId: string, size: "cover_big" | "cover_small" = "cover_big") {
-  return `https://images.igdb.com/igdb/image/upload/t_${size}/${imageId}.jpg`;
-}
 
 export function extractSteamAppId(externalGames?: IgdbExternalGame[]): string | undefined {
   if (!externalGames?.length) return undefined;
@@ -149,25 +154,42 @@ function deriveCrossplay(game: IgdbGame): boolean {
   return hasOnline && platforms.includes("PC") && hasConsole;
 }
 
+function deriveDeveloper(game: IgdbGame): string {
+  const dev = game.involved_companies?.find(
+    (c) => c.developer && c.company?.name,
+  );
+  return dev?.company?.name ?? "Unknown";
+}
+
 export function mapIgdbGame(game: IgdbGame): Game {
-  const year = game.first_release_date
-    ? new Date(game.first_release_date * 1000).getUTCFullYear()
-    : 0;
+  const released = game.first_release_date
+    ? new Date(game.first_release_date * 1000)
+    : null;
+  const year = released ? released.getUTCFullYear() : 0;
+  const releaseDate = released
+    ? released.toISOString().slice(0, 10)
+    : undefined;
   const image = game.cover?.image_id
-    ? igdbCoverUrl(game.cover.image_id)
+    ? igdbCoverUrl(game.cover.image_id, "cover_big_2x")
     : "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&h=820&fit=crop&auto=format";
+
+  const screenshots = (game.screenshots ?? [])
+    .map((s) => (s.image_id ? igdbCoverUrl(s.image_id, "720p") : null))
+    .filter((url): url is string => Boolean(url))
+    .slice(0, 6);
 
   return {
     id: `igdb-${game.id}`,
     title: game.name,
-    developer: "IGDB",
+    developer: deriveDeveloper(game),
     year,
+    releaseDate,
     genres: (game.genres ?? [])
       .map((g) => g.name)
       .filter((n): n is string => Boolean(n))
-      .slice(0, 3),
+      .slice(0, 5),
     description:
-      game.summary?.slice(0, 280) ||
+      game.summary?.slice(0, 600) ||
       (year ? `${game.name} (${year}) from IGDB.` : `${game.name} from IGDB.`),
     image,
     metacritic: game.aggregated_rating
@@ -179,5 +201,7 @@ export function mapIgdbGame(game: IgdbGame): Game {
     platforms: derivePlatforms(game),
     coopMaxPlayers: deriveCoopMax(game),
     crossplay: deriveCrossplay(game),
+    screenshots,
+    youtubeId: game.videos?.find((v) => v.video_id)?.video_id,
   };
 }

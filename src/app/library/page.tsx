@@ -14,6 +14,7 @@ import {
 import { normalizeGenreLabel } from "@/features/games/lib/genre-label";
 import { sortGames, type SortValue } from "@/features/games/lib/sort-games";
 import { SteamGameTile } from "@/features/games/components/SteamGameTile";
+import { gameCoverSrc } from "@/features/games/lib/igdb/image";
 import { CatalogFilterBar } from "@/shared/ui/CatalogFilterBar";
 import { FadeIn } from "@/shared/ui/FadeIn";
 import styles from "./page.module.css";
@@ -109,11 +110,11 @@ export default function LibraryPage() {
                   <SteamGameTile game={game} className={styles.tile}>
                     <div className={styles.coverWrap}>
                       <Image
-                        src={game.image}
+                        src={gameCoverSrc(game.image, "tile")}
                         alt=""
                         fill
                         className={styles.coverImage}
-                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 22vw, 180px"
+                        sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 16vw, 12vw"
                         unoptimized={
                           game.image.includes("igdb") || game.image.includes("rawg")
                         }
