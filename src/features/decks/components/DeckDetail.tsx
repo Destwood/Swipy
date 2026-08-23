@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Deck } from "@/features/decks/data/decks";
-import { deleteDeck, getDeckById } from "@/features/decks/lib/deck-store";
+import { deleteDeck, getDeckById, isUserDeck } from "@/features/decks/lib/deck-store";
 import type { Game } from "@/features/games/data/games";
 import {
   ensureSeedLibrary,
@@ -13,6 +13,7 @@ import {
   hydrateSeedGamesFromIgdb,
 } from "@/features/games/lib/game-library";
 import { FadeIn } from "@/shared/ui/FadeIn";
+import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
 import { UseInSessionDialog } from "@/features/session/components/UseInSessionDialog";
 import { SteamGameTile } from "@/features/games/components/SteamGameTile";
@@ -37,7 +38,8 @@ export function DeckDetail({ deckId }: Props) {
       await hydrateSeedGamesFromIgdb();
       if (cancelled) return;
       ensureSeedLibrary();
-      const found = getDeckById(deckId);
+      const found = await getDeckById(deckId);
+      if (cancelled) return;
       setDeck(found ?? null);
       setGames(found ? getLibraryGamesByIds(found.gameIds) : []);
     })();
@@ -46,9 +48,9 @@ export function DeckDetail({ deckId }: Props) {
     };
   }, [deckId]);
 
-  function onConfirmDelete() {
+  async function onConfirmDelete() {
     if (!deck) return;
-    if (!deleteDeck(deck.id)) return;
+    if (!(await deleteDeck(deck.id))) return;
     setConfirmOpen(false);
     router.push("/decks");
   }
@@ -72,9 +74,9 @@ export function DeckDetail({ deckId }: Props) {
           <p className={styles.missingText}>
             It may have been deleted or the link is outdated.
           </p>
-          <Link href="/decks" className={styles.secondaryButton}>
+          <Button href="/decks" variant={ButtonVariant.Dark} size={ButtonSize.Sm}>
             Back to decks
-          </Link>
+          </Button>
         </div>
       </div>
     );
@@ -91,29 +93,36 @@ export function DeckDetail({ deckId }: Props) {
           <h1 className={styles.title}>{deck.name}</h1>
           <p className={styles.meta}>
             {deck.gameIds.length} {deck.gameIds.length === 1 ? "game" : "games"}
-            {deck.id.startsWith("custom-") ? " · custom" : " · seed"}
+            {isUserDeck(deck) ? " · custom" : " · seed"}
           </p>
           {deck.description ? (
             <p className={styles.description}>{deck.description}</p>
           ) : null}
         </div>
         <div className={styles.actions}>
-          <button type="button" onClick={() => setUseOpen(true)} className={styles.primaryButton}>
+          <Button
+            type="button"
+            onClick={() => setUseOpen(true)}
+            variant={ButtonVariant.Accent}
+            size={ButtonSize.Sm}
+          >
             Use in session
-          </button>
-          <Link
+          </Button>
+          <Button
             href={`/decks/${encodeURIComponent(deck.id)}/edit`}
-            className={styles.secondaryButton}
+            variant={ButtonVariant.Dark}
+            size={ButtonSize.Sm}
           >
             Edit
-          </Link>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => setConfirmOpen(true)}
-            className={styles.dangerButton}
+            variant={ButtonVariant.Danger}
+            size={ButtonSize.Sm}
           >
             Delete
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -140,12 +149,13 @@ export function DeckDetail({ deckId }: Props) {
         <div className={styles.empty}>
           <p className={styles.emptyTitle}>No games yet</p>
           <p className={styles.emptyText}>Add games from the catalog to fill this deck.</p>
-          <Link
+          <Button
             href={`/decks/${encodeURIComponent(deck.id)}/edit`}
-            className={styles.secondaryButton}
+            variant={ButtonVariant.Dark}
+            size={ButtonSize.Sm}
           >
             Edit deck
-          </Link>
+          </Button>
         </div>
       ) : (
         <ul className={styles.grid}>

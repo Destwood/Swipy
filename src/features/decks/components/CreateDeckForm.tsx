@@ -14,16 +14,17 @@ import {
   hydrateSeedGamesFromIgdb,
 } from "@/features/games/lib/game-library";
 import {
-  collectCatalogFilterStats,
+  CATALOG_FILTER_SHELL,
   EMPTY_CATALOG_FILTERS,
-  gameMatchesCatalogFilters,
   type CatalogFilterState,
 } from "@/features/games/lib/catalog-filters";
+import { catalogSearchParams } from "@/features/games/lib/catalog-query";
 import { sortGames, type SortValue } from "@/features/games/lib/sort-games";
 import { saveCustomDeck, updateDeck, getDeckById } from "@/features/decks/lib/deck-store";
 import { FadeIn } from "@/shared/ui/FadeIn";
 import { CatalogFilterBar } from "@/shared/ui/CatalogFilterBar";
 import { HoverLift } from "@/shared/ui/HoverLift";
+import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import { steamStoreAppUrl } from "@/features/games/lib/steam";
 import styles from "./CreateDeckForm.module.css";
 
@@ -51,10 +52,13 @@ export function CreateDeckForm({ deckId }: Props) {
   useEffect(() => {
     ensureSeedLibrary();
     void hydrateSeedGamesFromIgdb();
-    void loadGames("");
 
-    if (deckId) {
-      const deck = getDeckById(deckId);
+    if (!deckId) return;
+
+    let cancelled = false;
+    void (async () => {
+      const deck = await getDeckById(deckId);
+      if (cancelled) return;
       if (!deck) {
         setError("Deck not found.");
         setReady(true);
@@ -68,48 +72,60 @@ export function CreateDeckForm({ deckId }: Props) {
       for (const g of games) map[g.id] = g;
       setSelectedGames(map);
       setReady(true);
-    }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [deckId]);
 
-  async function loadGames(q: string) {
-    setLoading(true);
-    setApiHint(null);
-    setFilters(EMPTY_CATALOG_FILTERS);
-    try {
-      const params = new URLSearchParams();
-      if (q.trim()) params.set("q", q.trim());
-      params.set("page_size", "48");
-      const res = await fetch(`/api/games?${params.toString()}`);
-      const data = (await res.json()) as {
-        results?: Game[];
-        error?: string;
-      };
-      if (!res.ok) {
-        setApiHint(data.error ?? "IGDB unavailable");
-        setResults([]);
-        return;
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      setLoading(true);
+      setApiHint(null);
+      try {
+        const params = catalogSearchParams({
+          filters,
+          sort,
+          page: 1,
+          pageSize: 48,
+          q: activeQuery,
+        });
+        const res = await fetch(`/api/games?${params.toString()}`);
+        const data = (await res.json()) as {
+          results?: Game[];
+          error?: string;
+        };
+        if (cancelled) return;
+        if (!res.ok) {
+          setApiHint(data.error ?? "IGDB unavailable");
+          setResults([]);
+          return;
+        }
+        const games = data.results ?? [];
+        setResults(games);
+        upsertGames(games);
+      } catch {
+        if (!cancelled) {
+          setApiHint("Network error");
+          setResults([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      const games = data.results ?? [];
-      setResults(games);
-      upsertGames(games);
-    } catch {
-      setApiHint("Network error");
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeQuery, filters, sort]);
 
   function runSearch() {
-    const q = draftQuery.trim();
-    setActiveQuery(q);
-    void loadGames(q);
+    setActiveQuery(draftQuery.trim());
   }
 
   function clearSearch() {
     setDraftQuery("");
     setActiveQuery("");
-    void loadGames("");
   }
 
   function toggle(game: Game) {
@@ -129,7 +145,7 @@ export function CreateDeckForm({ deckId }: Props) {
     });
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
@@ -143,28 +159,27 @@ export function CreateDeckForm({ deckId }: Props) {
     }
 
     upsertGames(Object.values(selectedGames));
-    if (deckId) {
-      updateDeck(deckId, { name, description, gameIds: selected });
-      router.push(`/decks?updated=${deckId}`);
-      return;
+    try {
+      if (deckId) {
+        await updateDeck(deckId, { name, description, gameIds: selected });
+        router.push(`/decks?updated=${deckId}`);
+        return;
+      }
+      const deck = await saveCustomDeck({
+        name,
+        description,
+        gameIds: selected,
+      });
+      router.push(`/decks?created=${deck.id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save the deck.");
     }
-    const deck = saveCustomDeck({
-      name,
-      description,
-      gameIds: selected,
-    });
-    router.push(`/decks?created=${deck.id}`);
   }
 
-  const stats = useMemo(
-    () => collectCatalogFilterStats(results, filters),
-    [results, filters],
+  const catalog = useMemo(
+    () => (activeQuery ? sortGames(results, sort) : results),
+    [results, activeQuery, sort],
   );
-
-  const catalog = useMemo(() => {
-    const base = results.filter((g) => gameMatchesCatalogFilters(g, filters));
-    return sortGames(base, sort);
-  }, [results, filters, sort]);
 
   const selectedCount = selected.length;
 
@@ -198,9 +213,9 @@ export function CreateDeckForm({ deckId }: Props) {
           <span className={styles.selectedCount}>
             {selectedCount} selected
           </span>
-          <button type="submit" className={styles.submit}>
+          <Button type="submit" variant={ButtonVariant.Accent} size={ButtonSize.Sm}>
             {isEdit ? "Save changes" : "Save deck"}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -219,18 +234,24 @@ export function CreateDeckForm({ deckId }: Props) {
             className={styles.searchInput}
             aria-label="Search games"
           />
-          <button
+          <Button
             type="button"
             onClick={runSearch}
             disabled={loading}
-            className={styles.searchButton}
+            variant={ButtonVariant.Soft}
+            size={ButtonSize.Sm}
           >
             {loading ? "…" : "Search"}
-          </button>
+          </Button>
           {activeQuery ? (
-            <button type="button" onClick={clearSearch} className={styles.clearButton}>
+            <Button
+              type="button"
+              onClick={clearSearch}
+              variant={ButtonVariant.Dark}
+              size={ButtonSize.Sm}
+            >
               Clear
-            </button>
+            </Button>
           ) : null}
         </div>
 
@@ -238,12 +259,10 @@ export function CreateDeckForm({ deckId }: Props) {
           <CatalogFilterBar
             filters={filters}
             onChange={setFilters}
-            genres={stats.genres}
-            modes={stats.modes}
-            players={stats.players}
-            platforms={stats.platforms}
-            crossplayCount={stats.crossplayCount}
-            totalCount={results.length}
+            genres={CATALOG_FILTER_SHELL.genres}
+            modes={CATALOG_FILTER_SHELL.modes}
+            players={CATALOG_FILTER_SHELL.players}
+            platforms={CATALOG_FILTER_SHELL.platforms}
             sort={sort}
             onSortChange={setSort}
           />

@@ -11,6 +11,7 @@ export type Database = {
           id: string;
           code: string;
           deck_id: string;
+          deck_name: string | null;
           status: SessionStatus;
           match_rule: MatchRule;
           created_at: string;
@@ -19,6 +20,7 @@ export type Database = {
           id?: string;
           code: string;
           deck_id: string;
+          deck_name?: string | null;
           status?: SessionStatus;
           match_rule?: MatchRule;
           created_at?: string;
@@ -27,6 +29,7 @@ export type Database = {
           id?: string;
           code?: string;
           deck_id?: string;
+          deck_name?: string | null;
           status?: SessionStatus;
           match_rule?: MatchRule;
           created_at?: string;
@@ -87,6 +90,69 @@ export type Database = {
           game_id?: string;
           value?: VoteValue;
           created_at?: string;
+        };
+        Relationships: [];
+      };
+      decks: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          description: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          description?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          description?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      deck_games: {
+        Row: {
+          deck_id: string;
+          game_id: string;
+          position: number;
+        };
+        Insert: {
+          deck_id: string;
+          game_id: string;
+          position?: number;
+        };
+        Update: {
+          deck_id?: string;
+          game_id?: string;
+          position?: number;
+        };
+        Relationships: [];
+      };
+      session_games: {
+        Row: {
+          session_id: string;
+          game_id: string;
+          position: number;
+        };
+        Insert: {
+          session_id: string;
+          game_id: string;
+          position?: number;
+        };
+        Update: {
+          session_id?: string;
+          game_id?: string;
+          position?: number;
         };
         Relationships: [];
       };

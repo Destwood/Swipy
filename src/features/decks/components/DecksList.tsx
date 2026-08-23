@@ -6,7 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import HeartIcon from "@/assets/icons/heart.svg";
 import SearchIcon from "@/assets/icons/search.svg";
 import type { Deck } from "@/features/decks/data/decks";
-import { deleteDeck, listDecks } from "@/features/decks/lib/deck-store";
+import { deleteDeck, isUserDeck, listDecks } from "@/features/decks/lib/deck-store";
+import { useAuthUser } from "@/features/auth/lib/use-auth-user";
 import {
   ensureSeedLibrary,
   getLibraryGamesByIds,
@@ -15,6 +16,7 @@ import {
 import { FadeIn } from "@/shared/ui/FadeIn";
 import { FilterChip } from "@/shared/ui/FilterChip";
 import { HoverLift } from "@/shared/ui/HoverLift";
+import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
 import { UseInSessionDialog } from "@/features/session/components/UseInSessionDialog";
 import styles from "./DecksList.module.css";
@@ -63,6 +65,7 @@ function toDeckView(deck: Deck): DeckView {
 }
 
 export function DecksList() {
+  const { user, ready: authReady } = useAuthUser();
   const [decks, setDecks] = useState<DeckView[]>([]);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<FilterTab>("all");
@@ -71,24 +74,25 @@ export function DecksList() {
   const [pendingDelete, setPendingDelete] = useState<DeckView | null>(null);
   const [pendingUse, setPendingUse] = useState<DeckView | null>(null);
 
-  function reload() {
+  async function reload() {
     ensureSeedLibrary();
-    setDecks(listDecks().map(toDeckView));
+    setDecks((await listDecks()).map(toDeckView));
     setFavorites(readFavorites());
   }
 
   useEffect(() => {
+    if (!authReady) return;
     let cancelled = false;
     void (async () => {
       await hydrateSeedGamesFromIgdb();
       if (cancelled) return;
-      reload();
+      await reload();
       setHydrating(false);
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [authReady, user?.id]);
 
   const totalGames = decks.reduce((n, d) => n + d.gameIds.length, 0);
 
@@ -119,10 +123,10 @@ export function DecksList() {
     });
   }
 
-  function onDelete(id: string) {
-    if (!deleteDeck(id)) return;
+  async function onDelete(id: string) {
+    if (!(await deleteDeck(id))) return;
     setPendingDelete(null);
-    reload();
+    await reload();
   }
 
   return (
@@ -154,12 +158,12 @@ export function DecksList() {
               : `${decks.length} ${decks.length === 1 ? "deck" : "decks"} · ${totalGames} games total`}
           </p>
         </div>
-        <Link href="/decks/new" className={styles.newButton}>
+        <Button href="/decks/new" variant={ButtonVariant.Accent}>
           <span className={styles.plusIcon} aria-hidden>
             +
           </span>
           New deck
-        </Link>
+        </Button>
       </div>
 
       <div className={styles.toolbar}>
@@ -274,9 +278,15 @@ function DeckCard({
         ))}
 
         <div className={styles.hoverCta}>
-          <button type="button" onClick={onUse} className={styles.useButton}>
+          <Button
+            type="button"
+            onClick={onUse}
+            variant={ButtonVariant.Accent}
+            size={ButtonSize.Sm}
+            className={styles.useButton}
+          >
             Use in session
-          </button>
+          </Button>
         </div>
 
         <div className={styles.cardActions}>
@@ -357,7 +367,7 @@ function DeckCard({
         <div className={styles.cardFooter}>
           <span className={styles.meta}>
             {deck.gameIds.length} games
-            {deck.id.startsWith("custom-") ? " · custom" : " · seed"}
+            {isUserDeck(deck) ? " · custom" : " · seed"}
           </span>
         </div>
       </Link>

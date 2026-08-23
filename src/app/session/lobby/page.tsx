@@ -16,6 +16,7 @@ import {
   startSessionSwiping,
   subscribeToMembers,
 } from "@/features/session/lib/sessions";
+import { Button, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./page.module.css";
 
 export default function SessionLobbyPage() {
@@ -42,9 +43,14 @@ export default function SessionLobbyPage() {
     setCode(session.code);
     setIsHost(active.isHost);
     setActiveDeckId(session.deck_id);
-    const deck = getDeckById(session.deck_id);
+    const deck = await getDeckById(session.deck_id);
+    const gameCount = deck?.gameIds.length;
     setDeckLabel(
-      deck ? `${deck.name} · ${deck.gameIds.length} games` : session.deck_id,
+      deck
+        ? `${deck.name} · ${gameCount} games`
+        : session.deck_name
+          ? session.deck_name
+          : session.deck_id,
     );
     setMembers(dbMembers.map(toUiMember));
 
@@ -131,24 +137,24 @@ export default function SessionLobbyPage() {
 
           <div className={styles.actions}>
             {isHost ? (
-              <button
+              <Button
                 type="button"
                 onClick={() => void onStart()}
                 disabled={busy || members.length === 0}
-                className={styles.startButton}
+                variant={ButtonVariant.Accent}
               >
                 {busy ? "Starting…" : "Start session swipe"}
-              </button>
+              </Button>
             ) : (
               <p className={styles.waitingText}>Waiting for host to start…</p>
             )}
-            <button
+            <Button
               type="button"
               onClick={() => void copyCode()}
-              className={styles.copyButton}
+              variant={ButtonVariant.Dark}
             >
               Copy invite code
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -9,6 +9,7 @@ import type { Game } from "@/features/games/data/games";
 import { getDeckById, setActiveDeckId } from "@/features/decks/lib/deck-store";
 import {
   getLibraryGamesByIds,
+  ensureGamesInLibrary,
   hydrateSeedGamesFromIgdb,
 } from "@/features/games/lib/game-library";
 import { getActiveSession, toUiMember } from "@/features/session/lib/session-context";
@@ -17,6 +18,7 @@ import {
   castVote,
   fetchMembers,
   fetchSession,
+  fetchSessionGames,
   markMemberDone,
 } from "@/features/session/lib/sessions";
 import { DeckSwipeStage } from "@/features/session/components/DeckSwipeStage";
@@ -45,10 +47,17 @@ export function SessionDeckClient() {
       const session = await fetchSession(active.sessionId);
       setActiveDeckId(session.deck_id);
       await hydrateSeedGamesFromIgdb();
-      const deck = getDeckById(session.deck_id);
-      const list = deck ? getLibraryGamesByIds(deck.gameIds) : [];
-      setDeckName(deck?.name ?? session.deck_id);
-      setGames(list);
+      const snapshotIds = await fetchSessionGames(session.id);
+      if (snapshotIds.length > 0) {
+        const list = await ensureGamesInLibrary(snapshotIds);
+        setDeckName(session.deck_name ?? "Deck");
+        setGames(list);
+      } else {
+        const deck = await getDeckById(session.deck_id);
+        const list = deck ? getLibraryGamesByIds(deck.gameIds) : [];
+        setDeckName(deck?.name ?? session.deck_id);
+        setGames(list);
+      }
       setIndex(0);
 
       const dbMembers = await fetchMembers(active.sessionId);
@@ -157,7 +166,7 @@ export function SessionDeckClient() {
                 className={styles.memberAvatar}
                 style={{ background: m.color }}
               >
-                {m.initials}
+                <span className={styles.initials}>{m.initials}</span>
               </div>
             ))}
           </div>

@@ -1,3 +1,4 @@
+import { getDeckById } from "@/features/decks/lib/deck-store";
 import { createGuestDataClient } from "@/shared/supabase/client";
 import type { VoteValue } from "@/shared/supabase/database.types";
 import {
@@ -21,11 +22,17 @@ export async function createGuestSession(input: {
   const guestToken = createGuestToken();
   const code = normalizeCode(input.code ?? generateSessionCode());
 
+  const deck = await getDeckById(input.deckId);
+  if (!deck || deck.gameIds.length === 0) {
+    throw new Error("Pick a deck with at least one game.");
+  }
+
   const { data: session, error: sessionError } = await supabase
     .from("sessions")
     .insert({
       code,
       deck_id: input.deckId,
+      deck_name: deck.name,
       status: "lobby",
       match_rule: "all",
     })
@@ -34,6 +41,18 @@ export async function createGuestSession(input: {
 
   if (sessionError || !session) {
     throw new Error(sessionError?.message ?? "Failed to create session");
+  }
+
+  const { error: gamesError } = await supabase.from("session_games").insert(
+    deck.gameIds.map((gameId, position) => ({
+      session_id: session.id,
+      game_id: gameId,
+      position,
+    })),
+  );
+  if (gamesError) {
+    await supabase.from("sessions").delete().eq("id", session.id);
+    throw new Error(gamesError.message);
   }
 
   const { data: member, error: memberError } = await supabase
@@ -127,6 +146,17 @@ export async function joinGuestSession(input: {
   };
   setActiveSession(active);
   return active;
+}
+
+export async function fetchSessionGames(sessionId: string): Promise<string[]> {
+  const supabase = createGuestDataClient();
+  const { data, error } = await supabase
+    .from("session_games")
+    .select("game_id, position")
+    .eq("session_id", sessionId)
+    .order("position", { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((row) => row.game_id);
 }
 
 export async function fetchSession(sessionId: string): Promise<DbSession> {

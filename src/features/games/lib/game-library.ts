@@ -65,6 +65,28 @@ export function getLibraryGamesByIds(ids: string[]): Game[] {
     .filter((g): g is Game => g !== undefined);
 }
 
+export async function ensureGamesInLibrary(ids: string[]): Promise<Game[]> {
+  const present = new Set(getLibraryGamesByIds(ids).map((game) => game.id));
+  const missing = ids.filter((id) => !present.has(id));
+  const igdbIds = [
+    ...new Set(
+      missing
+        .map((id) => (id.startsWith("igdb-") ? Number(id.slice(5)) : NaN))
+        .filter((n) => Number.isFinite(n) && n > 0),
+    ),
+  ];
+  if (igdbIds.length > 0) {
+    try {
+      const res = await fetch(`/api/games/by-ids?ids=${igdbIds.join(",")}`);
+      const data = (await res.json()) as { results?: Game[] };
+      if (res.ok && data.results?.length) upsertGames(data.results);
+    } catch {
+      // Keep whatever is already cached.
+    }
+  }
+  return getLibraryGamesByIds(ids);
+}
+
 function missingSeedIds(): number[] {
   const map = readLibrary();
   return SEED_IGDB_IDS.filter((id) => !map[`igdb-${id}`]);

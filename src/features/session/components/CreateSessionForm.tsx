@@ -8,6 +8,7 @@ import { getActiveDeckId, listDecks, setActiveDeckId } from "@/features/decks/li
 import { generateSessionCode } from "@/features/session/lib/session-context";
 import { useSessionDisplayName } from "@/features/session/lib/use-session-display-name";
 import { createGuestSession } from "@/features/session/lib/sessions";
+import { Button, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./CreateSessionForm.module.css";
 
 export function CreateSessionForm() {
@@ -21,13 +22,20 @@ export function CreateSessionForm() {
   const [sessionCode, setSessionCode] = useState("SWPY-····");
 
   useEffect(() => {
-    const all = listDecks();
-    setDecks(all);
-    const active = getActiveDeckId();
-    const initial =
-      (active && all.some((d) => d.id === active) && active) || all[0]?.id || "";
-    setDeckId(initial);
-    setSessionCode(generateSessionCode());
+    let cancelled = false;
+    void (async () => {
+      const all = await listDecks();
+      if (cancelled) return;
+      setDecks(all);
+      const active = getActiveDeckId();
+      const initial =
+        (active && all.some((d) => d.id === active) && active) || all[0]?.id || "";
+      setDeckId(initial);
+      setSessionCode(generateSessionCode());
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function openLobby() {
@@ -100,17 +108,17 @@ export function CreateSessionForm() {
       {error && <p className={styles.error}>{error}</p>}
 
       <div className={styles.actions}>
-        <button
+        <Button
           type="button"
           onClick={() => void openLobby()}
           disabled={!deckId || busy || !ready}
-          className={styles.primaryButton}
+          variant={ButtonVariant.Accent}
         >
           {busy ? "Creating…" : "Open lobby"}
-        </button>
-        <Link href="/session/join" className={styles.secondaryLink}>
+        </Button>
+        <Button href="/session/join" variant={ButtonVariant.Dark}>
           I have a code
-        </Link>
+        </Button>
       </div>
     </div>
   );
