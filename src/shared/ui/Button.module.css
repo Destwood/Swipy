@@ -1,0 +1,61 @@
+@reference "../../app/globals.css";
+
+.root {
+  @apply inline-flex cursor-pointer items-center justify-center gap-2.5 border text-center whitespace-nowrap no-underline transition-[background-color,border-color,color,box-shadow,opacity] duration-200;
+}
+
+.root:disabled {
+  @apply cursor-not-allowed opacity-40;
+}
+
+.root:focus-visible {
+  @apply outline-2 outline-offset-2 outline-sw-accent;
+}
+
+.md {
+  @apply rounded-xl px-6 py-3 text-[15px] sm:px-8 sm:py-3.5;
+}
+
+.sm {
+  @apply rounded-[10px] px-4 py-2.5 text-sm;
+}
+
+.accent {
+  @apply border-transparent bg-sw-accent font-semibold tracking-[-0.01em] text-sw-bg;
+}
+
+.md.accent {
+  @apply shadow-[0_0_28px_rgba(45,212,191,0.2),0_2px_8px_rgba(0,0,0,0.4)];
+}
+
+.accent:hover:not(:disabled) {
+  @apply bg-sw-like;
+}
+
+.md.accent:hover:not(:disabled) {
+  @apply shadow-[0_0_40px_rgba(45,212,191,0.32),0_2px_8px_rgba(0,0,0,0.4)];
+}
+
+.ghost {
+  @apply border-white/10 bg-white/[0.06] font-medium tracking-[-0.01em] text-sw-text/70;
+}
+
+.ghost:hover:not(:disabled) {
+  @apply bg-white/10 text-sw-text;
+}
+
+.soft {
+  @apply border-[rgba(45,212,191,0.28)] bg-sw-accent-d font-semibold tracking-[-0.01em] text-sw-accent;
+}
+
+.soft:hover:not(:disabled) {
+  @apply bg-[rgba(45,212,191,0.22)];
+}
+
+.danger {
+  @apply border-[rgba(251,113,133,0.35)] bg-[rgba(251,113,133,0.12)] font-semibold tracking-[-0.01em] text-sw-dislike;
+}
+
+.danger:hover:not(:disabled) {
+  @apply bg-[rgba(251,113,133,0.2)];
+}
