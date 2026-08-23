@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import ArrowRightIcon from "@/assets/icons/arrow-right.svg";
-import { AuthMenu } from "@/features/auth/components/AuthMenu";
-import { SwipyLogo } from "@/features/shell/components/SwipyLogo";
 import { HERO_IMG } from "@/features/games/data/games";
+import { AppTopBar } from "@/features/shell/components/AppTopBar";
+import { SwipyLogo } from "@/features/shell/components/SwipyLogo";
 import styles from "./page.module.css";
 
 export default function HomePage() {
@@ -22,9 +22,7 @@ export default function HomePage() {
 
       <div aria-hidden className={styles.bottomGradient} />
 
-      <div className={styles.homeAuth}>
-        <AuthMenu />
-      </div>
+      <AppTopBar />
 
       <div className={styles.content}>
         <SwipyLogo size="hero" />

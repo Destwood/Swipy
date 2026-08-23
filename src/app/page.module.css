@@ -1,7 +1,7 @@
 @reference "./globals.css";
 
 .root {
-  @apply relative flex h-full min-h-0 flex-1 flex-col items-center justify-center overflow-hidden bg-sw-bg;
+  @apply relative flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-sw-bg;
 }
 
 .heroImage {
@@ -15,7 +15,7 @@
     rgba(12, 14, 18, 0.55) 60%,
     rgba(12, 14, 18, 0.92) 100%
   );
-  @apply absolute inset-0;
+  @apply absolute inset-0 z-0;
 }
 
 .bottomGradient {
@@ -24,15 +24,11 @@
 }
 
 .content {
-  @apply relative z-[2] flex max-w-[680px] flex-col items-center px-10 text-center;
-}
-
-.homeAuth {
-  @apply absolute top-5 right-8 z-[3];
+  @apply relative z-[2] flex min-h-0 w-full max-w-[640px] flex-1 flex-col items-center justify-center self-center px-6 text-center sm:px-10;
 }
 
 .tagline {
-  @apply mt-5 mb-10 font-body text-lg leading-normal font-normal tracking-[-0.01em] text-sw-text/55;
+  @apply mt-4 mb-8 font-body text-base leading-normal font-normal tracking-[-0.01em] text-sw-text/55 sm:mt-5 sm:mb-10 sm:text-lg;
 }
 
 .actions {
@@ -40,7 +36,7 @@
 }
 
 .primaryLink {
-  @apply flex items-center gap-2.5 rounded-xl bg-sw-accent px-8 py-3.5 text-base font-semibold tracking-[-0.01em] text-sw-bg shadow-[0_0_36px_rgba(45,212,191,0.22),0_2px_8px_rgba(0,0,0,0.4)] transition-all duration-200 hover:bg-sw-like hover:shadow-[0_0_48px_rgba(45,212,191,0.35),0_2px_8px_rgba(0,0,0,0.4)];
+  @apply flex items-center gap-2.5 rounded-xl bg-sw-accent px-6 py-3 text-[15px] font-semibold tracking-[-0.01em] text-sw-bg shadow-[0_0_36px_rgba(45,212,191,0.22),0_2px_8px_rgba(0,0,0,0.4)] transition-all duration-200 hover:bg-sw-like hover:shadow-[0_0_48px_rgba(45,212,191,0.35),0_2px_8px_rgba(0,0,0,0.4)] sm:px-8 sm:py-3.5 sm:text-base;
 }
 
 .primaryIcon {
@@ -48,5 +44,5 @@
 }
 
 .secondaryLink {
-  @apply rounded-xl border border-white/10 bg-white/[0.06] px-8 py-3.5 text-base font-medium tracking-[-0.01em] text-sw-text/70 transition-all duration-[180ms] hover:bg-white/10 hover:text-sw-text;
+  @apply rounded-xl border border-white/10 bg-white/[0.06] px-6 py-3 text-[15px] font-medium tracking-[-0.01em] text-sw-text/70 transition-all duration-[180ms] hover:bg-white/10 hover:text-sw-text sm:px-8 sm:py-3.5 sm:text-base;
 }
