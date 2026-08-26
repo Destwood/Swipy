@@ -47,10 +47,18 @@
   @apply m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2;
 }
 
-.footer {
-  @apply mt-10 text-center font-mono text-[11px] text-white/15;
+.empty {
+  @apply rounded-2xl border border-dashed border-white/10 px-6 py-16 text-center;
 }
 
-.footerLink {
-  @apply text-white/25 underline-offset-2 hover:underline;
+.emptyTitle {
+  @apply m-0 mb-2 font-display text-base font-bold text-sw-text;
+}
+
+.emptyText {
+  @apply m-0 mb-5 font-body text-sm text-sw-muted;
+}
+
+.emptyLink {
+  @apply font-body text-sm font-medium text-sw-accent no-underline hover:underline;
 }

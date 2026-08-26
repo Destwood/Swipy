@@ -9,6 +9,7 @@ import {
   createGuestSession,
   startSessionSwiping,
 } from "@/features/session/lib/sessions";
+import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./UseInSessionDialog.module.css";
 
 type Props = {
@@ -106,31 +107,37 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
 
         <div className={styles.actions}>
           <div className={styles.modeRow}>
-            <button
+            <Button
               type="button"
               onClick={() => void startSolo()}
               disabled={busy || !deckId}
-              className={styles.solo}
+              variant={ButtonVariant.Accent}
+              size={ButtonSize.Sm}
+              className={styles.modeButton}
             >
               {busyMode === "solo" ? "Starting…" : "Solo"}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => void startTogether()}
               disabled={busy || !deckId}
-              className={styles.together}
+              variant={ButtonVariant.Dark}
+              size={ButtonSize.Sm}
+              className={styles.modeButton}
             >
               {busyMode === "together" ? "Opening…" : "Together"}
-            </button>
+            </Button>
           </div>
-          <button
+          <Button
             type="button"
             onClick={onClose}
             disabled={busy}
-            className={styles.cancel}
+            variant={ButtonVariant.Dark}
+            size={ButtonSize.Sm}
+            className={styles.modeButton}
           >
             Cancel
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

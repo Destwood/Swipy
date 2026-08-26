@@ -1,0 +1,44 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply mx-auto flex w-fit max-w-full flex-col items-center gap-2;
+}
+
+.label {
+  @apply self-start font-mono text-[11px] tracking-[0.06em] text-white/30 uppercase;
+}
+
+.well {
+  @apply inline-flex max-w-full cursor-pointer items-stretch overflow-hidden rounded-xl border-0 bg-sw-bg p-0 text-left outline-none transition-colors;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.well:hover {
+  @apply bg-[#090b0e];
+}
+
+.well:hover .copyAffordance {
+  @apply bg-white/[0.1] text-sw-like;
+}
+
+.well:focus-visible {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 0 0 2px rgba(45, 212, 191, 0.35);
+}
+
+.copyAffordance {
+  @apply flex w-9 shrink-0 items-center justify-center bg-white/[0.06] text-sw-accent transition-colors;
+}
+
+.copyIcon {
+  @apply h-3.5 w-3.5;
+}
+
+.code {
+  @apply min-w-0 truncate px-3 py-3 font-display text-[clamp(1.125rem,2.4vw,1.375rem)] font-extrabold tracking-[0.12em] text-sw-text;
+}
+
+.hint {
+  @apply text-center font-mono text-[11px] text-white/25;
+}

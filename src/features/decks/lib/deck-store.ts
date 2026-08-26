@@ -181,11 +181,6 @@ export async function deleteDeck(id: string): Promise<boolean> {
   return false;
 }
 
-/** @deprecated use deleteDeck */
-export function deleteCustomDeck(id: string): Promise<boolean> {
-  return deleteDeck(id);
-}
-
 export function setActiveDeckId(id: string) {
   sessionStorage.setItem(ACTIVE_DECK_KEY, id);
 }

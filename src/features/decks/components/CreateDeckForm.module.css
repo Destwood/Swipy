@@ -32,9 +32,6 @@
   @apply font-mono text-xs text-white/35;
 }
 
-.submit {
-  @apply rounded-lg bg-sw-accent px-5 py-2 text-sm font-semibold tracking-[-0.01em] text-sw-bg transition-all hover:bg-sw-like;
-}
 
 .searchRow {
   @apply flex flex-wrap items-center gap-3;
@@ -48,13 +45,6 @@
   @apply min-w-0 flex-1 rounded-xl border border-white/10 bg-sw-surface px-4 py-3 font-body text-sw-text outline-none placeholder:text-white/25 focus:border-sw-accent/40;
 }
 
-.searchButton {
-  @apply shrink-0 rounded-xl border border-[rgba(45,212,191,0.35)] bg-sw-accent-d px-5 py-3 text-sm font-semibold text-sw-accent transition-colors hover:bg-[rgba(45,212,191,0.22)] disabled:cursor-not-allowed disabled:opacity-50;
-}
-
-.clearButton {
-  @apply shrink-0 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/45 transition-colors hover:text-sw-text;
-}
 
 .filterToolbar {
   @apply w-full;

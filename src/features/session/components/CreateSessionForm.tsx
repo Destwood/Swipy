@@ -4,11 +4,17 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Deck } from "@/features/decks/data/decks";
-import { getActiveDeckId, listDecks, setActiveDeckId } from "@/features/decks/lib/deck-store";
-import { generateSessionCode } from "@/features/session/lib/session-context";
+import { listDecks, setActiveDeckId } from "@/features/decks/lib/deck-store";
 import { useSessionDisplayName } from "@/features/session/lib/use-session-display-name";
 import { createGuestSession } from "@/features/session/lib/sessions";
-import { Button, ButtonVariant } from "@/shared/ui/Button";
+import {
+  clearSessionCreateCode,
+  getOrCreateSessionCreateCode,
+  getSessionCreateDeckId,
+  setSessionCreateDeckId,
+} from "@/features/session/lib/session-create-deck";
+import { SessionCodeCopy } from "@/features/session/components/SessionCodeCopy";
+import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./CreateSessionForm.module.css";
 
 export function CreateSessionForm() {
@@ -27,11 +33,11 @@ export function CreateSessionForm() {
       const all = await listDecks();
       if (cancelled) return;
       setDecks(all);
-      const active = getActiveDeckId();
-      const initial =
-        (active && all.some((d) => d.id === active) && active) || all[0]?.id || "";
-      setDeckId(initial);
-      setSessionCode(generateSessionCode());
+      const pending = getSessionCreateDeckId();
+      setDeckId(
+        pending && all.some((d) => d.id === pending) ? pending : "",
+      );
+      setSessionCode(getOrCreateSessionCreateCode());
     })();
     return () => {
       cancelled = true;
@@ -44,12 +50,16 @@ export function CreateSessionForm() {
     setError(null);
     try {
       setActiveDeckId(deckId);
-      await createGuestSession({
+      setSessionCreateDeckId(deckId);
+      const session = await createGuestSession({
         deckId,
         displayName,
         code: sessionCode,
       });
-      router.push("/session/lobby");
+      clearSessionCreateCode();
+      router.push(
+        `/session/lobby/${encodeURIComponent(session.code)}`,
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to create session");
       setBusy(false);
@@ -57,47 +67,55 @@ export function CreateSessionForm() {
   }
 
   const selected = decks.find((d) => d.id === deckId);
+  const canOpenLobby = Boolean(deckId) && !busy && ready;
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
         {askForName ? (
-        <label className={styles.field}>
-          <span className={styles.fieldLabel}>Your name</span>
-          <input
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            className={styles.input}
-            autoComplete="nickname"
-          />
-        </label>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Your name</span>
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              className={styles.input}
+              autoComplete="nickname"
+            />
+          </label>
         ) : null}
 
-        <label className={styles.field}>
+        <div className={styles.field}>
           <span className={styles.fieldLabel}>Deck</span>
-          <select
-            value={deckId}
-            onChange={(e) => setDeckId(e.target.value)}
-            className={styles.select}
-          >
-            {decks.length === 0 && <option value="">No decks yet</option>}
-            {decks.map((deck) => (
-              <option key={deck.id} value={deck.id}>
-                {deck.name} ({deck.gameIds.length} games)
-              </option>
-            ))}
-          </select>
-          {selected && (
-            <span className={styles.deckHint}>
-              {selected.description ?? `${selected.gameIds.length} games in this deck`}
-            </span>
-          )}
-        </label>
+          <div className={styles.deckRow}>
+            <div className={styles.deckInfo}>
+              {selected ? (
+                <>
+                  <span className={styles.deckName}>{selected.name}</span>
+                  <span className={styles.deckHint}>
+                    {selected.description ??
+                      `${selected.gameIds.length} games in this deck`}
+                  </span>
+                </>
+              ) : (
+                <span className={styles.deckEmpty}>Select deck</span>
+              )}
+            </div>
+            <Button
+              href="/session/pick-deck"
+              variant={ButtonVariant.Soft}
+              size={ButtonSize.Sm}
+              className={styles.deckAction}
+            >
+              {selected ? "Change deck" : "Select deck"}
+            </Button>
+          </div>
+        </div>
 
         <div className={styles.codeSection}>
-          <span className={styles.codeLabel}>Session code</span>
-          <span className={styles.code}>{sessionCode}</span>
-          <span className={styles.codeHint}>Share after you open the lobby</span>
+          <SessionCodeCopy
+            code={sessionCode}
+            hint="Share after you open the lobby"
+          />
         </div>
 
         <Link href="/decks/new" className={styles.newDeckLink}>
@@ -111,7 +129,7 @@ export function CreateSessionForm() {
         <Button
           type="button"
           onClick={() => void openLobby()}
-          disabled={!deckId || busy || !ready}
+          disabled={!canOpenLobby}
           variant={ButtonVariant.Accent}
         >
           {busy ? "Creating…" : "Open lobby"}

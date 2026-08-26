@@ -13,6 +13,15 @@ import {
   type DbVote,
 } from "@/features/session/lib/session-context";
 
+function isUniqueCodeConflict(message: string | undefined): boolean {
+  if (!message) return false;
+  return (
+    message.includes("sessions_code_key") ||
+    message.includes("duplicate key") ||
+    message.includes("unique constraint")
+  );
+}
+
 export async function createGuestSession(input: {
   deckId: string;
   displayName: string;
@@ -20,27 +29,46 @@ export async function createGuestSession(input: {
 }): Promise<ActiveSession> {
   const supabase = createGuestDataClient();
   const guestToken = createGuestToken();
-  const code = normalizeCode(input.code ?? generateSessionCode());
 
   const deck = await getDeckById(input.deckId);
   if (!deck || deck.gameIds.length === 0) {
     throw new Error("Pick a deck with at least one game.");
   }
 
-  const { data: session, error: sessionError } = await supabase
-    .from("sessions")
-    .insert({
-      code,
-      deck_id: input.deckId,
-      deck_name: deck.name,
-      status: "lobby",
-      match_rule: "all",
-    })
-    .select()
-    .single();
+  let session: DbSession | null = null;
+  let lastError: string | null = null;
 
-  if (sessionError || !session) {
-    throw new Error(sessionError?.message ?? "Failed to create session");
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const code =
+      attempt === 0 && input.code
+        ? normalizeCode(input.code)
+        : generateSessionCode();
+
+    const { data, error } = await supabase
+      .from("sessions")
+      .insert({
+        code,
+        deck_id: input.deckId,
+        deck_name: deck.name,
+        status: "lobby",
+        match_rule: "all",
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      session = data;
+      break;
+    }
+
+    lastError = error?.message ?? "Failed to create session";
+    if (!isUniqueCodeConflict(error?.message)) {
+      throw new Error(lastError);
+    }
+  }
+
+  if (!session) {
+    throw new Error(lastError ?? "Failed to create session");
   }
 
   const { error: gamesError } = await supabase.from("session_games").insert(
@@ -68,7 +96,6 @@ export async function createGuestSession(input: {
     .single();
 
   if (memberError || !member) {
-    // Avoid orphan sessions when member insert fails
     await supabase.from("sessions").delete().eq("id", session.id);
     throw new Error(memberError?.message ?? "Failed to create host member");
   }
@@ -146,6 +173,19 @@ export async function joinGuestSession(input: {
   };
   setActiveSession(active);
   return active;
+}
+
+export async function fetchSessionByCode(
+  code: string,
+): Promise<DbSession | null> {
+  const supabase = createGuestDataClient();
+  const { data, error } = await supabase
+    .from("sessions")
+    .select()
+    .eq("code", normalizeCode(code))
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data;
 }
 
 export async function fetchSessionGames(sessionId: string): Promise<string[]> {

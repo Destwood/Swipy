@@ -62,7 +62,12 @@
 }
 
 .memberAvatar {
-  @apply flex h-7 w-7 items-center justify-center rounded-full font-display text-[10px] font-bold text-sw-bg;
+  @apply grid h-7 w-7 place-items-center rounded-full font-body text-[10px] font-bold leading-none tracking-tight text-sw-bg;
+}
+
+.initials {
+  @apply leading-none;
+  translate: 0 0.05em;
 }
 
 .voteError {

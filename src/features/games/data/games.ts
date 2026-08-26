@@ -27,21 +27,6 @@ export interface Game {
   youtubeId?: string;
 }
 
-/** @deprecated Hardcoded catalog removed — games come from IGDB into local library. */
-export const GAMES: Game[] = [];
-
-export function getGameById(id: string): Game | undefined {
-  return GAMES.find((g) => g.id === id);
-}
-
-export function getGamesByIds(ids: string[]): Game[] {
-  return ids
-    .map((id) => getGameById(id))
-    .filter((g): g is Game => g !== undefined);
-}
-
-/** Static sample for Liked / result layout placeholders. */
-export const SAMPLE_LIKED: Game[] = [];
-
+/** Home / hero atmospheric background. */
 export const HERO_IMG =
   "https://images.unsplash.com/photo-1773615098146-2341d1b72997?w=1600&h=1000&fit=crop&auto=format";

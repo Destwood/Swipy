@@ -22,18 +22,6 @@
   @apply flex flex-wrap justify-end gap-2;
 }
 
-.cancel {
-  @apply cursor-pointer rounded-[10px] border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-sw-text transition-colors hover:border-white/20 hover:bg-white/[0.07];
-}
-
-.confirm {
-  @apply cursor-pointer rounded-[10px] bg-sw-accent px-4 py-2.5 text-sm font-semibold tracking-[-0.01em] text-sw-bg transition-colors hover:bg-sw-like;
-}
-
-.confirmDanger {
-  @apply cursor-pointer rounded-[10px] border border-[rgba(251,113,133,0.35)] bg-[rgba(251,113,133,0.12)] px-4 py-2.5 text-sm font-semibold tracking-[-0.01em] text-sw-dislike transition-colors hover:bg-[rgba(251,113,133,0.2)];
-}
-
 @keyframes sw-dialog-fade {
   from {
     opacity: 0;

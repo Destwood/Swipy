@@ -20,28 +20,33 @@
   @apply rounded-xl border border-white/10 bg-sw-bg px-4 py-3 font-body text-sw-text outline-none focus:border-sw-accent/40;
 }
 
-.select {
-  @apply rounded-xl border border-white/10 bg-sw-bg px-4 py-3 font-body text-sw-text outline-none focus:border-sw-accent/40;
+.deckRow {
+  @apply flex items-center gap-3 rounded-xl bg-sw-bg px-3 py-2.5;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.deckInfo {
+  @apply min-w-0 flex-1;
+}
+
+.deckName {
+  @apply block truncate font-display text-base font-bold tracking-[-0.02em] text-sw-text;
+}
+
+.deckEmpty {
+  @apply block truncate font-body text-sm text-white/35;
 }
 
 .deckHint {
-  @apply font-body text-xs text-white/35;
+  @apply mt-0.5 block truncate font-body text-xs text-white/35;
+}
+
+.deckAction {
+  @apply shrink-0;
 }
 
 .codeSection {
-  @apply flex flex-col items-center gap-2 border-t border-white/[0.06] pt-5;
-}
-
-.codeLabel {
-  @apply font-mono text-[11px] tracking-[0.06em] text-white/30 uppercase;
-}
-
-.code {
-  @apply font-display text-[clamp(1.5rem,3vw,1.875rem)] font-extrabold tracking-[0.12em] text-sw-text;
-}
-
-.codeHint {
-  @apply font-mono text-[11px] text-white/25;
+  @apply flex justify-center border-t border-white/[0.06] pt-5;
 }
 
 .newDeckLink {
@@ -54,12 +59,4 @@
 
 .actions {
   @apply flex flex-wrap items-center justify-center gap-3;
-}
-
-.primaryButton {
-  @apply rounded-xl bg-sw-accent px-8 py-3.5 text-[15px] font-semibold tracking-[-0.01em] text-sw-bg shadow-[0_0_28px_rgba(45,212,191,0.2)] transition-all hover:bg-sw-like disabled:cursor-not-allowed disabled:opacity-40;
-}
-
-.secondaryLink {
-  @apply rounded-xl border border-white/10 bg-white/[0.06] px-8 py-3.5 text-[15px] font-medium text-sw-text/70 transition-all hover:bg-white/10 hover:text-sw-text;
 }

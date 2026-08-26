@@ -23,6 +23,8 @@ const HIDE_DELAY_MS = 220;
 type Props = {
   game: Game;
   children: ReactNode;
+  variant?: "tile" | "inline";
+  className?: string;
 };
 
 function canHoverPreview() {
@@ -59,7 +61,12 @@ function realDescription(game: Game) {
   return text;
 }
 
-export function GameHoverPreview({ game, children }: Props) {
+export function GameHoverPreview({
+  game,
+  children,
+  variant = "tile",
+  className,
+}: Props) {
   const anchorRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const showTimer = useRef(0);
@@ -174,7 +181,7 @@ export function GameHoverPreview({ game, children }: Props) {
   return (
     <div
       ref={anchorRef}
-      className={`${styles.anchor}${open ? ` ${styles.hot}` : ""}`}
+      className={`${styles.anchor} ${variant === "inline" ? styles.inline : styles.tile}${open ? ` ${styles.hot}` : ""}${className ? ` ${className}` : ""}`}
       onMouseEnter={scheduleShow}
       onMouseLeave={scheduleHide}
     >
@@ -196,54 +203,56 @@ export function GameHoverPreview({ game, children }: Props) {
                 style={{ top: pos.arrowTop }}
                 aria-hidden
               />
-              <div className={styles.media}>
-                <Image
-                  src={gameCoverSrc(current, "hero")}
-                  alt=""
-                  fill
-                  className={styles.image}
-                  sizes="272px"
-                  unoptimized={
-                    current.includes("igdb") || current.includes("rawg")
-                  }
-                />
-                {hasGallery ? (
-                  <>
-                    <button
-                      type="button"
-                      className={`${styles.nav} ${styles.prev}`}
-                      aria-label="Previous image"
-                      onClick={() => step(-1)}
-                    >
-                      <ChevronLeftIcon className={styles.navIcon} />
-                    </button>
-                    <button
-                      type="button"
-                      className={`${styles.nav} ${styles.next}`}
-                      aria-label="Next image"
-                      onClick={() => step(1)}
-                    >
-                      <ArrowRightIcon className={styles.navIcon} />
-                    </button>
-                    <span className={styles.counter}>
-                      {index + 1}/{images.length}
-                    </span>
-                  </>
-                ) : null}
-              </div>
-              <div className={styles.body}>
-                <p className={styles.title}>{game.title}</p>
-                {release ? (
-                  <p className={styles.meta}>
-                    {release}
-                    {game.developer && game.developer !== "Unknown"
-                      ? ` · ${game.developer}`
-                      : ""}
-                  </p>
-                ) : null}
-                {description ? (
-                  <p className={styles.description}>{description}</p>
-                ) : null}
+              <div className={styles.cardInner}>
+                <div className={styles.media}>
+                  <Image
+                    src={gameCoverSrc(current, "hero")}
+                    alt=""
+                    fill
+                    className={styles.image}
+                    sizes="272px"
+                    unoptimized={
+                      current.includes("igdb") || current.includes("rawg")
+                    }
+                  />
+                  {hasGallery ? (
+                    <>
+                      <button
+                        type="button"
+                        className={`${styles.nav} ${styles.prev}`}
+                        aria-label="Previous image"
+                        onClick={() => step(-1)}
+                      >
+                        <ChevronLeftIcon className={styles.navIcon} />
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.nav} ${styles.next}`}
+                        aria-label="Next image"
+                        onClick={() => step(1)}
+                      >
+                        <ArrowRightIcon className={styles.navIcon} />
+                      </button>
+                      <span className={styles.counter}>
+                        {index + 1}/{images.length}
+                      </span>
+                    </>
+                  ) : null}
+                </div>
+                <div className={styles.body}>
+                  <p className={styles.title}>{game.title}</p>
+                  {release ? (
+                    <p className={styles.meta}>
+                      {release}
+                      {game.developer && game.developer !== "Unknown"
+                        ? ` · ${game.developer}`
+                        : ""}
+                    </p>
+                  ) : null}
+                  {description ? (
+                    <p className={styles.description}>{description}</p>
+                  ) : null}
+                </div>
               </div>
             </div>,
             document.body,

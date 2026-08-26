@@ -1,0 +1,27 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply relative inline-grid shrink-0 place-items-center overflow-hidden rounded-full font-body font-bold leading-none tracking-tight text-sw-bg;
+  box-shadow: 0 0 0 2px #0c0e12;
+}
+
+.xs {
+  @apply h-[22px] w-[22px] text-[9px];
+}
+
+.sm {
+  @apply h-7 w-7 text-[10px];
+}
+
+.photo {
+  @apply object-cover;
+}
+
+.initials {
+  @apply leading-none;
+  translate: 0 0.05em;
+}
+
+.dimmed {
+  @apply opacity-40;
+}

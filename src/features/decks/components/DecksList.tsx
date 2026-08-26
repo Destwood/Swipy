@@ -27,6 +27,11 @@ const PLACEHOLDER_COVER =
 
 type FilterTab = "all" | "favorites";
 
+type DecksListProps = {
+  mode?: "browse" | "pick";
+  onPick?: (deckId: string) => void;
+};
+
 type DeckView = Deck & {
   covers: string[];
   genres: string[];
@@ -64,7 +69,8 @@ function toDeckView(deck: Deck): DeckView {
   return { ...deck, covers, genres };
 }
 
-export function DecksList() {
+export function DecksList({ mode = "browse", onPick }: DecksListProps) {
+  const pickMode = mode === "pick";
   const { user, ready: authReady } = useAuthUser();
   const [decks, setDecks] = useState<DeckView[]>([]);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -144,18 +150,22 @@ export function DecksList() {
         }}
       />
       <UseInSessionDialog
-        open={Boolean(pendingUse)}
+        open={!pickMode && Boolean(pendingUse)}
         deckId={pendingUse?.id ?? null}
         deckName={pendingUse?.name}
         onClose={() => setPendingUse(null)}
       />
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Decks</h1>
+          <h1 className={styles.title}>
+            {pickMode ? "Select a deck" : "Decks"}
+          </h1>
           <p className={styles.subtitle}>
             {hydrating
               ? "Loading games from IGDB…"
-              : `${decks.length} ${decks.length === 1 ? "deck" : "decks"} · ${totalGames} games total`}
+              : pickMode
+                ? "Pick one deck for this session."
+                : `${decks.length} ${decks.length === 1 ? "deck" : "decks"} · ${totalGames} games total`}
           </p>
         </div>
         <Button href="/decks/new" variant={ButtonVariant.Accent}>
@@ -218,9 +228,16 @@ export function DecksList() {
               <DeckCard
                 deck={deck}
                 isFavorite={favorites.has(deck.id)}
+                ctaLabel={pickMode ? "Select" : "Use in session"}
                 onToggleFav={() => toggleFav(deck.id)}
                 onDelete={() => setPendingDelete(deck)}
-                onUse={() => setPendingUse(deck)}
+                onUse={() => {
+                  if (pickMode) {
+                    onPick?.(deck.id);
+                    return;
+                  }
+                  setPendingUse(deck);
+                }}
               />
             </FadeIn>
           ))}
@@ -244,12 +261,14 @@ export function DecksList() {
 function DeckCard({
   deck,
   isFavorite,
+  ctaLabel,
   onToggleFav,
   onDelete,
   onUse,
 }: {
   deck: DeckView;
   isFavorite: boolean;
+  ctaLabel: string;
   onToggleFav: () => void;
   onDelete: () => void;
   onUse: () => void;
@@ -285,7 +304,7 @@ function DeckCard({
             size={ButtonSize.Sm}
             className={styles.useButton}
           >
-            Use in session
+            {ctaLabel}
           </Button>
         </div>
 
@@ -344,25 +363,29 @@ function DeckCard({
         href={`/decks/${encodeURIComponent(deck.id)}`}
         className={styles.cardBody}
       >
-        <div className={styles.titleRow}>
-          <h3 className={styles.cardTitle}>{deck.name}</h3>
-          {isFavorite ? <HeartIcon className={styles.favDot} /> : null}
+        <div className={styles.titleSlot}>
+          <div className={styles.titleRow}>
+            <h3 className={styles.cardTitle}>{deck.name}</h3>
+            {isFavorite ? <HeartIcon className={styles.favDot} /> : null}
+          </div>
         </div>
 
-        {deck.genres.length > 0 ? (
-          <div className={styles.tags}>
-            {deck.genres.map((g, i) => (
-              <span
-                key={g}
-                className={`${styles.tag} ${i === 0 ? styles.tagAccent : ""}`}
-              >
-                {g}
-              </span>
-            ))}
-          </div>
-        ) : deck.description ? (
-          <p className={styles.cardDesc}>{deck.description}</p>
-        ) : null}
+        <div className={styles.tagsSlot}>
+          {deck.genres.length > 0 ? (
+            <div className={styles.tags}>
+              {deck.genres.map((g, i) => (
+                <span
+                  key={g}
+                  className={`${styles.tag} ${i === 0 ? styles.tagAccent : ""}`}
+                >
+                  {g}
+                </span>
+              ))}
+            </div>
+          ) : deck.description ? (
+            <p className={styles.cardDesc}>{deck.description}</p>
+          ) : null}
+        </div>
 
         <div className={styles.cardFooter}>
           <span className={styles.meta}>

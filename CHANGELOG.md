@@ -12,34 +12,38 @@ How to use:
 
 ## [Unreleased]
 
-Work on the `dev` branch — not on `main` yet.
+## [0.3.0] - 2026-08-26
+
+Session lobby polish, richer match results, catalog UX, and production cleanup.
 
 ### Added
 
-- Practice swipe on `/deck` with real drag, like/skip, and a right-hand game info panel
-- Game info panel: title, developer/year, genres, 2×3 screenshots, description, framed favorite star
-- Screenshot lightbox with prev/next, Escape, and pointer cursor on controls
-- Steam screenshots via `/api/steam/media`; **Open in Steam** control (recessed Steam chrome, official mark, white label)
-- Personal favorite games in `localStorage` (`swipy.favoriteGameIds`) — distinct from session likes
-- Home page always shows the same top bar as the rest of the app (Decks / Games / account)
+- Lobby URLs at `/session/lobby/[code]` — share a link; guests can join from the page
+- Session create: pick-deck flow, sunken code copy control, toast on copy
+- Match results: agreement tiers (100% / 75% / 50% / 30%), rejected list, vote avatars with who liked/skipped
+- Top-agreement hero cards with cover, screenshots, Steam + SteamDB buttons, favorite star
+- Compact match rows with hover preview and favorite
+- Catalog filters redesigned (Genre / Play / Platform), sticky + collapsible bar, scroll-to-top on Games
+- Favorites page wired to starred games (`/liked`); Favorites link in the top bar
+- Lightweight toast host for copy / small confirmations
 
 ### Changed
 
-- Denser layout for ~1440×900 notebooks: fluid swipe card, tighter pages, smaller favorite control
-- IGDB covers load at higher resolution (hero/tile sizes) so library and cards stay sharp
-- Session names: solo never asks; co-op asks guests only; signed-in players use Google/email name
-- Logged-in name is preferred over a leftover guest nickname
-- Profile nickname editor is planned later (account page), not built yet
+- Session code collisions retry with a fresh code; create-form code clears after a successful lobby open
+- Lobby members refresh live (realtime + short poll)
+- Deck cards reserve title/tag slots so short tag lists no longer push titles down
+- Library tiles equal-height titles; hover preview images clipped to the card
 
 ### Fixed
 
-- Sidebar no longer paints IGDB shots first, then replaces them with Steam (one load, cached by app id)
-- Extra gap between the like button and the info panel on swipe
+- Duplicate `sessions_code_key` when re-opening a lobby with a cached code
+- Matches row hover no longer stacking library-tile glow on list rows
 
 ### Removed
 
-- Floating home-only auth chip (replaced by the shared top bar)
-- Session name field on solo start and on co-op when already signed in
+- Layout-preview routes (`/end`, `/liked/empty`, `/deck/empty|loading|error`)
+- Sample/hardcoded session members and empty `SAMPLE_LIKED` / `GAMES` helpers
+- Unused SteamDB icon variants (kept light SVG only)
 
 ## [0.2.0] - 2026-08-06
 
@@ -78,4 +82,3 @@ First product cut beyond the initial Next.js scaffold: real sessions, IGDB catal
 ### Removed
 
 - FrameNav and “static layout preview” home copy
-- Hardcoded Unsplash seed game images

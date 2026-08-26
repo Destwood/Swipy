@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { setActiveDeckId } from "@/features/decks/lib/deck-store";
 import { useSessionDisplayName } from "@/features/session/lib/use-session-display-name";
 import { joinGuestSession } from "@/features/session/lib/sessions";
+import { Button, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./JoinSessionForm.module.css";
 
 export function JoinSessionForm() {
@@ -23,7 +23,9 @@ export function JoinSessionForm() {
     try {
       const session = await joinGuestSession({ code, displayName });
       setActiveDeckId(session.deckId);
-      router.push("/session/lobby");
+      router.push(
+        `/session/lobby/${encodeURIComponent(session.code)}`,
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to join");
       setBusy(false);
@@ -65,17 +67,17 @@ export function JoinSessionForm() {
       {error && <p className={styles.error}>{error}</p>}
 
       <div className={styles.actions}>
-        <button
+        <Button
           type="button"
           onClick={() => void joinLobby()}
           disabled={busy || !ready || code.trim().length < 6}
-          className={styles.primaryButton}
+          variant={ButtonVariant.Accent}
         >
           {busy ? "Joining…" : "Join lobby"}
-        </button>
-        <Link href="/session" className={styles.secondaryLink}>
+        </Button>
+        <Button href="/session" variant={ButtonVariant.Dark}>
           Create instead
-        </Link>
+        </Button>
       </div>
     </div>
   );

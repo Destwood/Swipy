@@ -6,3 +6,7 @@ export function steamStoreAppUrl(appId: string): string {
 export function steamStoreWebUrl(appId: string): string {
   return `https://store.steampowered.com/app/${appId}`;
 }
+
+export function steamDbUrl(appId: string): string {
+  return `https://steamdb.info/app/${appId}/`;
+}

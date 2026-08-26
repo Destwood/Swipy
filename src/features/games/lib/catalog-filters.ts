@@ -1,8 +1,5 @@
 import type { Game } from "@/features/games/data/games";
-import {
-  collectGenreStats,
-  gameHasGenre,
-} from "@/features/games/lib/genre-label";
+import { gameHasGenre } from "@/features/games/lib/genre-label";
 
 export type CatalogFilterState = {
   genre: string;
@@ -20,15 +17,9 @@ export const EMPTY_CATALOG_FILTERS: CatalogFilterState = {
   crossplayOnly: false,
 };
 
-export type ChipStat = { label: string; count: number };
-
-function unlabeled(labels: string[]): ChipStat[] {
-  return labels.map((label) => ({ label, count: 0 }));
-}
-
-/** Fixed chip labels for the catalog UI before live counts exist. */
-export const CATALOG_FILTER_SHELL = {
-  genres: unlabeled([
+/** Fixed catalog filter options (UI labels = filter values). */
+export const CATALOG_FILTER_OPTIONS = {
+  genres: [
     "Action",
     "Adventure",
     "RPG",
@@ -37,11 +28,29 @@ export const CATALOG_FILTER_SHELL = {
     "Simulator",
     "Indie",
     "Puzzle",
-  ]),
-  modes: unlabeled(["Single", "Multiplayer", "Co-op"]),
-  players: unlabeled(["2", "3–4", "5+"]),
-  platforms: unlabeled(["PC", "PlayStation", "Xbox", "Nintendo"]),
-};
+  ],
+  modes: [
+    { value: "Single", label: "Solo" },
+    { value: "Multiplayer", label: "Multiplayer" },
+    { value: "Co-op", label: "Co-op" },
+  ],
+  players: [
+    { value: "2", label: "2 players" },
+    { value: "3–4", label: "3–4" },
+    { value: "5+", label: "5+" },
+  ],
+  platforms: ["PC", "PlayStation", "Xbox", "Nintendo"],
+} as const;
+
+export function catalogFiltersActive(filters: CatalogFilterState): boolean {
+  return (
+    filters.genre !== "All" ||
+    filters.mode !== "All" ||
+    filters.players !== "All" ||
+    filters.platform !== "All" ||
+    filters.crossplayOnly
+  );
+}
 
 export function playersBucket(max?: number): string | null {
   if (!max || max < 2) return null;
@@ -78,72 +87,4 @@ export function gameMatchesCatalogFilters(
   }
   if (filters.crossplayOnly && !game.crossplay) return false;
   return true;
-}
-
-function countBy(
-  games: Game[],
-  pick: (g: Game) => string[],
-): ChipStat[] {
-  const counts = new Map<string, number>();
-  for (const game of games) {
-    const seen = new Set<string>();
-    for (const label of pick(game)) {
-      if (!label || seen.has(label)) continue;
-      seen.add(label);
-      counts.set(label, (counts.get(label) ?? 0) + 1);
-    }
-  }
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .map(([label, count]) => ({ label, count }));
-}
-
-/** Stats for cascade chips, computed against games that already match upstream filters. */
-export function collectCatalogFilterStats(
-  games: Game[],
-  filters: CatalogFilterState,
-) {
-  const afterGenre = games.filter((g) => gameHasGenre(g, filters.genre));
-  const modeCounts = countBy(afterGenre, (g) => g.modes ?? []);
-  const modeMap = new Map(modeCounts.map((m) => [m.label, m.count]));
-  const modes: ChipStat[] = ["Single", "Multiplayer", "Co-op"]
-    .map((label) => ({ label, count: modeMap.get(label) ?? 0 }))
-    .filter((m) => m.count > 0);
-
-  const afterMode =
-    filters.mode === "All"
-      ? afterGenre
-      : afterGenre.filter((g) => (g.modes ?? []).includes(filters.mode));
-
-  const playerCounts = new Map<string, number>();
-  for (const game of afterMode) {
-    const bucket = playersBucket(game.coopMaxPlayers);
-    if (!bucket) continue;
-    playerCounts.set(bucket, (playerCounts.get(bucket) ?? 0) + 1);
-  }
-  const players: ChipStat[] = ["2", "3–4", "5+"]
-    .map((label) => ({ label, count: playerCounts.get(label) ?? 0 }))
-    .filter((x) => x.count > 0);
-
-  const afterPlayers =
-    filters.mode === "Co-op"
-      ? afterMode.filter((g) => matchesPlayers(g, filters.players))
-      : afterMode;
-
-  const platformOrder = ["PC", "PlayStation", "Xbox", "Nintendo"];
-  const platformCounts = countBy(afterPlayers, (g) => g.platforms ?? []);
-  const platformMap = new Map(platformCounts.map((p) => [p.label, p.count]));
-  const platforms: ChipStat[] = platformOrder
-    .map((label) => ({ label, count: platformMap.get(label) ?? 0 }))
-    .filter((p) => p.count > 0);
-
-  const crossplayCount = afterPlayers.filter((g) => g.crossplay).length;
-
-  return {
-    genres: collectGenreStats(games),
-    modes,
-    players,
-    platforms,
-    crossplayCount,
-  };
 }

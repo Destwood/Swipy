@@ -1,0 +1,70 @@
+@reference "../../../app/globals.css";
+
+.anchor {
+  @apply relative inline-flex cursor-default items-center gap-1.5;
+}
+
+.stack {
+  @apply flex items-center;
+}
+
+.stack > :not(:first-child) {
+  margin-left: -6px;
+}
+
+.more {
+  @apply ml-[-6px] grid h-[22px] min-w-[22px] place-items-center rounded-full bg-sw-surface2 px-1 font-mono text-[9px] text-white/55;
+  box-shadow: 0 0 0 2px #0c0e12;
+}
+
+.count {
+  @apply font-mono text-[11px] text-sw-accent;
+}
+
+.tip {
+  @apply pointer-events-auto fixed z-[70] min-w-[180px] max-w-[240px] rounded-xl border border-white/12 bg-sw-surface px-3 py-2.5 shadow-[0_14px_36px_rgba(0,0,0,0.55)];
+  animation: sw-vote-tip-in 140ms ease both;
+}
+
+.group + .group {
+  @apply mt-2.5 border-t border-white/[0.08] pt-2.5;
+}
+
+.groupLabel {
+  @apply m-0 mb-1.5 font-mono text-[10px] tracking-[0.06em] text-white/35 uppercase;
+}
+
+.people {
+  @apply m-0 flex list-none flex-col gap-1.5 p-0;
+}
+
+.person {
+  @apply flex items-center gap-2;
+}
+
+.personName {
+  @apply min-w-0 truncate font-body text-[12px] text-sw-text;
+}
+
+@keyframes sw-vote-tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tip {
+    animation: none;
+  }
+}
+
+@media (hover: none) {
+  .tip {
+    @apply hidden;
+  }
+}

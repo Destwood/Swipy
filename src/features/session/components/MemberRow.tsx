@@ -15,7 +15,7 @@ export function MemberRow({ member }: { member: SessionMember }) {
         className={styles.avatar}
         style={{ background: member.color }}
       >
-        {member.initials}
+        <span className={styles.initials}>{member.initials}</span>
       </div>
       <div className={styles.content}>
         <div className={styles.nameRow}>

@@ -1,60 +1,80 @@
 @reference "../../app/globals.css";
 
 .root {
-  @apply flex flex-col gap-2.5;
+  @apply sticky top-0 z-20 flex flex-col gap-0 bg-sw-bg/95 backdrop-blur-[12px];
+  margin-inline: calc(-1 * var(--sw-page-pad-x, 0px));
+  padding-inline: var(--sw-page-pad-x, 0px);
+  padding-top: 0.35rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.bar {
-  @apply grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:gap-4;
+.header {
+  @apply flex flex-wrap items-center justify-between gap-2;
 }
 
-.filters {
-  @apply flex min-w-0 flex-wrap items-center gap-1;
+.toggle {
+  @apply flex min-w-0 max-w-full cursor-pointer items-center gap-2 rounded-lg border-0 bg-transparent px-1 py-1.5 text-left transition-colors hover:text-sw-text;
 }
 
-.row {
-  @apply flex min-w-0 flex-wrap items-center gap-1;
+.toggleLabel {
+  @apply shrink-0 font-display text-sm font-bold tracking-[-0.02em] text-sw-text;
 }
 
-.splitRow {
-  @apply grid grid-cols-1 items-start gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4;
+.summary {
+  @apply min-w-0 truncate font-body text-xs text-white/40;
 }
 
-.playersRow {
-  @apply sm:justify-end;
+.toggleIcon {
+  @apply h-3.5 w-3.5 shrink-0 -rotate-90 text-white/45 transition-transform duration-200;
 }
 
-.moreButton {
-  @apply flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-sw-muted transition-[color,border-color,transform] duration-150 hover:border-white/15 hover:text-sw-text;
-}
-
-.moreButton:active {
-  transform: scale(0.96);
-}
-
-.moreIcon {
-  @apply h-3.5 w-3.5 -rotate-90 transition-transform duration-200;
-}
-
-.moreIconOpen {
+.toggleIconOpen {
   @apply rotate-90;
 }
 
-.count {
-  @apply ml-1.5 font-mono text-[10px] text-inherit opacity-55;
+.headerActions {
+  @apply flex shrink-0 flex-wrap items-center justify-end gap-2;
 }
 
 .sortWrap {
-  @apply flex shrink-0 items-center justify-self-end sm:pt-0.5;
+  @apply flex shrink-0 items-center;
 }
 
 .sortSelect {
   @apply cursor-pointer rounded-[9px] border border-white/[0.08] bg-sw-surface px-3 py-2 font-body text-sm text-sw-text outline-none transition-colors focus:border-sw-accent/40;
 }
 
+.clearButton {
+  @apply inline-flex cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 py-1.5 font-body text-sm text-white/40 transition-colors hover:text-sw-text;
+}
+
+.clearIcon {
+  @apply h-3 w-3 shrink-0;
+}
+
+.panel {
+  @apply mt-3 flex flex-col gap-3;
+}
+
+.group {
+  @apply flex min-w-0 flex-col gap-1.5;
+}
+
+.groupLabel {
+  @apply font-mono text-[10px] tracking-[0.08em] text-white/35 uppercase;
+}
+
+.chips {
+  @apply flex min-w-0 flex-wrap items-center gap-1;
+}
+
+.divider {
+  @apply mx-1 hidden h-4 w-px bg-white/[0.1] sm:block;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .moreIcon,
-  .moreButton {
+  .toggleIcon {
     transition: none;
   }
 }

@@ -15,7 +15,7 @@
 }
 
 .toolbar {
-  @apply mb-5;
+  @apply mb-3;
 }
 
 .count {
@@ -28,10 +28,15 @@
 
 .grid {
   @apply m-0 grid list-none grid-cols-3 gap-2 p-0 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8;
+  align-items: stretch;
+}
+
+.gridItem {
+  @apply h-full min-h-0;
 }
 
 .tile {
-  @apply block overflow-visible rounded-xl border border-white/[0.06] bg-sw-surface text-inherit no-underline;
+  @apply flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-sw-surface text-inherit no-underline;
   transition:
     border-color 180ms ease,
     background-color 180ms ease,
@@ -39,7 +44,7 @@
 }
 
 .coverWrap {
-  @apply relative aspect-[3/4] w-full overflow-hidden bg-sw-surface2;
+  @apply relative aspect-[3/4] w-full shrink-0 overflow-hidden rounded-t-[11px] bg-sw-surface2;
 }
 
 .coverImage {
@@ -51,11 +56,11 @@
 }
 
 .tileBody {
-  @apply relative px-2.5 pt-2.5 pb-3;
+  @apply relative flex min-h-0 flex-1 flex-col px-2.5 pt-2.5 pb-3;
 }
 
 .gameTitle {
-  @apply m-0 mb-1 min-h-[2.4em] font-display text-[12px] leading-snug font-bold tracking-[-0.02em] text-sw-text;
+  @apply m-0 mb-1 h-[3.75em] font-display text-[12px] leading-[1.25] font-bold tracking-[-0.02em] text-sw-text;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -63,7 +68,7 @@
 }
 
 .gameMeta {
-  @apply m-0 truncate font-body text-[11px] text-white/35;
+  @apply m-0 mt-auto truncate font-body text-[11px] text-white/35;
 }
 
 .score {
@@ -71,7 +76,7 @@
 }
 
 .skeletonTile {
-  @apply overflow-hidden rounded-xl border border-white/[0.06] bg-sw-surface;
+  @apply flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-sw-surface;
 }
 
 .skeletonCover {
@@ -102,12 +107,30 @@
   @apply col-span-full h-px list-none;
 }
 
+.toTop {
+  @apply fixed right-5 bottom-5 z-30 flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border border-white/12 bg-sw-surface/90 text-sw-text shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur-[10px] transition-[transform,border-color,background-color] duration-150 hover:border-sw-accent/40 hover:bg-sw-surface2 sm:right-7 sm:bottom-7;
+}
+
+.toTop:active {
+  transform: scale(0.96);
+}
+
+.toTopIcon {
+  @apply h-4 w-4 rotate-90;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .coverImage {
     transition: none;
   }
 
   .tile:hover .coverImage {
+    transform: none;
+  }
+
+  .toTop,
+  .toTop:active {
+    transition: none;
     transform: none;
   }
 }

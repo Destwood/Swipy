@@ -5,7 +5,12 @@
 }
 
 .avatar {
-  @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold text-sw-bg;
+  @apply grid h-11 w-11 shrink-0 place-items-center rounded-full font-body text-sm font-bold leading-none tracking-tight text-sw-bg;
+}
+
+.initials {
+  @apply leading-none;
+  translate: 0 0.05em;
 }
 
 .content {

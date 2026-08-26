@@ -12,18 +12,6 @@
   @apply m-0 min-w-0 flex-1 font-display text-[22px] leading-tight font-extrabold tracking-[-0.03em] text-sw-text;
 }
 
-.favorite {
-  @apply mt-0.5 flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center overflow-visible rounded-md border border-white/22 bg-white/[0.04] p-0 text-white/55 transition-colors hover:border-white/45 hover:bg-white/[0.08] hover:text-sw-text;
-}
-
-.favoriteOn {
-  @apply border-[#f5c451]/55 bg-[#f5c451]/14 text-[#f5c451] hover:border-[#f5c451]/80 hover:bg-[#f5c451]/22 hover:text-[#f5c451];
-}
-
-.favoriteIcon {
-  @apply block h-3.5 w-3.5 shrink-0 overflow-visible;
-}
-
 .scroll {
   @apply min-h-0 flex-1 overflow-x-hidden overflow-y-auto;
 }

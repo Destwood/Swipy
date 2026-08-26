@@ -1,9 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
 import ArrowRightIcon from "@/assets/icons/arrow-right.svg";
 import { HERO_IMG } from "@/features/games/data/games";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
 import { SwipyLogo } from "@/features/shell/components/SwipyLogo";
+import { Button, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./page.module.css";
 
 export default function HomePage() {
@@ -30,16 +30,16 @@ export default function HomePage() {
         <p className={styles.tagline}>Swipe with friends. Pick what to play.</p>
 
         <div className={styles.actions}>
-          <Link href="/session" className={styles.primaryLink}>
+          <Button href="/session" variant={ButtonVariant.Accent}>
             Play with friends
             <ArrowRightIcon width={16} height={16} className={styles.primaryIcon} aria-hidden />
-          </Link>
-          <Link href="/decks" className={styles.secondaryLink}>
+          </Button>
+          <Button href="/decks" variant={ButtonVariant.Dark}>
             Manage decks
-          </Link>
-          <Link href="/library" className={styles.secondaryLink}>
+          </Button>
+          <Button href="/library" variant={ButtonVariant.Dark}>
             Browse games
-          </Link>
+          </Button>
         </div>
       </div>
     </div>

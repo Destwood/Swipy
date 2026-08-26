@@ -1,0 +1,27 @@
+@reference "../../app/globals.css";
+
+.host {
+  @apply pointer-events-none fixed inset-x-0 bottom-6 z-[100] flex flex-col items-center gap-2 px-4;
+}
+
+.toast {
+  @apply rounded-xl border border-white/10 bg-sw-surface2 px-4 py-2.5 font-body text-sm text-sw-text shadow-[0_12px_32px_rgba(0,0,0,0.45)];
+  animation: sw-toast-in 200ms ease both;
+}
+
+@keyframes sw-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

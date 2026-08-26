@@ -2,14 +2,9 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import StarIcon from "@/assets/icons/star.svg";
-import StarOutlineIcon from "@/assets/icons/star-outline.svg";
 import SteamIcon from "@/assets/icons/steam.svg";
+import { GameFavoriteButton } from "@/features/games/components/GameFavoriteButton";
 import type { Game } from "@/features/games/data/games";
-import {
-  isFavoriteGame,
-  toggleFavoriteGame,
-} from "@/features/games/lib/game-favorites";
 import { steamStoreWebUrl } from "@/features/games/lib/steam";
 import {
   getCachedSteamMedia,
@@ -30,11 +25,9 @@ function stripHtml(html: string) {
 export function GameInfoSidebar({ game }: Props) {
   const [steam, setSteam] = useState<SteamMedia | null>(null);
   const [steamReady, setSteamReady] = useState(!game.steamAppId);
-  const [favorite, setFavorite] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    setFavorite(isFavoriteGame(game.id));
     setGalleryIndex(null);
   }, [game.id]);
 
@@ -104,23 +97,7 @@ export function GameInfoSidebar({ game }: Props) {
     <aside className={styles.root} aria-label={`${game.title} details`}>
       <div className={styles.titleRow}>
         <h2 className={styles.title}>{game.title}</h2>
-        <button
-          type="button"
-          className={`${styles.favorite} ${favorite ? styles.favoriteOn : ""}`}
-          aria-pressed={favorite}
-          aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
-          onClick={() => setFavorite(toggleFavoriteGame(game.id))}
-        >
-          {favorite ? (
-            <StarIcon width={14} height={14} className={styles.favoriteIcon} />
-          ) : (
-            <StarOutlineIcon
-              width={14}
-              height={14}
-              className={styles.favoriteIcon}
-            />
-          )}
-        </button>
+        <GameFavoriteButton gameId={game.id} />
       </div>
 
       <div className={styles.scroll}>

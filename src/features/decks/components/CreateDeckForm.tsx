@@ -14,7 +14,6 @@ import {
   hydrateSeedGamesFromIgdb,
 } from "@/features/games/lib/game-library";
 import {
-  CATALOG_FILTER_SHELL,
   EMPTY_CATALOG_FILTERS,
   type CatalogFilterState,
 } from "@/features/games/lib/catalog-filters";
@@ -259,10 +258,6 @@ export function CreateDeckForm({ deckId }: Props) {
           <CatalogFilterBar
             filters={filters}
             onChange={setFilters}
-            genres={CATALOG_FILTER_SHELL.genres}
-            modes={CATALOG_FILTER_SHELL.modes}
-            players={CATALOG_FILTER_SHELL.players}
-            platforms={CATALOG_FILTER_SHELL.platforms}
             sort={sort}
             onSortChange={setSort}
           />

@@ -43,12 +43,61 @@
   @apply font-body text-sw-text/45;
 }
 
+.section {
+  @apply mb-8;
+}
+
+.sectionHeader {
+  @apply mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1;
+}
+
+.sectionTitle {
+  @apply font-display text-lg font-bold tracking-[-0.02em] text-sw-text;
+}
+
+.sectionMeta {
+  @apply font-mono text-[11px] text-white/35;
+}
+
+.sectionRejected .sectionTitle {
+  @apply text-sw-dislike;
+}
+
 .list {
   @apply m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2;
 }
 
+.heroList {
+  @apply m-0 grid list-none grid-cols-1 gap-5 p-0;
+}
+
 .row {
-  @apply flex items-center gap-5 rounded-xl px-4 py-3.5 transition-colors hover:bg-white/[0.035];
+  @apply list-none;
+}
+
+.rowInner {
+  @apply flex items-center gap-5 rounded-xl px-4 py-3.5 transition-colors hover:bg-white/[0.04];
+}
+
+.previewWrap {
+  @apply flex min-w-0 flex-1 self-stretch;
+}
+
+.previewAnchor {
+  @apply flex min-w-0 flex-1 self-stretch;
+}
+
+.previewHit {
+  @apply flex min-h-full w-full min-w-0 flex-1 items-center gap-5 rounded-lg text-inherit no-underline outline-none transition-colors;
+}
+
+.previewHit:hover .gameTitle,
+.previewHit:focus-visible .gameTitle {
+  @apply text-sw-accent;
+}
+
+.previewHit:focus-visible {
+  @apply ring-2 ring-sw-accent/50;
 }
 
 .rank {
@@ -68,7 +117,7 @@
 }
 
 .gameTitle {
-  @apply mb-1.5 truncate font-display text-base font-bold tracking-[-0.02em] text-sw-text;
+  @apply mb-1.5 truncate font-display text-base font-bold tracking-[-0.02em] text-sw-text transition-colors;
 }
 
 .metaRow {
@@ -79,8 +128,88 @@
   @apply font-mono text-[11px] text-sw-accent;
 }
 
-.playLink {
-  @apply shrink-0 cursor-pointer rounded-lg border border-[rgba(45,212,191,0.28)] bg-sw-accent-d px-3 py-2 text-sm font-medium text-sw-accent transition-colors hover:bg-[rgba(45,212,191,0.22)];
+.voteMeta {
+  @apply flex shrink-0 flex-wrap items-center gap-2;
+}
+
+.pctBadge {
+  @apply rounded-md bg-sw-accent-d px-1.5 py-0.5 font-mono text-[11px] text-sw-accent;
+}
+
+.heroItem {
+  @apply list-none;
+}
+
+.heroCard {
+  @apply grid grid-cols-1 overflow-hidden rounded-2xl border border-white/[0.06] bg-sw-surface md:grid-cols-[260px_minmax(0,1fr)];
+}
+
+.heroCover {
+  @apply relative min-h-[240px] w-full overflow-hidden bg-sw-surface2 md:min-h-full;
+}
+
+.heroRank {
+  @apply absolute top-3 left-3 z-[1] rounded-md bg-black/55 px-2 py-1 font-mono text-[11px] text-white/80 backdrop-blur-[4px];
+}
+
+.heroBody {
+  @apply flex min-w-0 flex-1 flex-col gap-3 px-5 py-5;
+}
+
+.heroTitleRow {
+  @apply flex items-start gap-2;
+}
+
+.heroTitle {
+  @apply m-0 min-w-0 flex-1 font-display text-[clamp(1.25rem,2.4vw,1.75rem)] leading-tight font-extrabold tracking-[-0.03em] text-sw-text;
+}
+
+.heroFav {
+  @apply mt-1;
+}
+
+.rowFav {
+  @apply shrink-0;
+}
+
+.heroByline {
+  @apply m-0 font-mono text-[11px] text-white/40;
+}
+
+.heroAbout {
+  @apply m-0 font-body text-sm leading-relaxed text-sw-text/65;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+
+.heroShots {
+  @apply flex flex-wrap gap-2;
+}
+
+.heroShot {
+  @apply relative h-[72px] w-[120px] cursor-pointer overflow-hidden rounded-lg border-0 bg-sw-surface2 p-0 outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-sw-accent/50;
+}
+
+.heroShotImage {
+  @apply object-cover;
+}
+
+.heroVotes {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+.heroActions {
+  @apply mt-auto flex flex-wrap items-center gap-2 pt-1;
+}
+
+.heroSteam {
+  @apply inline-flex items-center gap-1.5;
+}
+
+.heroSteamIcon {
+  @apply shrink-0;
 }
 
 .noSteam {
@@ -93,18 +222,6 @@
 
 .footer {
   @apply mt-10 flex flex-wrap gap-3;
-}
-
-.shareButton {
-  @apply cursor-pointer rounded-xl border border-[rgba(45,212,191,0.28)] bg-sw-accent-d px-8 py-3.5 text-[15px] font-semibold tracking-[-0.01em] text-sw-accent transition-all hover:bg-[rgba(45,212,191,0.22)] disabled:cursor-not-allowed disabled:opacity-40;
-}
-
-.continueLink {
-  @apply rounded-xl bg-sw-accent px-8 py-3.5 text-[15px] font-semibold tracking-[-0.01em] text-sw-bg transition-all hover:bg-sw-like;
-}
-
-.keepSwipingLink {
-  @apply rounded-xl border border-white/10 bg-white/[0.06] px-8 py-3.5 text-[15px] font-medium text-sw-text/70 transition-all hover:bg-white/10 hover:text-sw-text;
 }
 
 .topBarLeft {

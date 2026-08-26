@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
+import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./ConfirmDialog.module.css";
 
 type Props = {
@@ -71,21 +72,23 @@ export function ConfirmDialog({
           </p>
         ) : null}
         <div className={styles.actions}>
-          <button
+          <Button
             ref={cancelRef}
             type="button"
             onClick={onCancel}
-            className={styles.cancel}
+            variant={ButtonVariant.Dark}
+            size={ButtonSize.Sm}
           >
             {cancelLabel}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={onConfirm}
-            className={danger ? styles.confirmDanger : styles.confirm}
+            variant={danger ? ButtonVariant.Danger : ButtonVariant.Accent}
+            size={ButtonSize.Sm}
           >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

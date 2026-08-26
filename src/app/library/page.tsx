@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import ChevronLeftIcon from "@/assets/icons/chevron-left.svg";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
 import { GameHoverPreview } from "@/features/games/components/GameHoverPreview";
 import { SteamGameTile } from "@/features/games/components/SteamGameTile";
 import {
-  CATALOG_FILTER_SHELL,
   EMPTY_CATALOG_FILTERS,
   type CatalogFilterState,
 } from "@/features/games/lib/catalog-filters";
@@ -22,7 +22,7 @@ function SkeletonTiles({ count }: { count: number }) {
   return (
     <>
       {Array.from({ length: count }, (_, i) => (
-        <li key={`sk-${i}`} className={styles.skeletonTile} aria-hidden>
+        <li key={`sk-${i}`} className={`${styles.gridItem} ${styles.skeletonTile}`} aria-hidden>
           <div className={`${styles.skeletonCover} sw-shimmer`} />
           <div className={styles.tileBody}>
             <div className={`${styles.skeletonTitle} sw-shimmer`} />
@@ -37,10 +37,24 @@ function SkeletonTiles({ count }: { count: number }) {
 export default function LibraryPage() {
   const [filters, setFilters] = useState<CatalogFilterState>(EMPTY_CATALOG_FILTERS);
   const [sort, setSort] = useState<SortValue>("popular");
+  const [showTop, setShowTop] = useState(false);
   const { games, loading, loadingMore, error, hasMore, loadMore } =
     useCatalogGames(filters, sort);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    const root = scrollRef.current;
+    if (!root) return;
+
+    function onScroll() {
+      setShowTop(root!.scrollTop > 480);
+    }
+
+    onScroll();
+    root.addEventListener("scroll", onScroll, { passive: true });
+    return () => root.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const root = scrollRef.current;
@@ -55,6 +69,10 @@ export default function LibraryPage() {
     io.observe(target);
     return () => io.disconnect();
   }, [hasMore, loadMore, loading, games.length]);
+
+  function scrollToTop() {
+    scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   const status = loading
     ? "Loading popular games…"
@@ -71,10 +89,6 @@ export default function LibraryPage() {
             <CatalogFilterBar
               filters={filters}
               onChange={setFilters}
-              genres={CATALOG_FILTER_SHELL.genres}
-              modes={CATALOG_FILTER_SHELL.modes}
-              players={CATALOG_FILTER_SHELL.players}
-              platforms={CATALOG_FILTER_SHELL.platforms}
               sort={sort}
               onSortChange={setSort}
             />
@@ -100,6 +114,7 @@ export default function LibraryPage() {
                 <FadeIn
                   key={game.id}
                   as="li"
+                  className={styles.gridItem}
                   delayMs={i < 24 ? Math.min(i, 16) * 28 : 0}
                 >
                   <GameHoverPreview game={game}>
@@ -142,6 +157,17 @@ export default function LibraryPage() {
           )}
         </div>
       </div>
+
+      {showTop ? (
+        <button
+          type="button"
+          className={styles.toTop}
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+        >
+          <ChevronLeftIcon className={styles.toTopIcon} aria-hidden />
+        </button>
+      ) : null}
     </div>
   );
 }

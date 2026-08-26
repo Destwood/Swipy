@@ -1,34 +1,41 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ChevronLeftIcon from "@/assets/icons/chevron-left.svg";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
-import { GenreTag } from "@/features/games/components/GenreTag";
 import { SwipyLogo } from "@/features/shell/components/SwipyLogo";
 import type { Game } from "@/features/games/data/games";
-import { getLibraryGameById } from "@/features/games/lib/game-library";
 import { steamStoreAppUrl } from "@/features/games/lib/steam";
-import { getActiveSession } from "@/features/session/lib/session-context";
+import { MatchGameRow } from "@/features/session/components/MatchGameRow";
+import { VoteBreakdown } from "@/features/session/components/VoteBreakdown";
+import { getActiveSession, toUiMember } from "@/features/session/lib/session-context";
+import {
+  buildAgreementSections,
+  countLikesByGame,
+  flattenAgreementGames,
+  gamesLikedByMember,
+  gamesRejectedByMember,
+  type AgreementSection,
+  type RankedGame,
+} from "@/features/session/lib/match-results";
 import {
   buildShareMatchesPayload,
   buildShareMatchesUrl,
   encodeShareMatchesToken,
   formatShareExpiry,
 } from "@/features/session/lib/share-matches";
-import {
-  computeMatchGameIds,
-  fetchMembers,
-  fetchSession,
-  fetchVotes,
-} from "@/features/session/lib/sessions";
+import { fetchMembers, fetchVotes } from "@/features/session/lib/sessions";
+import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./SessionMatchesClient.module.css";
 
 const RESULT_GAME_KEY = "swipy.resultGameId";
 
 export function SessionMatchesClient() {
-  const [matches, setMatches] = useState<Game[]>([]);
+  const [isSolo, setIsSolo] = useState(false);
+  const [liked, setLiked] = useState<Game[]>([]);
+  const [sections, setSections] = useState<AgreementSection[]>([]);
+  const [rejected, setRejected] = useState<Game[]>([]);
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
   const [memberCount, setMemberCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -45,23 +52,38 @@ export function SessionMatchesClient() {
         return;
       }
 
-      const [session, members, votes] = await Promise.all([
-        fetchSession(active.sessionId),
+      const [members, votes] = await Promise.all([
         fetchMembers(active.sessionId),
         fetchVotes(active.sessionId),
       ]);
 
-      const counts: Record<string, number> = {};
-      for (const vote of votes) {
-        if (vote.value === "like") {
-          counts[vote.game_id] = (counts[vote.game_id] ?? 0) + 1;
-        }
-      }
-
-      const ids = computeMatchGameIds(votes, members.length, session.match_rule);
-      setMatches(ids.map(getLibraryGameById).filter((g): g is Game => Boolean(g)));
+      const counts = countLikesByGame(votes);
+      const solo = members.length <= 1;
+      setIsSolo(solo);
       setLikeCounts(counts);
       setMemberCount(members.length);
+
+      if (solo) {
+        const myLiked = gamesLikedByMember(votes, active.memberId);
+        const myRejected = gamesRejectedByMember(votes, active.memberId);
+        setLiked(myLiked);
+        setRejected(myRejected);
+        setSections([]);
+      } else {
+        const agreement = buildAgreementSections(counts, members.length, {
+          members: members.map(toUiMember),
+          votes,
+        });
+        const inAgreement = new Set(
+          flattenAgreementGames(agreement).map((g) => g.id),
+        );
+        setSections(agreement);
+        setLiked([]);
+        setRejected(
+          gamesRejectedByMember(votes, active.memberId, inAgreement),
+        );
+      }
+
       setReady(true);
     }
 
@@ -71,22 +93,20 @@ export function SessionMatchesClient() {
     });
   }, []);
 
+  const shareGames = isSolo ? liked : flattenAgreementGames(sections);
+  const topPick = shareGames[0] ?? rejected[0] ?? null;
+
   function pickGame(gameId: string) {
     sessionStorage.setItem(RESULT_GAME_KEY, gameId);
   }
 
-  function openSteam(game: Game) {
-    if (!game.steamAppId) return;
-    window.location.href = steamStoreAppUrl(game.steamAppId);
-  }
-
   async function shareResults() {
-    if (matches.length === 0 || shareBusy) return;
+    if (shareGames.length === 0 || shareBusy) return;
     setShareBusy(true);
     setShareHint(null);
     try {
       const payload = buildShareMatchesPayload({
-        matches,
+        matches: shareGames,
         likeCounts,
         memberCount,
       });
@@ -101,18 +121,100 @@ export function SessionMatchesClient() {
     }
   }
 
+  function pickAction(game: Game) {
+    if (game.steamAppId) {
+      return (
+        <Button
+          type="button"
+          onClick={() => {
+            window.location.href = steamStoreAppUrl(game.steamAppId!);
+          }}
+          variant={ButtonVariant.Soft}
+          size={ButtonSize.Sm}
+        >
+          Play this
+        </Button>
+      );
+    }
+    return (
+      <Button
+        href="/session/result"
+        onClick={() => pickGame(game.id)}
+        variant={ButtonVariant.Soft}
+        size={ButtonSize.Sm}
+      >
+        Pick
+      </Button>
+    );
+  }
+
+  function renderRankedList(
+    games: RankedGame[],
+    showStats: boolean,
+    variant: "compact" | "hero" = "compact",
+  ) {
+    return (
+      <ul className={variant === "hero" ? styles.heroList : styles.list}>
+        {games.map((ranked, index) => (
+          <MatchGameRow
+            key={ranked.game.id}
+            game={ranked.game}
+            rank={index + 1}
+            variant={variant}
+            voteMeta={
+              showStats ? (
+                <>
+                  <span className={styles.pctBadge}>{ranked.pct}%</span>
+                  <VoteBreakdown
+                    voters={ranked.voters}
+                    likes={ranked.likes}
+                    members={ranked.members}
+                  />
+                </>
+              ) : null
+            }
+            action={variant === "hero" ? null : pickAction(ranked.game)}
+          />
+        ))}
+      </ul>
+    );
+  }
+
+  function renderGameList(
+    games: Game[],
+    showRank = true,
+    variant: "compact" | "hero" = "compact",
+  ) {
+    return (
+      <ul className={variant === "hero" ? styles.heroList : styles.list}>
+        {games.map((game, index) => (
+          <MatchGameRow
+            key={game.id}
+            game={game}
+            rank={showRank ? index + 1 : undefined}
+            variant={variant}
+            action={variant === "hero" ? null : pickAction(game)}
+          />
+        ))}
+      </ul>
+    );
+  }
+
   if (!ready) {
     return <div className={styles.loading}>Computing matches…</div>;
   }
+
+  const hasAny =
+    liked.length > 0 || sections.length > 0 || rejected.length > 0;
 
   return (
     <div className={styles.root}>
       <AppTopBar
         right={
-          matches[0] ? (
+          topPick ? (
             <Link
               href="/session/result"
-              onClick={() => pickGame(matches[0].id)}
+              onClick={() => pickGame(topPick.id)}
               className={styles.pickLink}
             >
               Pick a game
@@ -133,93 +235,94 @@ export function SessionMatchesClient() {
       <div className={styles.scroll}>
         <div className={styles.page}>
           <div className={styles.header}>
-            <p className={styles.eyebrow}>Shared list</p>
-            <h1 className={styles.title}>Matches</h1>
+            <p className={styles.eyebrow}>
+              {isSolo ? "Your list" : "Shared list"}
+            </p>
+            <h1 className={styles.title}>{isSolo ? "Results" : "Matches"}</h1>
             <p className={styles.subtitle}>
-              Games liked by everyone in the session. Open Steam or share the list.
+              {isSolo
+                ? "Games you liked or skipped. Open Steam from the cover or title."
+                : "Agreement by how many people liked each game. Open Steam or share the list."}
             </p>
           </div>
 
           {error && <p className={styles.error}>{error}</p>}
           {shareHint ? <p className={styles.shareHint}>{shareHint}</p> : null}
 
-          {matches.length === 0 ? (
+          {!hasAny ? (
             <p className={styles.empty}>
-              No full matches yet. Keep swiping or wait for friends to finish.
+              {isSolo
+                ? "No votes yet. Keep swiping."
+                : "No matches yet. Keep swiping or wait for friends to finish."}
             </p>
-          ) : (
-            <ul className={styles.list}>
-              {matches.map((game, index) => (
-                <li key={game.id} className={styles.row}>
-                  <span className={styles.rank}>{index + 1}</span>
-                  <div className={styles.thumbnail}>
-                    <Image
-                      src={game.image}
-                      alt={`${game.title} cover`}
-                      fill
-                      className={styles.cover}
-                      sizes="72px"
-                      unoptimized={
-                        game.image.includes("igdb") || game.image.includes("rawg")
-                      }
-                    />
+          ) : null}
+
+          {isSolo && liked.length > 0 ? (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Liked</h2>
+                <span className={styles.sectionMeta}>
+                  {liked.length} {liked.length === 1 ? "game" : "games"}
+                </span>
+              </div>
+              {renderGameList(liked, true, "hero")}
+            </section>
+          ) : null}
+
+          {!isSolo
+            ? sections.map((section, sectionIndex) => (
+                <section key={section.tier.key} className={styles.section}>
+                  <div className={styles.sectionHeader}>
+                    <h2 className={styles.sectionTitle}>{section.tier.label}</h2>
+                    <span className={styles.sectionMeta}>
+                      {section.games.length}{" "}
+                      {section.games.length === 1 ? "game" : "games"}
+                    </span>
                   </div>
-                  <div className={styles.content}>
-                    <div className={styles.gameTitle}>{game.title}</div>
-                    <div className={styles.metaRow}>
-                      {game.genres.slice(0, 2).map((g, i) => (
-                        <GenreTag key={g} label={g} accent={i === 0} />
-                      ))}
-                      <span className={styles.likeCount}>
-                        {likeCounts[game.id] ?? 0}/{memberCount} liked
-                      </span>
-                    </div>
-                  </div>
-                  {game.steamAppId ? (
-                    <button
-                      type="button"
-                      onClick={() => openSteam(game)}
-                      className={styles.playLink}
-                    >
-                      Play this
-                    </button>
-                  ) : (
-                    <Link
-                      href="/session/result"
-                      onClick={() => pickGame(game.id)}
-                      className={styles.playLink}
-                    >
-                      Pick
-                    </Link>
+                  {renderRankedList(
+                    section.games,
+                    true,
+                    sectionIndex === 0 ? "hero" : "compact",
                   )}
-                </li>
-              ))}
-            </ul>
-          )}
+                </section>
+              ))
+            : null}
+
+          {rejected.length > 0 ? (
+            <section className={`${styles.section} ${styles.sectionRejected}`}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Rejected</h2>
+                <span className={styles.sectionMeta}>
+                  {rejected.length} {rejected.length === 1 ? "game" : "games"}
+                </span>
+              </div>
+              {renderGameList(rejected)}
+            </section>
+          ) : null}
 
           <div className={styles.footer}>
-            {matches.length > 0 ? (
-              <button
+            {shareGames.length > 0 ? (
+              <Button
                 type="button"
                 onClick={() => void shareResults()}
                 disabled={shareBusy}
-                className={styles.shareButton}
+                variant={ButtonVariant.Soft}
               >
                 {shareBusy ? "Copying…" : "Share with friends"}
-              </button>
+              </Button>
             ) : null}
-            {matches[0] && (
-              <Link
+            {topPick && (
+              <Button
                 href="/session/result"
-                onClick={() => pickGame(matches[0].id)}
-                className={styles.continueLink}
+                onClick={() => pickGame(topPick.id)}
+                variant={ButtonVariant.Accent}
               >
                 Continue to result
-              </Link>
+              </Button>
             )}
-            <Link href="/session/deck" className={styles.keepSwipingLink}>
+            <Button href="/session/deck" variant={ButtonVariant.Dark}>
               Keep swiping
-            </Link>
+            </Button>
           </div>
         </div>
       </div>

@@ -1,10 +1,17 @@
+"use client";
+
 import Image from "next/image";
 import CloseIcon from "@/assets/icons/close.svg";
 import type { Game } from "@/features/games/data/games";
 import { GenreTag } from "./GenreTag";
 import styles from "./LikedRow.module.css";
 
-export function LikedRow({ game }: { game: Game }) {
+type Props = {
+  game: Game;
+  onRemove?: () => void;
+};
+
+export function LikedRow({ game, onRemove }: Props) {
   return (
     <li className={styles.row}>
       <div className={styles.thumbnail}>
@@ -14,6 +21,9 @@ export function LikedRow({ game }: { game: Game }) {
           fill
           className={styles.cover}
           sizes="72px"
+          unoptimized={
+            game.image.includes("igdb") || game.image.includes("rawg")
+          }
         />
       </div>
 
@@ -34,13 +44,16 @@ export function LikedRow({ game }: { game: Game }) {
         </div>
       </div>
 
-      <button
-        type="button"
-        aria-label={`Remove ${game.title}`}
-        className={styles.removeButton}
-      >
-        <CloseIcon className={styles.removeIcon} aria-hidden />
-      </button>
+      {onRemove ? (
+        <button
+          type="button"
+          aria-label={`Remove ${game.title} from favorites`}
+          className={styles.removeButton}
+          onClick={onRemove}
+        >
+          <CloseIcon className={styles.removeIcon} aria-hidden />
+        </button>
+      ) : null}
     </li>
   );
 }

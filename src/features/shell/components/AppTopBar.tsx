@@ -28,7 +28,7 @@ const NAV = [
 export function AppTopBar({
   children,
   right,
-  showLikedLink = false,
+  showLikedLink = true,
   remainingLabel,
   showNav = true,
 }: Props) {
@@ -64,7 +64,7 @@ export function AppTopBar({
         {showLikedLink && (
           <Link href="/liked" className={styles.likedLink}>
             <HeartIcon className={styles.likedIcon} aria-hidden />
-            Liked
+            Favorites
           </Link>
         )}
         {remainingLabel !== undefined && (

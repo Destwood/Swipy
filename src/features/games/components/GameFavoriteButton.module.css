@@ -1,0 +1,13 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center overflow-visible rounded-md border border-white/22 bg-white/[0.04] p-0 text-white/55 transition-colors hover:border-white/45 hover:bg-white/[0.08] hover:text-sw-text;
+}
+
+.on {
+  @apply border-[#f5c451]/55 bg-[#f5c451]/14 text-[#f5c451] hover:border-[#f5c451]/80 hover:bg-[#f5c451]/22 hover:text-[#f5c451];
+}
+
+.icon {
+  @apply block h-3.5 w-3.5 shrink-0 overflow-visible;
+}

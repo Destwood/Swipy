@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import ChevronLeftIcon from "@/assets/icons/chevron-left.svg";
-import type {
-  CatalogFilterState,
-  ChipStat,
+import CloseIcon from "@/assets/icons/close.svg";
+import {
+  CATALOG_FILTER_OPTIONS,
+  catalogFiltersActive,
+  EMPTY_CATALOG_FILTERS,
+  type CatalogFilterState,
 } from "@/features/games/lib/catalog-filters";
 import {
   SORT_OPTIONS,
@@ -13,217 +16,196 @@ import {
 import { FilterChip } from "@/shared/ui/FilterChip";
 import styles from "./CatalogFilterBar.module.css";
 
-const DEFAULT_VISIBLE = 1;
-
 type Props = {
   filters: CatalogFilterState;
   onChange: (next: CatalogFilterState) => void;
-  genres: ChipStat[];
-  modes: ChipStat[];
-  players: ChipStat[];
-  platforms: ChipStat[];
-  crossplayCount?: number;
-  totalCount?: number;
   sort: SortValue;
   onSortChange: (value: SortValue) => void;
-  visibleCount?: number;
 };
 
-function toggleChip(current: string, next: string): string {
+function toggleValue(current: string, next: string): string {
   return current === next ? "All" : next;
 }
 
-function Chips({
-  items,
-  active,
-  onToggle,
-}: {
-  items: ChipStat[];
-  active: string;
-  onToggle: (label: string) => void;
-}) {
-  return (
-    <>
-      {items.map((item) => (
-        <FilterChip
-          key={item.label}
-          active={active === item.label}
-          onClick={() => onToggle(item.label)}
-        >
-          {item.label}
-          <span className={styles.count}>{item.count}</span>
-        </FilterChip>
-      ))}
-    </>
-  );
+function activeSummary(filters: CatalogFilterState): string[] {
+  const parts: string[] = [];
+  if (filters.genre !== "All") parts.push(filters.genre);
+  if (filters.mode !== "All") {
+    const mode = CATALOG_FILTER_OPTIONS.modes.find(
+      (m) => m.value === filters.mode,
+    );
+    parts.push(mode?.label ?? filters.mode);
+  }
+  if (filters.players !== "All") {
+    const players = CATALOG_FILTER_OPTIONS.players.find(
+      (p) => p.value === filters.players,
+    );
+    parts.push(players?.label ?? filters.players);
+  }
+  if (filters.platform !== "All") parts.push(filters.platform);
+  if (filters.crossplayOnly) parts.push("Crossplay");
+  return parts;
 }
 
 export function CatalogFilterBar({
   filters,
   onChange,
-  genres,
-  modes,
-  players,
-  platforms,
-  crossplayCount = 0,
-  totalCount = 0,
   sort,
   onSortChange,
-  visibleCount = DEFAULT_VISIBLE,
 }: Props) {
-  const [genresOpen, setGenresOpen] = useState(false);
-
-  const visibleGenres = useMemo(() => {
-    if (genresOpen) return genres;
-    const head = genres.slice(0, visibleCount);
-    if (
-      filters.genre !== "All" &&
-      !head.some((g) => g.label === filters.genre) &&
-      genres.some((g) => g.label === filters.genre)
-    ) {
-      const active = genres.find((g) => g.label === filters.genre);
-      if (active) return [...head.slice(0, Math.max(0, visibleCount - 1)), active];
-    }
-    return head;
-  }, [genresOpen, genres, filters.genre, visibleCount]);
-
-  const hasMoreGenres = genres.length > visibleCount;
-  const showPlayers = filters.mode === "Co-op" && players.length > 0;
+  const [open, setOpen] = useState(true);
+  const showPlayers = filters.mode === "Co-op";
+  const dirty = catalogFiltersActive(filters);
+  const summary = activeSummary(filters);
 
   return (
     <div className={styles.root}>
-      <div className={styles.bar}>
-        <div className={styles.filters}>
-          <FilterChip
-            active={filters.genre === "All"}
-            onClick={() =>
-              onChange({
-                ...filters,
-                genre: "All",
-                mode: "All",
-                players: "All",
-                platform: "All",
-                crossplayOnly: false,
-              })
-            }
-          >
-            All
-            <span className={styles.count}>{totalCount}</span>
-          </FilterChip>
-          {visibleGenres.map((genre) => (
-            <FilterChip
-              key={genre.label}
-              active={filters.genre === genre.label}
-              onClick={() =>
-                onChange({
-                  ...filters,
-                  genre: genre.label,
-                  mode: "All",
-                  players: "All",
-                  platform: "All",
-                  crossplayOnly: false,
-                })
-              }
-            >
-              {genre.label}
-              <span className={styles.count}>{genre.count}</span>
-            </FilterChip>
-          ))}
-          {hasMoreGenres ? (
+      <div className={styles.header}>
+        <button
+          type="button"
+          className={styles.toggle}
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span className={styles.toggleLabel}>Filters</span>
+          {dirty && !open && summary.length > 0 ? (
+            <span className={styles.summary}>{summary.join(" · ")}</span>
+          ) : null}
+          <ChevronLeftIcon
+            className={`${styles.toggleIcon} ${open ? styles.toggleIconOpen : ""}`}
+            aria-hidden
+          />
+        </button>
+
+        <div className={styles.headerActions}>
+          {dirty ? (
             <button
               type="button"
-              aria-expanded={genresOpen}
-              aria-label={genresOpen ? "Show fewer genres" : "Show more genres"}
-              onClick={() => setGenresOpen((v) => !v)}
-              className={styles.moreButton}
+              className={styles.clearButton}
+              onClick={() => onChange(EMPTY_CATALOG_FILTERS)}
             >
-              <ChevronLeftIcon
-                className={`${styles.moreIcon} ${genresOpen ? styles.moreIconOpen : ""}`}
-                aria-hidden
-              />
+              <CloseIcon className={styles.clearIcon} aria-hidden />
+              Clear filters
             </button>
           ) : null}
-        </div>
 
-        <label className={styles.sortWrap}>
-          <select
-            className={styles.sortSelect}
-            value={sort}
-            onChange={(e) => onSortChange(e.target.value as SortValue)}
-            aria-label="Sort"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </label>
+          <label className={styles.sortWrap}>
+            <select
+              className={styles.sortSelect}
+              value={sort}
+              onChange={(e) => onSortChange(e.target.value as SortValue)}
+              aria-label="Sort"
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       </div>
 
-      {modes.length > 0 ? (
-        <div className={showPlayers ? styles.splitRow : styles.row}>
-          <div className={styles.row}>
-            <Chips
-              items={modes}
-              active={filters.mode}
-              onToggle={(mode) => {
-                const nextMode = toggleChip(filters.mode, mode);
-                onChange({
-                  ...filters,
-                  mode: nextMode,
-                  players: "All",
-                  platform: "All",
-                  crossplayOnly: false,
-                });
-              }}
-            />
+      {open ? (
+        <div className={styles.panel}>
+          <div className={styles.group}>
+            <span className={styles.groupLabel}>Genre</span>
+            <div className={styles.chips}>
+              <FilterChip
+                active={filters.genre === "All"}
+                onClick={() => onChange({ ...filters, genre: "All" })}
+              >
+                All
+              </FilterChip>
+              {CATALOG_FILTER_OPTIONS.genres.map((genre) => (
+                <FilterChip
+                  key={genre}
+                  active={filters.genre === genre}
+                  onClick={() =>
+                    onChange({
+                      ...filters,
+                      genre: toggleValue(filters.genre, genre),
+                    })
+                  }
+                >
+                  {genre}
+                </FilterChip>
+              ))}
+            </div>
           </div>
-          {showPlayers ? (
-            <div className={`${styles.row} ${styles.playersRow}`}>
-              <Chips
-                items={players}
-                active={filters.players}
-                onToggle={(playersValue) => {
+
+          <div className={styles.group}>
+            <span className={styles.groupLabel}>Play</span>
+            <div className={styles.chips}>
+              {CATALOG_FILTER_OPTIONS.modes.map((mode) => (
+                <FilterChip
+                  key={mode.value}
+                  active={filters.mode === mode.value}
+                  onClick={() => {
+                    const nextMode = toggleValue(filters.mode, mode.value);
+                    onChange({
+                      ...filters,
+                      mode: nextMode,
+                      players: nextMode === "Co-op" ? filters.players : "All",
+                    });
+                  }}
+                >
+                  {mode.label}
+                </FilterChip>
+              ))}
+              {showPlayers ? (
+                <>
+                  <span className={styles.divider} aria-hidden />
+                  {CATALOG_FILTER_OPTIONS.players.map((p) => (
+                    <FilterChip
+                      key={p.value}
+                      active={filters.players === p.value}
+                      onClick={() =>
+                        onChange({
+                          ...filters,
+                          players: toggleValue(filters.players, p.value),
+                        })
+                      }
+                    >
+                      {p.label}
+                    </FilterChip>
+                  ))}
+                </>
+              ) : null}
+            </div>
+          </div>
+
+          <div className={styles.group}>
+            <span className={styles.groupLabel}>Platform</span>
+            <div className={styles.chips}>
+              {CATALOG_FILTER_OPTIONS.platforms.map((platform) => (
+                <FilterChip
+                  key={platform}
+                  active={filters.platform === platform}
+                  onClick={() =>
+                    onChange({
+                      ...filters,
+                      platform: toggleValue(filters.platform, platform),
+                    })
+                  }
+                >
+                  {platform}
+                </FilterChip>
+              ))}
+              <span className={styles.divider} aria-hidden />
+              <FilterChip
+                active={filters.crossplayOnly}
+                onClick={() =>
                   onChange({
                     ...filters,
-                    players: toggleChip(filters.players, playersValue),
-                    platform: "All",
-                    crossplayOnly: false,
-                  });
-                }}
-              />
+                    crossplayOnly: !filters.crossplayOnly,
+                  })
+                }
+              >
+                Crossplay
+              </FilterChip>
             </div>
-          ) : null}
-        </div>
-      ) : null}
-
-      {platforms.length > 0 || crossplayCount > 0 ? (
-        <div className={styles.row}>
-          <Chips
-            items={platforms}
-            active={filters.platform}
-            onToggle={(platform) => {
-              onChange({
-                ...filters,
-                platform: toggleChip(filters.platform, platform),
-              });
-            }}
-          />
-          {crossplayCount > 0 ? (
-            <FilterChip
-              active={filters.crossplayOnly}
-              onClick={() =>
-                onChange({
-                  ...filters,
-                  crossplayOnly: !filters.crossplayOnly,
-                })
-              }
-            >
-              Crossplay
-              <span className={styles.count}>{crossplayCount}</span>
-            </FilterChip>
-          ) : null}
+          </div>
         </div>
       ) : null}
     </div>
