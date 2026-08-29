@@ -1,0 +1,41 @@
+@reference "../../app/globals.css";
+
+.row {
+  @apply flex w-full cursor-pointer items-center gap-3 rounded-lg border-0 bg-transparent px-2.5 py-2 text-left transition-colors hover:bg-white/[0.05];
+}
+
+.copy {
+  @apply min-w-0 flex-1;
+}
+
+.label {
+  @apply block font-body text-sm text-sw-text;
+}
+
+.hint {
+  @apply mt-0.5 block min-h-[2.4em] font-body text-[11px] leading-snug text-white/35;
+}
+
+.track {
+  @apply relative h-[22px] w-[40px] shrink-0 rounded-full bg-white/[0.12] transition-colors duration-200;
+}
+
+.trackOn {
+  @apply bg-sw-accent/35;
+}
+
+.thumb {
+  @apply absolute top-[3px] left-[3px] h-4 w-4 rounded-full bg-white/80 shadow-[0_1px_4px_rgba(0,0,0,0.35)] transition-transform duration-200 ease-out;
+}
+
+.trackOn .thumb {
+  transform: translateX(18px);
+  @apply bg-sw-accent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track,
+  .thumb {
+    transition: none;
+  }
+}

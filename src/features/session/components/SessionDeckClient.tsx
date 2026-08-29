@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
-import { SwipyLogo } from "@/features/shell/components/SwipyLogo";
 import type { Game } from "@/features/games/data/games";
 import { getDeckById, setActiveDeckId } from "@/features/decks/lib/deck-store";
 import {
@@ -16,12 +15,16 @@ import { getActiveSession, toUiMember } from "@/features/session/lib/session-con
 import type { SessionMember } from "@/features/session/data/session";
 import {
   castVote,
+  deleteVote,
   fetchMembers,
   fetchSession,
   fetchSessionGames,
   markMemberDone,
 } from "@/features/session/lib/sessions";
 import { DeckSwipeStage } from "@/features/session/components/DeckSwipeStage";
+import { SwipeUndoChip } from "@/features/session/components/SwipeUndoChip";
+import { useSwipeUndo } from "@/features/session/lib/use-swipe-undo";
+import { PageBackLink } from "@/shared/ui/PageBackLink";
 import styles from "./SessionDeckClient.module.css";
 
 export function SessionDeckClient() {
@@ -34,6 +37,7 @@ export function SessionDeckClient() {
   const [error, setError] = useState<string | null>(null);
   const [voting, setVoting] = useState(false);
   const [swipeKey, setSwipeKey] = useState(0);
+  const undo = useSwipeUndo();
 
   useEffect(() => {
     async function load() {
@@ -86,6 +90,7 @@ export function SessionDeckClient() {
         gameId: current.id,
         value,
       });
+      undo.record(index);
 
       if (index >= games.length - 1) {
         await markMemberDone(active.memberId);
@@ -101,11 +106,42 @@ export function SessionDeckClient() {
     }
   }
 
+  async function undoLast() {
+    if (voting) return;
+    const prev = undo.back();
+    if (prev == null) return;
+    const game = games[prev];
+    const active = getActiveSession();
+    setVoting(true);
+    setError(null);
+    try {
+      if (active && game) {
+        try {
+          await deleteVote({
+            sessionId: active.sessionId,
+            memberId: active.memberId,
+            gameId: game.id,
+          });
+        } catch {
+          /* keep going — recast upserts */
+        }
+      }
+      setIndex(prev);
+      setSwipeKey((key) => key + 1);
+    } finally {
+      setVoting(false);
+    }
+  }
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (document.body.dataset.galleryOpen) return;
       if (e.key === "ArrowRight" || e.key === "l") void vote("like");
       if (e.key === "ArrowLeft" || e.key === "a") void vote("dislike");
+      if (e.key === "Backspace" || e.key === "u" || e.key === "U") {
+        e.preventDefault();
+        void undoLast();
+      }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -114,6 +150,12 @@ export function SessionDeckClient() {
   const current = games[index];
   const next = games[index + 1];
   const remaining = games.length - index;
+  const lobbyHref = (() => {
+    const active = getActiveSession();
+    return active?.code
+      ? `/session/lobby/${encodeURIComponent(active.code)}`
+      : "/session";
+  })();
 
   if (!ready) {
     return <div className={styles.loading}>Loading deck…</div>;
@@ -145,44 +187,53 @@ export function SessionDeckClient() {
     <div className={styles.root}>
       <div aria-hidden className={styles.glow} />
 
-      <AppTopBar
-        remainingLabel={`${remaining} left`}
-        right={
-          <div className={styles.topBarRight}>
-            <span className={styles.deckName}>{deckName}</span>
-            <Link href="/session/matches" className={styles.matchesLink}>
+      <AppTopBar />
+
+      <div className={styles.stage}>
+        <div className={`${styles.sessionChrome} ${styles.sessionChromeWide}`}>
+          <div className={styles.chromeStart}>
+            <div className={styles.chromeNav}>
+              <PageBackLink href={lobbyHref} className={styles.chromeChip}>
+                ← Lobby
+              </PageBackLink>
+              <div className={styles.members}>
+                {members.slice(0, 4).map((m) => (
+                  <div
+                    key={m.id}
+                    title={m.name}
+                    className={styles.memberAvatar}
+                    style={{ background: m.color }}
+                  >
+                    <span className={styles.initials}>{m.initials}</span>
+                  </div>
+                ))}
+              </div>
+              <span className={styles.deckName}>{deckName}</span>
+            </div>
+            <SwipeUndoChip
+              disabled={voting || !undo.canUndo}
+              onUndo={() => void undoLast()}
+            />
+          </div>
+          <div className={styles.chromeEnd}>
+            <span className={styles.remainingLabel}>{remaining} left</span>
+            <Link href="/session/matches" className={styles.chromeChip}>
               Matches
             </Link>
           </div>
-        }
-      >
-        <div className={styles.topBarLeft}>
-          <SwipyLogo size="bar" href="/" />
-          <div className={styles.members}>
-            {members.slice(0, 4).map((m) => (
-              <div
-                key={m.id}
-                title={m.name}
-                className={styles.memberAvatar}
-                style={{ background: m.color }}
-              >
-                <span className={styles.initials}>{m.initials}</span>
-              </div>
-            ))}
-          </div>
         </div>
-      </AppTopBar>
 
-      {error && <p className={styles.voteError}>{error}</p>}
+        {error && <p className={styles.voteError}>{error}</p>}
 
-      <DeckSwipeStage
-        current={current}
-        next={next}
-        enabled={!voting}
-        swipeKey={swipeKey}
-        onLike={() => void vote("like")}
-        onSkip={() => void vote("dislike")}
-      />
+        <DeckSwipeStage
+          current={current}
+          next={next}
+          enabled={!voting}
+          swipeKey={swipeKey}
+          onLike={() => void vote("like")}
+          onSkip={() => void vote("dislike")}
+        />
+      </div>
     </div>
   );
 }

@@ -23,6 +23,10 @@
   will-change: transform;
 }
 
+button.lift {
+  @apply box-border w-full min-w-0 appearance-none cursor-pointer border-0 bg-transparent p-0 text-left text-inherit;
+}
+
 .liftSm:hover {
   transform: translateY(-2px);
 }

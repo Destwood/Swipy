@@ -1,0 +1,48 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply inline-flex items-center justify-center font-semibold no-underline;
+}
+
+.sm,
+.row,
+.md {
+  @apply text-white;
+  background: #0c1015;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sm:hover,
+.row:hover,
+.md:hover {
+  color: #fff;
+  background: #151b24;
+}
+
+.sm {
+  @apply shrink-0 gap-1 whitespace-nowrap rounded-lg px-2.5 py-1.5 font-body text-[10px];
+}
+
+.row {
+  @apply shrink-0 gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 font-body text-xs;
+}
+
+.md {
+  @apply w-full gap-2.5 whitespace-nowrap rounded-xl px-3 py-3 font-body text-sm font-semibold;
+}
+
+.icon {
+  @apply shrink-0;
+}
+
+.sm .icon {
+  @apply h-3 w-3;
+}
+
+.row .icon {
+  @apply h-[15px] w-[15px];
+}
+
+.md .icon {
+  @apply h-5 w-5 text-white;
+}

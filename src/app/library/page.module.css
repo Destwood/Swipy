@@ -15,7 +15,23 @@
 }
 
 .toolbar {
-  @apply mb-3;
+  @apply mb-3 flex flex-col gap-3;
+}
+
+.searchRow {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+.searchInput {
+  @apply min-w-0 flex-1 rounded-[9px] border border-white/[0.08] bg-sw-surface px-3.5 py-2 font-body text-sm text-sw-text outline-none transition-colors placeholder:text-white/25 focus:border-sw-accent/40 sm:max-w-[320px];
+}
+
+.searchButton {
+  @apply cursor-pointer rounded-[9px] border border-white/[0.08] bg-white/[0.04] px-3.5 py-2 font-body text-sm text-sw-text transition-colors hover:border-white/15 hover:bg-white/[0.08] disabled:cursor-default disabled:opacity-50;
+}
+
+.searchClear {
+  @apply cursor-pointer rounded-[9px] border-0 bg-transparent px-2 py-2 font-body text-sm text-white/40 transition-colors hover:text-sw-text;
 }
 
 .count {
@@ -32,11 +48,11 @@
 }
 
 .gridItem {
-  @apply h-full min-h-0;
+  @apply min-h-0 min-w-0 w-full;
 }
 
 .tile {
-  @apply flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-sw-surface text-inherit no-underline;
+  @apply flex h-full w-full min-w-0 flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-sw-surface text-inherit no-underline;
   transition:
     border-color 180ms ease,
     background-color 180ms ease,
@@ -56,7 +72,7 @@
 }
 
 .tileBody {
-  @apply relative flex min-h-0 flex-1 flex-col px-2.5 pt-2.5 pb-3;
+  @apply relative flex min-h-0 flex-1 flex-col px-2.5 pt-2.5 pb-2.5;
 }
 
 .gameTitle {
@@ -67,12 +83,12 @@
   overflow: hidden;
 }
 
-.gameMeta {
-  @apply m-0 mt-auto truncate font-body text-[11px] text-white/35;
+.metaRow {
+  @apply mt-auto flex min-h-[14px] items-center justify-between gap-1;
 }
 
-.score {
-  @apply absolute top-2 right-2 z-[1] rounded-md bg-black/55 px-1.5 py-0.5 font-mono text-[11px] text-sw-accent backdrop-blur-[4px];
+.gameMeta {
+  @apply m-0 min-w-0 truncate font-body text-[11px] text-white/35;
 }
 
 .skeletonTile {

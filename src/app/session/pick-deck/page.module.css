@@ -4,18 +4,6 @@
   @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
 }
 
-.topBarLeft {
-  @apply flex items-center gap-4;
-}
-
-.backLink {
-  @apply flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-white/40 transition-colors hover:text-sw-text;
-}
-
-.divider {
-  @apply h-5 w-px bg-white/[0.08];
-}
-
 .content {
   @apply min-h-0 flex-1 overflow-y-auto;
 }

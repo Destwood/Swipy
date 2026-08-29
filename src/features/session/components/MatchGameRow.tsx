@@ -4,9 +4,10 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { GameFavoriteButton } from "@/features/games/components/GameFavoriteButton";
 import { GameHoverPreview } from "@/features/games/components/GameHoverPreview";
+import { GamePriceBadge } from "@/features/games/components/GamePriceBadge";
 import { GenreTag } from "@/features/games/components/GenreTag";
 import type { Game } from "@/features/games/data/games";
-import { steamStoreAppUrl } from "@/features/games/lib/steam";
+import { openSteamStore, steamStoreUrl } from "@/features/games/lib/steam";
 import { MatchHeroCard } from "@/features/session/components/MatchHeroCard";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./SessionMatchesClient.module.css";
@@ -28,11 +29,11 @@ export function MatchGameRow({
   action,
   variant = "compact",
 }: Props) {
-  const steamHref = game.steamAppId ? steamStoreAppUrl(game.steamAppId) : null;
+  const steamHref = game.steamAppId ? steamStoreUrl(game.steamAppId) : null;
 
   function openSteam() {
-    if (!steamHref) return;
-    window.location.href = steamHref;
+    if (!game.steamAppId) return;
+    openSteamStore(game.steamAppId);
   }
 
   if (variant === "hero") {
@@ -78,8 +79,14 @@ export function MatchGameRow({
         />
       </div>
       <div className={styles.content}>
-        <div className={styles.gameTitle}>{game.title}</div>
+        <div className={styles.titleRow}>
+          <div className={styles.gameTitle}>{game.title}</div>
+          <div className={styles.price}>
+            <GamePriceBadge appId={game.steamAppId} size="sm" />
+          </div>
+        </div>
         {genres}
+        {voteMeta ? <div className={styles.voteMeta}>{voteMeta}</div> : null}
       </div>
     </>
   );
@@ -95,7 +102,16 @@ export function MatchGameRow({
             className={styles.previewAnchor}
           >
             {steamHref ? (
-              <a href={steamHref} className={styles.previewHit}>
+              <a
+                href={steamHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.previewHit}
+                onClick={(e) => {
+                  e.preventDefault();
+                  openSteam();
+                }}
+              >
                 {compactBody}
               </a>
             ) : (
@@ -103,9 +119,8 @@ export function MatchGameRow({
             )}
           </GameHoverPreview>
         </div>
-        {voteMeta ? <div className={styles.voteMeta}>{voteMeta}</div> : null}
         <GameFavoriteButton gameId={game.id} className={styles.rowFav} />
-        {defaultAction}
+        <div className={styles.rowAction}>{defaultAction}</div>
       </div>
     </li>
   );

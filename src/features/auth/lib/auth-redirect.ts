@@ -57,6 +57,11 @@ export function safeNextPath(next: string | null): string {
   return next;
 }
 
-export function oauthCallbackUrl() {
-  return `${window.location.origin}/auth/callback`;
+export function oauthCallbackUrl(next?: string | null) {
+  const url = new URL(`${window.location.origin}/auth/callback`);
+  if (next) {
+    const safe = safeNextPath(next);
+    if (safe !== "/") url.searchParams.set("next", safe);
+  }
+  return url.toString();
 }

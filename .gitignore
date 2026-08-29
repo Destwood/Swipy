@@ -37,13 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
-# supabase local CLI / temp
+# supabase local CLI / temp — apply SQL in dashboard, do not commit
 .supabase/
-supabase/.temp/
-supabase/.branches/
-
-# Apply SQL in the Supabase dashboard; do not publish migrations
-supabase/migrations/
+supabase/
 
 # typescript
 *.tsbuildinfo

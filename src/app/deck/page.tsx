@@ -1,6 +1,6 @@
 import { DeckPreviewClient } from "@/features/session/components/DeckPreviewClient";
 
-/** Local practice swipe — live votes still go through /session/deck. */
+/** Solo swipe of the active deck. Infinite catalog lives at /infinite. */
 export default function DeckPage() {
-  return <DeckPreviewClient />;
+  return <DeckPreviewClient mode="deck" />;
 }

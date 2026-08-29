@@ -16,16 +16,8 @@
   @apply min-w-0 flex-1;
 }
 
-.titleRow {
-  @apply mb-1.5 flex items-center gap-3;
-}
-
 .title {
-  @apply truncate font-display text-base font-bold tracking-[-0.02em] text-sw-text;
-}
-
-.metacritic {
-  @apply shrink-0 font-mono text-[11px] text-[rgba(45,212,191,0.75)];
+  @apply mb-1.5 block min-w-0 truncate font-display text-base font-bold tracking-[-0.02em] text-sw-text;
 }
 
 .metaRow {
@@ -33,7 +25,11 @@
 }
 
 .developer {
-  @apply ml-0.5 font-mono text-[11px] text-white/22;
+  @apply ml-0.5 min-w-0 flex-1 font-mono text-[11px] text-white/22;
+}
+
+.price {
+  @apply mt-0.5 min-w-[4.5rem] shrink-0 text-right;
 }
 
 .removeButton {

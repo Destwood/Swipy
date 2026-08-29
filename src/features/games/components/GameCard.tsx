@@ -9,7 +9,23 @@ interface Props {
   dimmed?: boolean;
 }
 
+function cardBlurb(text: string) {
+  const cleaned = text.replace(/\s+/g, " ").trim();
+  if (!cleaned || /from IGDB\.?$/i.test(cleaned)) return null;
+  return cleaned;
+}
+
 export function GameCard({ game, dimmed = false }: Props) {
+  const genres = game.genres.filter(Boolean).slice(0, 2);
+  const studio =
+    game.developer &&
+    game.developer !== "Unknown" &&
+    game.developer !== "IGDB"
+      ? game.developer
+      : null;
+  const byline = [studio, game.year || null].filter(Boolean).join(" · ");
+  const description = cardBlurb(game.description);
+
   return (
     <div className={`${styles.root} ${dimmed ? styles.dimmed : ""}`}>
       <Image
@@ -28,22 +44,20 @@ export function GameCard({ game, dimmed = false }: Props) {
           <div className={styles.gradient} />
 
           <div className={styles.footer}>
-            <div className={styles.meta}>
-              {game.developer} · {game.year}
-              {game.metacritic != null && (
-                <span className={styles.metacritic}>MC {game.metacritic}</span>
-              )}
-            </div>
+            {genres.length > 0 ? (
+              <div className={styles.genreRow}>
+                {genres.map((g) => (
+                  <GenreTag key={g} label={g} compact />
+                ))}
+              </div>
+            ) : null}
 
             <h2 className={styles.title}>{game.title}</h2>
+            {byline ? <p className={styles.meta}>{byline}</p> : null}
 
-            <div className={styles.genres}>
-              {game.genres.filter(Boolean).map((g, i) => (
-                <GenreTag key={g} label={g} accent={i === 0} />
-              ))}
-            </div>
-
-            <p className={styles.description}>{game.description}</p>
+            {description ? (
+              <p className={styles.description}>{description}</p>
+            ) : null}
           </div>
         </>
       )}

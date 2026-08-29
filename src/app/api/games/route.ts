@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import { igdbQuery } from "@/features/games/lib/igdb/client";
 import {
   buildIgdbCatalogQuery,
+  buildInfiniteCatalogQuery,
   parseCatalogFilters,
   parseCatalogSort,
+  parseInfiniteFilterParams,
 } from "@/features/games/lib/igdb/catalog-query";
 import { mapIgdbGame, type IgdbGame } from "@/features/games/lib/igdb/map-game";
 
@@ -18,7 +20,14 @@ export async function GET(request: Request) {
     );
     const filters = parseCatalogFilters(searchParams);
     const sort = parseCatalogSort(searchParams.get("sort"));
-    const body = buildIgdbCatalogQuery({ q, page, pageSize, filters, sort });
+    const infinite = searchParams.get("infinite") === "1";
+    const body = infinite
+      ? buildInfiniteCatalogQuery({
+          page,
+          pageSize,
+          filters: parseInfiniteFilterParams(searchParams),
+        })
+      : buildIgdbCatalogQuery({ q, page, pageSize, filters, sort });
     const results = await igdbQuery<IgdbGame[]>(body);
 
     return NextResponse.json({

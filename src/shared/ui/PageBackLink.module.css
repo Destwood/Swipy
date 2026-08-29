@@ -1,0 +1,5 @@
+@reference "../../app/globals.css";
+
+.link {
+  @apply mb-4 inline-block font-mono text-[11px] tracking-[0.04em] text-white/35 uppercase no-underline transition-colors hover:text-sw-text;
+}

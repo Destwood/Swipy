@@ -1,12 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import ChevronLeftIcon from "@/assets/icons/chevron-left.svg";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
 import { MemberRow } from "@/features/session/components/MemberRow";
-import { SwipyLogo } from "@/features/shell/components/SwipyLogo";
+import { SessionCodeCopy } from "@/features/session/components/SessionCodeCopy";
 import type { SessionMember } from "@/features/session/data/session";
 import { getDeckById, setActiveDeckId } from "@/features/decks/lib/deck-store";
 import {
@@ -27,6 +25,7 @@ import {
   subscribeToMembers,
 } from "@/features/session/lib/sessions";
 import { Button, ButtonVariant } from "@/shared/ui/Button";
+import { PageBackLink } from "@/shared/ui/PageBackLink";
 import styles from "@/app/session/lobby/page.module.css";
 
 type Props = {
@@ -196,39 +195,19 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
     }
   }
 
-  async function copyInvite() {
-    const url =
-      typeof window !== "undefined"
-        ? `${window.location.origin}/session/lobby/${encodeURIComponent(code)}`
-        : code;
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      try {
-        await navigator.clipboard.writeText(code);
-      } catch {
-        setError("Could not copy invite");
-      }
-    }
-  }
-
   const readyCount = members.filter((m) => m.status !== "waiting").length;
+  const inviteUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/session/lobby/${encodeURIComponent(code)}`
+      : code;
 
   return (
     <div className={styles.root}>
-      <AppTopBar right={<span className={styles.codeBadge}>{code}</span>}>
-        <div className={styles.topBarLeft}>
-          <Link href="/session" className={styles.backLink}>
-            <ChevronLeftIcon width={14} height={14} aria-hidden />
-            Back
-          </Link>
-          <div className={styles.divider} />
-          <SwipyLogo size="bar" />
-        </div>
-      </AppTopBar>
+      <AppTopBar />
 
       <div className={styles.content}>
         <div className={styles.inner}>
+          <PageBackLink href="/session">← Session</PageBackLink>
           <div className={styles.header}>
             <div>
               <p className={styles.eyebrow}>Lobby</p>
@@ -274,6 +253,23 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
             </div>
           ) : (
             <>
+              <section className={styles.invite} aria-label="Invite">
+                <div className={styles.inviteCopy}>
+                  <p className={styles.inviteTitle}>Invite friends</p>
+                  <p className={styles.inviteText}>
+                    Share the code or link while everyone joins.
+                  </p>
+                </div>
+                <SessionCodeCopy
+                  code={code}
+                  copyValue={inviteUrl}
+                  label="Session code"
+                  hint="Click to copy lobby link"
+                  align="start"
+                  className={styles.inviteCode}
+                />
+              </section>
+
               <ul className={styles.memberList}>
                 {members.map((member) => (
                   <MemberRow key={member.id} member={member} />
@@ -295,13 +291,6 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
                     Waiting for host to start…
                   </p>
                 )}
-                <Button
-                  type="button"
-                  onClick={() => void copyInvite()}
-                  variant={ButtonVariant.Dark}
-                >
-                  Copy lobby link
-                </Button>
               </div>
             </>
           )}

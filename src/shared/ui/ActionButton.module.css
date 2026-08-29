@@ -6,18 +6,76 @@
   height: var(--sw-action);
 }
 
-.root {
-  @apply flex shrink-0 cursor-pointer items-center justify-center rounded-full border-[1.5px] transition-all duration-[180ms] ease-out;
+.hit {
+  @apply relative flex h-full w-full min-w-0 cursor-pointer items-center self-stretch border-0 bg-transparent p-0;
+  min-width: calc(var(--sw-action) + 1.25rem);
+}
+
+.hit::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.hitSkip {
+  @apply justify-start;
+  padding-inline-start: clamp(0.75rem, 2.5vw, 1.75rem);
+}
+
+.hitSkip::before {
+  background: linear-gradient(
+    to right,
+    rgba(251, 113, 133, 0.14) 0%,
+    rgba(251, 113, 133, 0.06) 40%,
+    transparent 65%,
+    transparent 100%
+  );
+}
+
+.hitLike {
+  @apply justify-end;
+  padding-inline-end: clamp(0.75rem, 2.5vw, 1.75rem);
+}
+
+.hitLike::before {
+  background: linear-gradient(
+    to left,
+    rgba(52, 211, 153, 0.14) 0%,
+    rgba(52, 211, 153, 0.06) 40%,
+    transparent 65%,
+    transparent 100%
+  );
+}
+
+.hitSkip:hover::before,
+.hitLike:hover::before {
+  opacity: 1;
+}
+
+.face {
+  @apply pointer-events-none relative z-[1] flex shrink-0 items-center justify-center rounded-full border-[1.5px] transition-all duration-[180ms] ease-out;
   width: var(--sw-action);
   height: var(--sw-action);
 }
 
 .like {
-  @apply border-[rgba(52,211,153,0.28)] bg-[rgba(52,211,153,0.1)] text-sw-like hover:border-[rgba(52,211,153,0.5)] hover:bg-[rgba(52,211,153,0.2)] hover:shadow-[0_0_28px_rgba(52,211,153,0.18)];
+  @apply border-[rgba(52,211,153,0.28)] bg-[rgba(52,211,153,0.1)] text-sw-like;
+}
+
+.hitLike:hover .like {
+  @apply border-[rgba(52,211,153,0.5)] bg-[rgba(52,211,153,0.2)] shadow-[0_0_28px_rgba(52,211,153,0.18)];
 }
 
 .dislike {
-  @apply border-[rgba(251,113,133,0.28)] bg-[rgba(251,113,133,0.1)] text-sw-dislike hover:border-[rgba(251,113,133,0.5)] hover:bg-[rgba(251,113,133,0.2)] hover:shadow-[0_0_28px_rgba(251,113,133,0.18)];
+  @apply border-[rgba(251,113,133,0.28)] bg-[rgba(251,113,133,0.1)] text-sw-dislike;
+}
+
+.hitSkip:hover .dislike {
+  @apply border-[rgba(251,113,133,0.5)] bg-[rgba(251,113,133,0.2)] shadow-[0_0_28px_rgba(251,113,133,0.18)];
 }
 
 .icon {

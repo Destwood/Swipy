@@ -21,6 +21,7 @@ export function CreateSessionForm() {
   const router = useRouter();
   const [decks, setDecks] = useState<Deck[]>([]);
   const [deckId, setDeckId] = useState("");
+  const [decksLoading, setDecksLoading] = useState(true);
   const { displayName, setDisplayName, ready, askForName } =
     useSessionDisplayName("Host");
   const [busy, setBusy] = useState(false);
@@ -29,6 +30,7 @@ export function CreateSessionForm() {
 
   useEffect(() => {
     let cancelled = false;
+    setDecksLoading(true);
     void (async () => {
       const all = await listDecks();
       if (cancelled) return;
@@ -38,6 +40,7 @@ export function CreateSessionForm() {
         pending && all.some((d) => d.id === pending) ? pending : "",
       );
       setSessionCode(getOrCreateSessionCreateCode());
+      setDecksLoading(false);
     })();
     return () => {
       cancelled = true;
@@ -67,7 +70,7 @@ export function CreateSessionForm() {
   }
 
   const selected = decks.find((d) => d.id === deckId);
-  const canOpenLobby = Boolean(deckId) && !busy && ready;
+  const canOpenLobby = Boolean(deckId) && !busy && ready && !decksLoading;
 
   return (
     <div className={styles.page}>
@@ -88,7 +91,12 @@ export function CreateSessionForm() {
           <span className={styles.fieldLabel}>Deck</span>
           <div className={styles.deckRow}>
             <div className={styles.deckInfo}>
-              {selected ? (
+              {decksLoading ? (
+                <div aria-busy="true" aria-label="Loading deck">
+                  <div className={`${styles.skeletonName} sw-shimmer`} />
+                  <div className={`${styles.skeletonHint} sw-shimmer`} />
+                </div>
+              ) : selected ? (
                 <>
                   <span className={styles.deckName}>{selected.name}</span>
                   <span className={styles.deckHint}>

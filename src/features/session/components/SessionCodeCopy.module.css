@@ -4,6 +4,18 @@
   @apply mx-auto flex w-fit max-w-full flex-col items-center gap-2;
 }
 
+.alignStart {
+  @apply mx-0 items-stretch;
+}
+
+.alignStart .label {
+  @apply self-start;
+}
+
+.alignStart .hint {
+  @apply text-left;
+}
+
 .label {
   @apply self-start font-mono text-[11px] tracking-[0.06em] text-white/30 uppercase;
 }

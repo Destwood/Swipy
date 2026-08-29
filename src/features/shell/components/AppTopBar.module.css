@@ -1,7 +1,7 @@
 @reference "../../../app/globals.css";
 
 .root {
-  @apply relative z-10 flex shrink-0 items-center justify-between border-b border-white/[0.06] bg-[rgba(12,14,18,0.8)] px-4 backdrop-blur-[12px] sm:px-8;
+  @apply relative z-40 flex shrink-0 items-center justify-between border-b border-white/[0.06] bg-[rgba(12,14,18,0.8)] px-4 backdrop-blur-[12px] sm:px-8;
   height: var(--sw-topbar-h);
 }
 
@@ -26,13 +26,9 @@
 }
 
 .likedLink {
-  @apply flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-white/35 transition-colors hover:text-sw-accent;
+  @apply flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-[#f5c451]/70 transition-colors hover:text-[#f5c451];
 }
 
 .likedIcon {
-  @apply h-[15px] w-[15px];
-}
-
-.remainingLabel {
-  @apply font-mono text-[13px] tracking-[0.02em] text-white/28;
+  @apply h-[15px] w-[15px] text-[#f5c451];
 }

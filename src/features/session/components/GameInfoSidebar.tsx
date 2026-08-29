@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import SteamIcon from "@/assets/icons/steam.svg";
 import { GameFavoriteButton } from "@/features/games/components/GameFavoriteButton";
+import { GamePriceBadge } from "@/features/games/components/GamePriceBadge";
+import { SteamStoreButton } from "@/features/games/components/SteamStoreButton";
 import type { Game } from "@/features/games/data/games";
-import { steamStoreWebUrl } from "@/features/games/lib/steam";
 import {
   getCachedSteamMedia,
   setCachedSteamMedia,
@@ -140,16 +140,10 @@ export function GameInfoSidebar({ game }: Props) {
       </div>
 
       {game.steamAppId ? (
-        <a
-          href={steamStoreWebUrl(game.steamAppId)}
-          className={styles.steam}
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Open in Steam"
-        >
-          <SteamIcon width={18} height={18} className={styles.steamIcon} />
-          Open in Steam
-        </a>
+        <div className={styles.buy}>
+          <GamePriceBadge appId={game.steamAppId} variant="buy" />
+          <SteamStoreButton appId={game.steamAppId} className={styles.steam} />
+        </div>
       ) : null}
 
       {galleryIndex != null && shots[galleryIndex] ? (

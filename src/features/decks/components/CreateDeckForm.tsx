@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import CheckIcon from "@/assets/icons/check.svg";
 import type { Game } from "@/features/games/data/games";
@@ -17,14 +17,18 @@ import {
   EMPTY_CATALOG_FILTERS,
   type CatalogFilterState,
 } from "@/features/games/lib/catalog-filters";
-import { catalogSearchParams } from "@/features/games/lib/catalog-query";
-import { sortGames, type SortValue } from "@/features/games/lib/sort-games";
+import { useCatalogGames } from "@/features/games/lib/use-catalog-games";
+import type { SortValue } from "@/features/games/lib/sort-games";
 import { saveCustomDeck, updateDeck, getDeckById } from "@/features/decks/lib/deck-store";
 import { FadeIn } from "@/shared/ui/FadeIn";
 import { CatalogFilterBar } from "@/shared/ui/CatalogFilterBar";
+import { CatalogSearch } from "@/shared/ui/CatalogSearch";
 import { HoverLift } from "@/shared/ui/HoverLift";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
-import { steamStoreAppUrl } from "@/features/games/lib/steam";
+import { GamePriceBadge } from "@/features/games/components/GamePriceBadge";
+import { normalizeGenreLabel } from "@/features/games/lib/genre-label";
+import { openSteamStore } from "@/features/games/lib/steam";
+import { useLoadingMoreSkeletonCount } from "@/shared/ui/use-loading-more-skeleton-count";
 import styles from "./CreateDeckForm.module.css";
 
 type Props = {
@@ -38,15 +42,26 @@ export function CreateDeckForm({ deckId }: Props) {
   const [description, setDescription] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedGames, setSelectedGames] = useState<Record<string, Game>>({});
-  const [results, setResults] = useState<Game[]>([]);
-  const [draftQuery, setDraftQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [apiHint, setApiHint] = useState<string | null>(null);
   const [ready, setReady] = useState(!isEdit);
   const [filters, setFilters] = useState<CatalogFilterState>(EMPTY_CATALOG_FILTERS);
   const [sort, setSort] = useState<SortValue>("popular");
+  const {
+    games: catalog,
+    loading,
+    loadingMore,
+    error: catalogError,
+    hasMore,
+    loadMore,
+  } = useCatalogGames(filters, sort, activeQuery);
+  const sentinelRef = useRef<HTMLLIElement>(null);
+  const gridRef = useRef<HTMLUListElement>(null);
+  const moreSkeletonCount = useLoadingMoreSkeletonCount(
+    gridRef,
+    catalog.length,
+    loadingMore,
+  );
 
   useEffect(() => {
     ensureSeedLibrary();
@@ -78,54 +93,20 @@ export function CreateDeckForm({ deckId }: Props) {
   }, [deckId]);
 
   useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      setLoading(true);
-      setApiHint(null);
-      try {
-        const params = catalogSearchParams({
-          filters,
-          sort,
-          page: 1,
-          pageSize: 48,
-          q: activeQuery,
-        });
-        const res = await fetch(`/api/games?${params.toString()}`);
-        const data = (await res.json()) as {
-          results?: Game[];
-          error?: string;
-        };
-        if (cancelled) return;
-        if (!res.ok) {
-          setApiHint(data.error ?? "IGDB unavailable");
-          setResults([]);
-          return;
-        }
-        const games = data.results ?? [];
-        setResults(games);
-        upsertGames(games);
-      } catch {
-        if (!cancelled) {
-          setApiHint("Network error");
-          setResults([]);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [activeQuery, filters, sort]);
+    const target = sentinelRef.current;
+    if (!target || !hasMore || loading) return;
 
-  function runSearch() {
-    setActiveQuery(draftQuery.trim());
-  }
-
-  function clearSearch() {
-    setDraftQuery("");
-    setActiveQuery("");
-  }
+    const root =
+      target.closest<HTMLElement>("[data-deck-catalog-scroll]") ?? null;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) loadMore();
+      },
+      { root, rootMargin: "600px 0px" },
+    );
+    io.observe(target);
+    return () => io.disconnect();
+  }, [hasMore, loadMore, loading, catalog.length]);
 
   function toggle(game: Game) {
     setSelected((prev) => {
@@ -175,12 +156,16 @@ export function CreateDeckForm({ deckId }: Props) {
     }
   }
 
-  const catalog = useMemo(
-    () => (activeQuery ? sortGames(results, sort) : results),
-    [results, activeQuery, sort],
-  );
-
   const selectedCount = selected.length;
+  const status = loading
+    ? activeQuery
+      ? `Searching “${activeQuery}”…`
+      : "Loading games…"
+    : loadingMore
+      ? `Showing ${catalog.length}…`
+      : activeQuery
+        ? `${catalog.length} results`
+        : `${catalog.length} games`;
 
   if (!ready) {
     return <p className={styles.apiHint}>Loading deck…</p>;
@@ -219,40 +204,13 @@ export function CreateDeckForm({ deckId }: Props) {
       </div>
 
       <div className={styles.searchBlock}>
-        <div className={styles.searchRow}>
-          <input
-            value={draftQuery}
-            onChange={(e) => setDraftQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                runSearch();
-              }
-            }}
-            placeholder="Search games…"
-            className={styles.searchInput}
-            aria-label="Search games"
-          />
-          <Button
-            type="button"
-            onClick={runSearch}
-            disabled={loading}
-            variant={ButtonVariant.Soft}
-            size={ButtonSize.Sm}
-          >
-            {loading ? "…" : "Search"}
-          </Button>
-          {activeQuery ? (
-            <Button
-              type="button"
-              onClick={clearSearch}
-              variant={ButtonVariant.Dark}
-              size={ButtonSize.Sm}
-            >
-              Clear
-            </Button>
-          ) : null}
-        </div>
+        <CatalogSearch
+          value={activeQuery}
+          onChange={setActiveQuery}
+          filters={filters}
+          sort={sort}
+          disabled={loading && !loadingMore}
+        />
 
         <div className={styles.filterToolbar}>
           <CatalogFilterBar
@@ -263,33 +221,35 @@ export function CreateDeckForm({ deckId }: Props) {
           />
         </div>
 
-        <span className={styles.catalogMeta}>
-          {loading
-            ? "Loading popular games…"
-            : activeQuery
-              ? `${catalog.length} results`
-              : `${catalog.length} popular`}
-        </span>
+        <span className={styles.catalogMeta}>{status}</span>
       </div>
 
-      {apiHint && <p className={styles.apiHint}>{apiHint}</p>}
+      {catalogError ? <p className={styles.apiHint}>{catalogError}</p> : null}
       {error && <p className={styles.error}>{error}</p>}
 
       {!loading && catalog.length === 0 ? (
         <p className={styles.empty}>No games found. Try another search.</p>
       ) : (
-        <ul className={styles.catalogGrid}>
+        <ul
+          ref={gridRef}
+          className={styles.catalogGrid}
+          aria-busy={loading || loadingMore}
+        >
           {catalog.map((game, i) => {
             const isOn = selected.includes(game.id);
             return (
-              <FadeIn key={game.id} as="li" delayMs={Math.min(i, 20) * 22}>
+              <FadeIn
+                key={game.id}
+                as="li"
+                delayMs={loadingMore || i >= 24 ? 0 : Math.min(i, 12) * 18}
+              >
                 <HoverLift amount="sm" press>
                   <button
                     type="button"
                     onClick={(e) => {
                       if ((e.metaKey || e.ctrlKey) && game.steamAppId) {
                         e.preventDefault();
-                        window.location.href = steamStoreAppUrl(game.steamAppId);
+                        openSteamStore(game.steamAppId);
                         return;
                       }
                       toggle(game);
@@ -311,7 +271,8 @@ export function CreateDeckForm({ deckId }: Props) {
                         className={styles.cover}
                         sizes="(max-width: 640px) 33vw, (max-width: 1024px) 16vw, 12vw"
                         unoptimized={
-                          game.image.includes("igdb") || game.image.includes("rawg")
+                          game.image.includes("igdb") ||
+                          game.image.includes("rawg")
                         }
                       />
                       <span
@@ -321,13 +282,35 @@ export function CreateDeckForm({ deckId }: Props) {
                         {isOn && <CheckIcon className={styles.checkIcon} />}
                       </span>
                       <div className={styles.cardFade} />
-                      <span className={styles.cardTitle}>{game.title}</span>
+                      <div className={styles.coverMeta}>
+                        <span className={styles.cardTitle}>{game.title}</span>
+                        <div className={styles.coverRow}>
+                          <span className={styles.cardGenre}>
+                            {game.genres[0]
+                              ? normalizeGenreLabel(game.genres[0])
+                              : ""}
+                          </span>
+                          <GamePriceBadge appId={game.steamAppId} size="xs" />
+                        </div>
+                      </div>
                     </div>
                   </button>
                 </HoverLift>
               </FadeIn>
             );
           })}
+          {loadingMore
+            ? Array.from({ length: moreSkeletonCount }, (_, i) => (
+                <li
+                  key={`sk-${i}`}
+                  className={`${styles.skeletonCard} sw-shimmer`}
+                  aria-hidden
+                />
+              ))
+            : null}
+          {hasMore ? (
+            <li ref={sentinelRef} className={styles.sentinel} aria-hidden />
+          ) : null}
         </ul>
       )}
     </form>

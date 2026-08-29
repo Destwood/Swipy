@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, DM_Sans, DM_Mono } from "next/font/google";
 import { Grain } from "@/features/shell/components/Grain";
+import { CustomCursor } from "@/features/custom-cursor";
 import { ToastHost } from "@/shared/ui/ToastHost";
 import "./globals.css";
 import styles from "./layout.module.css";
@@ -40,6 +41,7 @@ export default function RootLayout({
     >
       <body className={styles.body}>
         <Grain />
+        <CustomCursor />
         <div className={styles.main}>{children}</div>
         <ToastHost />
       </body>

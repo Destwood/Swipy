@@ -1,7 +1,7 @@
 @reference "../../../app/globals.css";
 
 .anchor {
-  @apply block h-full;
+  @apply block h-full w-full min-w-0;
 }
 
 .tile {
@@ -65,20 +65,32 @@
   isolation: isolate;
 }
 
+.mediaHit {
+  @apply absolute inset-0 z-0 cursor-pointer border-0 bg-transparent p-0;
+}
+
 .image {
   @apply object-cover;
 }
 
 .nav {
-  @apply absolute top-1/2 z-[1] flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/50 text-white/90 backdrop-blur-[4px] transition-colors hover:bg-black/75 hover:text-white;
+  @apply absolute top-0 z-[1] flex h-full w-11 cursor-pointer items-center border-0 bg-transparent p-0;
 }
 
 .prev {
-  @apply left-1.5;
+  @apply left-0 justify-start pl-1.5;
 }
 
 .next {
-  @apply right-1.5;
+  @apply right-0 justify-end pr-1.5;
+}
+
+.navFace {
+  @apply flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/50 text-white/90 backdrop-blur-[4px];
+}
+
+.nav:hover .navFace {
+  @apply bg-black/75 text-white;
 }
 
 .navIcon {
@@ -90,23 +102,35 @@
 }
 
 .body {
-  @apply px-3 py-2.5;
+  @apply px-3.5 py-3.5;
 }
 
 .title {
-  @apply m-0 mb-0.5 font-display text-[13px] leading-snug font-bold tracking-[-0.02em] text-sw-text;
+  @apply m-0 min-w-0 font-display text-sm leading-tight font-bold tracking-[-0.02em] text-sw-text;
 }
 
 .meta {
-  @apply m-0 mb-1.5 font-mono text-[10px] text-white/40;
+  @apply m-0 mt-0.5 mb-2 font-mono text-[10px] text-white/40;
+}
+
+.genres {
+  @apply mb-2.5 flex flex-wrap gap-1;
+}
+
+.chip {
+  @apply rounded-full bg-white/[0.07] px-1.5 py-0.5 font-body text-[9px] text-white/45;
 }
 
 .description {
-  @apply m-0 font-body text-[11px] leading-relaxed text-sw-text/70;
+  @apply m-0 mb-3 font-body text-[10px] leading-relaxed text-sw-text/45;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   overflow: hidden;
+}
+
+.footer {
+  @apply flex items-center justify-between gap-2 border-t border-white/[0.08] pt-3;
 }
 
 @keyframes sw-preview-in {

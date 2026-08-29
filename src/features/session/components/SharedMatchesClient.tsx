@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
-import { SwipyLogo } from "@/features/shell/components/SwipyLogo";
 import type { Game } from "@/features/games/data/games";
 import {
   ensureSeedLibrary,
@@ -122,11 +121,7 @@ export function SharedMatchesClient() {
 
   return (
     <div className={styles.root}>
-      <AppTopBar>
-        <div className={styles.topBarLeft}>
-          <SwipyLogo size="bar" href="/" />
-        </div>
-      </AppTopBar>
+      <AppTopBar />
 
       <div className={styles.scroll}>
         <div className={styles.page}>
@@ -186,14 +181,9 @@ export function SharedMatchesClient() {
                         rank={index + 1}
                         variant={sectionIndex === 0 ? "hero" : "compact"}
                         voteMeta={
-                          <>
-                            <span className={styles.pctBadge}>
-                              {ranked.pct}%
-                            </span>
-                            <span className={styles.likeCount}>
-                              {ranked.likes}/{ranked.members} liked
-                            </span>
-                          </>
+                          <span className={styles.likeCount}>
+                            {ranked.likes}/{ranked.members} liked
+                          </span>
                         }
                       />
                     ))}

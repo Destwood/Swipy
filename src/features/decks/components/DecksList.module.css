@@ -56,6 +56,40 @@
   @apply flex;
 }
 
+.skeletonCard {
+  @apply flex h-full w-full flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-sw-surface;
+}
+
+.skeletonMosaic {
+  @apply grid h-40 gap-px bg-[#0c0e12];
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.skeletonCell {
+  @apply bg-white/[0.04];
+}
+
+.skeletonBody {
+  @apply flex flex-1 flex-col px-[18px] pt-4 pb-[18px];
+}
+
+.skeletonTitle {
+  @apply mb-2 h-[1.3em] w-[72%] rounded-sm bg-white/[0.07];
+}
+
+.skeletonTags {
+  @apply mb-3.5 flex min-h-[3.25rem] flex-wrap gap-1.5;
+}
+
+.skeletonTag {
+  @apply h-5 w-14 rounded-[5px] bg-white/[0.05];
+}
+
+.skeletonMeta {
+  @apply mt-auto h-3 w-24 rounded-sm bg-white/[0.05];
+}
+
 .card {
   @apply relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-sw-surface shadow-[0_4px_16px_rgba(0,0,0,0.3)];
 }
@@ -116,12 +150,16 @@
   @apply flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-[7px] border border-white/12 bg-[rgba(12,14,18,0.7)] text-sm text-white/65 backdrop-blur-[8px] transition-all;
 }
 
-.iconButtonFav {
-  @apply border-[rgba(52,211,153,0.4)] bg-[rgba(52,211,153,0.2)] text-sw-like;
+.favButton {
+  @apply border-[#f5c451]/35 text-[#f5c451]/80 hover:border-[#f5c451]/55 hover:text-[#f5c451];
 }
 
-.heartIcon {
-  @apply h-3 w-3;
+.iconButtonFav {
+  @apply border-[#f5c451]/55 bg-[#f5c451]/14 text-[#f5c451];
+}
+
+.favIcon {
+  @apply h-3.5 w-3.5;
 }
 
 .menuWrap {
@@ -161,7 +199,7 @@
 }
 
 .favDot {
-  @apply mt-1 h-3 w-3 shrink-0 text-sw-like;
+  @apply mt-1 h-3.5 w-3.5 shrink-0 text-[#f5c451];
 }
 
 .tagsSlot {

@@ -1,0 +1,45 @@
+@reference "../../app/globals.css";
+
+.root {
+  @apply relative w-full min-w-0;
+}
+
+.row {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+.input {
+  @apply min-w-0 flex-1 rounded-[9px] border border-white/[0.08] bg-sw-surface px-3.5 py-2 font-body text-sm text-sw-text outline-none transition-colors placeholder:text-white/25 focus:border-sw-accent/40;
+}
+
+.searchButton {
+  @apply cursor-pointer rounded-[9px] border border-white/[0.08] bg-white/[0.04] px-3.5 py-2 font-body text-sm text-sw-text transition-colors hover:border-white/15 hover:bg-white/[0.08] disabled:cursor-default disabled:opacity-50;
+}
+
+.clear {
+  @apply cursor-pointer rounded-[9px] border-0 bg-transparent px-2 py-2 font-body text-sm text-white/40 transition-colors hover:text-sw-text;
+}
+
+.list {
+  @apply absolute top-[calc(100%+6px)] right-0 left-0 z-40 m-0 max-h-72 w-full list-none overflow-y-auto rounded-xl border border-white/10 bg-sw-surface p-1 shadow-[0_16px_40px_rgba(0,0,0,0.55)];
+}
+
+.option {
+  @apply flex w-full cursor-pointer items-baseline justify-between gap-3 rounded-lg border-0 bg-transparent px-3 py-2 text-left transition-colors hover:bg-white/[0.06];
+}
+
+.optionActive {
+  @apply bg-white/[0.08];
+}
+
+.optionTitle {
+  @apply min-w-0 truncate font-body text-sm text-sw-text;
+}
+
+.optionMeta {
+  @apply shrink-0 font-mono text-[11px] text-white/35;
+}
+
+.hint {
+  @apply px-3 py-2 font-body text-sm text-white/35;
+}

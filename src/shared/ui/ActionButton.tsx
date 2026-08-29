@@ -20,13 +20,18 @@ export function ActionButton({ type, muted = false, onClick }: Props) {
       type="button"
       aria-label={isLike ? "Like" : "Dislike"}
       onClick={onClick}
-      className={`${styles.root} ${isLike ? styles.like : styles.dislike}`}
+      className={`${styles.hit} ${isLike ? styles.hitLike : styles.hitSkip}`}
     >
-      {isLike ? (
-        <HeartIcon className={styles.icon} aria-hidden />
-      ) : (
-        <CloseIcon className={styles.icon} aria-hidden />
-      )}
+      <span
+        className={`${styles.face} ${isLike ? styles.like : styles.dislike}`}
+        aria-hidden
+      >
+        {isLike ? (
+          <HeartIcon className={styles.icon} />
+        ) : (
+          <CloseIcon className={styles.icon} />
+        )}
+      </span>
     </button>
   );
 }

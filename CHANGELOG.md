@@ -12,6 +12,49 @@ How to use:
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-29
+
+Infinite mode, swipe polish, account UX, Steam pricing, and ignored-games sync.
+
+### Added
+
+- **Infinite mode** at `/infinite`: endless IGDB catalog stream with filters before start (platforms, all genres, crossplay); active chips float to the top; filter chips scroll inside the dialog
+- Infinite-mode **trash** (bottom-left): permanently hide a game; manage the list at `/ignored` (newest first, Restore / Remove on hover)
+- **Undo last swipe** (`← Previous`, up to 5 games back) under the page-back chip
+- **Ignore list** in Preferences: hide games that include a chosen genre, or that are exclusive to a chosen platform
+- **Account** area with sidebar: Profile, Preferences, Integrations; header menu links to Account / Preferences / Integrations / Ignored games
+- **Custom cursor** toggle (Preferences + auth menu); **Open Steam in browser** preference
+- Steam **prices** on catalog / deck tiles / swipe sidebar / hover preview (UAH); sale percent when discounted
+- **Metacritic** badge on cover tiles (green 80+ / yellow 75+ / red)
+- **Auth**: Google sign-in with `?next=` return path; avatar in account shell
+- Join session: **paste** clipboard code; empty field (placeholder only)
+- Steam price API resolves **regional app IDs** (e.g. Dishonored `205100` → `217980` in UA) so local prices match the store
+
+### Changed
+
+- Home: **Find a game** opens Solo / Together; **Infinite mode** opens a filter dialog then `/infinite`; `/deck` swipes the active deck
+- Swipe **like / skip** full-height side rails with soft color wash (~65% fade), slow card lean toward hovered side, subtle cursor pull on the **top card only** (stack behind stays put)
+- Swipe **sidebar** buy block: price right-aligned above full-width Open in Steam; **no price on the swipe card** itself
+- Screenshot gallery prev / next aligned to outer edges of wide hit zones
+- Signed-in custom decks migrate to Supabase; create/update/delete errors surface in UI instead of silent localStorage fallback
+- Catalog genre chips match games that **include** the genre (not exclusive-only)
+
+### Fixed
+
+- Header account menu stacks above catalog filters on Decks / Games
+- Swipe sidebar price aligns with Steam button padding
+- Swipe side rails sit above the card row so like / skip hover and clicks work
+- Swipe card width no longer collapses to 0px when magnet wrapper inherits `--sw-card-w`
+- **Card drag** restored on the interactive layer; pointer release outside the browser window ends the swipe
+- Steam prices for titles with a separate regional store listing (e.g. Dishonored in Ukraine)
+
+### Deploy notes (0.4.0)
+
+1. **Env** (see `.env.example`): `NEXT_PUBLIC_SUPABASE_*`, `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET`, `NEXT_PUBLIC_SITE_URL`; Google OAuth in Supabase dashboard.
+2. **Supabase SQL**: run `supabase/ignored_games.sql` in the SQL editor if `ignored_games` is not applied yet (signed-in ignore sync).
+3. **Build**: `npm ci && npm run build` (uses `next build --webpack`).
+4. **Prod**: push `main` (or merge PR) so Vercel deploys; confirm `/infinite`, swipe, and a priced game (e.g. Dishonored **260₴**) after deploy.
+
 ## [0.3.0] - 2026-08-26
 
 Session lobby polish, richer match results, catalog UX, and production cleanup.

@@ -1,16 +1,21 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { oauthCallbackUrl } from "@/features/auth/lib/auth-redirect";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  oauthCallbackUrl,
+  safeNextPath,
+} from "@/features/auth/lib/auth-redirect";
 import { createBrowserSupabaseClient } from "@/shared/supabase/client";
 import styles from "./GoogleSignInButton.module.css";
 
 export function GoogleSignInButton() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   async function signIn() {
     const supabase = createBrowserSupabaseClient();
-    const redirectTo = oauthCallbackUrl();
+    const next = safeNextPath(searchParams.get("next"));
+    const redirectTo = oauthCallbackUrl(next === "/" ? null : next);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

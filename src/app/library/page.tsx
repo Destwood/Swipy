@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import ChevronLeftIcon from "@/assets/icons/chevron-left.svg";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
 import { GameHoverPreview } from "@/features/games/components/GameHoverPreview";
+import { GamePriceBadge } from "@/features/games/components/GamePriceBadge";
+import { MetacriticBadge } from "@/features/games/components/MetacriticBadge";
 import { SteamGameTile } from "@/features/games/components/SteamGameTile";
 import {
   EMPTY_CATALOG_FILTERS,
@@ -15,7 +17,9 @@ import { gameCoverSrc } from "@/features/games/lib/igdb/image";
 import type { SortValue } from "@/features/games/lib/sort-games";
 import { useCatalogGames } from "@/features/games/lib/use-catalog-games";
 import { CatalogFilterBar } from "@/shared/ui/CatalogFilterBar";
+import { CatalogSearch } from "@/shared/ui/CatalogSearch";
 import { FadeIn } from "@/shared/ui/FadeIn";
+import { useLoadingMoreSkeletonCount } from "@/shared/ui/use-loading-more-skeleton-count";
 import styles from "./page.module.css";
 
 function SkeletonTiles({ count }: { count: number }) {
@@ -37,11 +41,18 @@ function SkeletonTiles({ count }: { count: number }) {
 export default function LibraryPage() {
   const [filters, setFilters] = useState<CatalogFilterState>(EMPTY_CATALOG_FILTERS);
   const [sort, setSort] = useState<SortValue>("popular");
+  const [query, setQuery] = useState("");
   const [showTop, setShowTop] = useState(false);
   const { games, loading, loadingMore, error, hasMore, loadMore } =
-    useCatalogGames(filters, sort);
+    useCatalogGames(filters, sort, query);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLLIElement>(null);
+  const gridRef = useRef<HTMLUListElement>(null);
+  const moreSkeletonCount = useLoadingMoreSkeletonCount(
+    gridRef,
+    games.length,
+    loadingMore,
+  );
 
   useEffect(() => {
     const root = scrollRef.current;
@@ -75,10 +86,14 @@ export default function LibraryPage() {
   }
 
   const status = loading
-    ? "Loading popular games…"
+    ? query
+      ? `Searching “${query}”…`
+      : "Loading popular games…"
     : loadingMore
       ? `Showing ${games.length}…`
-      : `Showing ${games.length}`;
+      : query
+        ? `${games.length} results for “${query}”`
+        : `Showing ${games.length}`;
 
   return (
     <div className={styles.root}>
@@ -86,6 +101,13 @@ export default function LibraryPage() {
       <div className={styles.content} ref={scrollRef}>
         <div className={styles.inner}>
           <FadeIn className={styles.toolbar}>
+            <CatalogSearch
+              value={query}
+              onChange={setQuery}
+              filters={filters}
+              sort={sort}
+              disabled={loading && !loadingMore}
+            />
             <CatalogFilterBar
               filters={filters}
               onChange={setFilters}
@@ -109,13 +131,15 @@ export default function LibraryPage() {
               </p>
             </div>
           ) : (
-            <ul className={styles.grid} aria-busy={loadingMore}>
+            <ul ref={gridRef} className={styles.grid} aria-busy={loadingMore}>
               {games.map((game, i) => (
                 <FadeIn
                   key={game.id}
                   as="li"
                   className={styles.gridItem}
-                  delayMs={i < 24 ? Math.min(i, 16) * 28 : 0}
+                  delayMs={
+                    loadingMore || i >= 24 ? 0 : Math.min(i, 12) * 18
+                  }
                 >
                   <GameHoverPreview game={game}>
                     <SteamGameTile game={game} className={styles.tile}>
@@ -126,30 +150,33 @@ export default function LibraryPage() {
                           fill
                           className={styles.coverImage}
                           sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 16vw, 12vw"
+                          priority={i < 8}
                           unoptimized={
                             game.image.includes("igdb") ||
                             game.image.includes("rawg")
                           }
                         />
                         {game.metacritic != null ? (
-                          <span className={styles.score}>{game.metacritic}</span>
+                          <MetacriticBadge score={game.metacritic} />
                         ) : null}
                       </div>
                       <div className={styles.tileBody}>
                         <h2 className={styles.gameTitle}>{game.title}</h2>
-                        <p className={styles.gameMeta}>
-                          {game.year || "—"}
-                          {game.genres[0]
-                            ? ` · ${normalizeGenreLabel(game.genres[0])}`
-                            : ""}
-                          {game.steamAppId ? " · Steam" : ""}
-                        </p>
+                        <div className={styles.metaRow}>
+                          <p className={styles.gameMeta}>
+                            {game.year || "—"}
+                            {game.genres[0]
+                              ? ` · ${normalizeGenreLabel(game.genres[0])}`
+                              : ""}
+                          </p>
+                          <GamePriceBadge appId={game.steamAppId} size="xs" />
+                        </div>
                       </div>
                     </SteamGameTile>
                   </GameHoverPreview>
                 </FadeIn>
               ))}
-              {loadingMore ? <SkeletonTiles count={8} /> : null}
+              {loadingMore ? <SkeletonTiles count={moreSkeletonCount} /> : null}
               {hasMore ? (
                 <li ref={sentinelRef} className={styles.sentinel} aria-hidden />
               ) : null}

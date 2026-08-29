@@ -41,6 +41,14 @@
   @apply mt-0.5 block truncate font-body text-xs text-white/35;
 }
 
+.skeletonName {
+  @apply h-4 w-[55%] rounded-sm bg-white/[0.08];
+}
+
+.skeletonHint {
+  @apply mt-2 h-3 w-[40%] rounded-sm bg-white/[0.05];
+}
+
 .deckAction {
   @apply shrink-0;
 }

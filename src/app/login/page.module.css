@@ -31,3 +31,7 @@
 .noteLink {
   @apply text-sw-accent/80 transition-colors hover:text-sw-accent;
 }
+
+.signInFallback {
+  @apply inline-flex h-11 min-w-[220px] items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-4 font-body text-sm text-white/40;
+}

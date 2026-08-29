@@ -8,14 +8,46 @@
   @apply rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-sw-text/70 transition-colors hover:border-sw-accent/35 hover:text-sw-accent;
 }
 
-.menu {
-  @apply flex items-center gap-3;
+.root {
+  @apply relative;
+}
+
+.trigger {
+  @apply flex max-w-[180px] cursor-pointer items-center gap-1.5 rounded-lg border border-transparent px-2 py-1.5 transition-colors hover:border-white/[0.08] hover:bg-white/[0.04];
+}
+
+.triggerOpen {
+  @apply border-white/[0.08] bg-white/[0.04];
 }
 
 .name {
-  @apply max-w-[140px] truncate font-mono text-[12px] text-white/40;
+  @apply min-w-0 truncate font-mono text-[12px] text-white/55;
+}
+
+.triggerAvatar {
+  @apply h-[22px] w-[22px] shrink-0 rounded-full object-cover;
+}
+
+.chevron {
+  @apply text-[10px] text-white/30;
+}
+
+.dropdown {
+  @apply absolute top-[calc(100%+8px)] right-0 z-50 w-[300px] rounded-xl border border-white/10 bg-sw-surface p-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.55)];
+}
+
+.section {
+  @apply flex flex-col gap-0.5;
+}
+
+.menuLink {
+  @apply block rounded-lg px-2.5 py-2 font-body text-sm text-sw-text/80 transition-colors hover:bg-white/[0.05] hover:text-sw-text;
+}
+
+.divider {
+  @apply my-1 h-px bg-white/[0.06];
 }
 
 .signOut {
-  @apply cursor-pointer rounded-lg border border-transparent px-2 py-1 text-sm text-white/35 transition-colors hover:text-sw-text;
+  @apply w-full cursor-pointer rounded-lg border-0 bg-transparent px-2.5 py-2 text-left font-body text-sm text-sw-dislike/90 transition-colors hover:bg-[rgba(251,113,133,0.08)];
 }

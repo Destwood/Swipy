@@ -3,6 +3,7 @@
 import Image from "next/image";
 import CloseIcon from "@/assets/icons/close.svg";
 import type { Game } from "@/features/games/data/games";
+import { GamePriceBadge } from "./GamePriceBadge";
 import { GenreTag } from "./GenreTag";
 import styles from "./LikedRow.module.css";
 
@@ -28,20 +29,20 @@ export function LikedRow({ game, onRemove }: Props) {
       </div>
 
       <div className={styles.content}>
-        <div className={styles.titleRow}>
-          <span className={styles.title}>{game.title}</span>
-          {game.metacritic != null && (
-            <span className={styles.metacritic}>MC {game.metacritic}</span>
-          )}
-        </div>
+        <span className={styles.title}>{game.title}</span>
         <div className={styles.metaRow}>
           {game.genres.filter(Boolean).map((g, i) => (
             <GenreTag key={g} label={g} accent={i === 0} />
           ))}
           <span className={styles.developer}>
             {game.developer} · {game.year}
+            {game.metacritic != null ? ` · MC ${game.metacritic}` : ""}
           </span>
         </div>
+      </div>
+
+      <div className={styles.price}>
+        <GamePriceBadge appId={game.steamAppId} size="sm" />
       </div>
 
       {onRemove ? (

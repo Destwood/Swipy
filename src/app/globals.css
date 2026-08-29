@@ -40,7 +40,7 @@ body {
 
 :root {
   --sw-topbar-h: 52px;
-  --sw-swipe-chrome: calc(var(--sw-topbar-h) + 56px);
+  --sw-swipe-chrome: calc(var(--sw-topbar-h) + 52px);
   --sw-card-max-h: 520px;
   --sw-card-h: min(var(--sw-card-max-h), calc(100dvh - var(--sw-swipe-chrome)));
   --sw-card-w: min(380px, calc(var(--sw-card-h) * 0.735), calc(100dvw - 11rem));
@@ -61,7 +61,7 @@ body {
 @media (max-height: 760px) {
   :root {
     --sw-topbar-h: 48px;
-    --sw-swipe-chrome: calc(var(--sw-topbar-h) + 36px);
+    --sw-swipe-chrome: calc(var(--sw-topbar-h) + 40px);
   }
 }
 

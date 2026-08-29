@@ -17,10 +17,10 @@
   @apply pointer-events-none absolute inset-0;
   background: linear-gradient(
     to bottom,
-    transparent 30%,
-    rgba(12, 14, 18, 0.4) 55%,
-    rgba(12, 14, 18, 0.88) 75%,
-    rgba(12, 14, 18, 0.97) 100%
+    transparent 48%,
+    rgba(12, 14, 18, 0.32) 68%,
+    rgba(12, 14, 18, 0.88) 86%,
+    rgba(12, 14, 18, 0.96) 100%
   );
 }
 
@@ -29,23 +29,19 @@
   padding: 0 clamp(1rem, 2vw, 1.5rem) clamp(0.85rem, 2.2dvh, 1.75rem);
 }
 
-.meta {
-  @apply mb-2 font-mono text-[11px] tracking-[0.04em] text-sw-text/45;
-}
-
-.metacritic {
-  @apply ml-2.5 text-sw-accent;
+.genreRow {
+  @apply mb-2 flex min-h-[1.25rem] items-center gap-2;
 }
 
 .title {
-  @apply mb-2 font-display leading-[1.1] font-extrabold tracking-[-0.03em] text-sw-text;
+  @apply m-0 min-w-0 font-display leading-[1.1] font-extrabold tracking-[-0.03em] text-sw-text;
   font-size: clamp(1.15rem, 2.6dvh, 1.75rem);
 }
 
-.genres {
-  @apply mb-3 flex flex-wrap gap-1.5;
+.meta {
+  @apply m-0 mt-1 truncate font-mono text-[10px] tracking-[0.04em] text-sw-text/35;
 }
 
 .description {
-  @apply line-clamp-2 font-body text-[13px] leading-[1.55] font-normal text-sw-text/52;
+  @apply m-0 mt-2 line-clamp-2 font-body text-[13px] leading-[1.55] font-normal text-sw-text/52 lg:hidden;
 }

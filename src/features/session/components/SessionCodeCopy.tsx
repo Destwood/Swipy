@@ -6,18 +6,26 @@ import styles from "./SessionCodeCopy.module.css";
 
 type Props = {
   code: string;
+  /** If set, clipboard gets this value while the UI still shows `code`. */
+  copyValue?: string;
   label?: string;
   hint?: string;
+  align?: "center" | "start";
+  className?: string;
 };
 
 export function SessionCodeCopy({
   code,
+  copyValue,
   label = "Session code",
   hint,
+  align = "center",
+  className,
 }: Props) {
   async function copy() {
+    const value = copyValue?.trim() || code;
     try {
-      await navigator.clipboard.writeText(code);
+      await navigator.clipboard.writeText(value);
       toast("Copied");
     } catch {
       toast("Could not copy");
@@ -25,7 +33,9 @@ export function SessionCodeCopy({
   }
 
   return (
-    <div className={styles.root}>
+    <div
+      className={`${styles.root} ${align === "start" ? styles.alignStart : ""} ${className ?? ""}`}
+    >
       {label ? <span className={styles.label}>{label}</span> : null}
       <button
         type="button"

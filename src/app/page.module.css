@@ -32,6 +32,10 @@
 }
 
 .actions {
+  @apply flex flex-col items-center gap-3;
+}
+
+.primaryRow {
   @apply flex flex-wrap items-center justify-center gap-3;
 }
 

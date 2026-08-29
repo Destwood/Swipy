@@ -31,6 +31,12 @@ function writeCustomDecks(decks: Deck[]) {
   localStorage.setItem(CUSTOM_DECKS_KEY, JSON.stringify(decks));
 }
 
+function removeCustomDecksByIds(ids: string[]) {
+  if (ids.length === 0) return;
+  const drop = new Set(ids);
+  writeCustomDecks(readCustomDecks().filter((deck) => !drop.has(deck.id)));
+}
+
 function readHiddenSeeds(): Set<string> {
   if (typeof window === "undefined") return new Set();
   try {
@@ -83,11 +89,7 @@ export async function saveCustomDeck(input: {
 }): Promise<Deck> {
   const userId = await getSignedInUserId();
   if (userId) {
-    try {
-      return await insertAccountDeck(input);
-    } catch {
-      // Tables may not exist until the SQL migration is applied.
-    }
+    return insertAccountDeck(input);
   }
   return saveLocalDeck(input);
 }
@@ -98,21 +100,27 @@ export async function listDecks(): Promise<Deck[]> {
   try {
     const userId = await getSignedInUserId();
     if (userId) {
-      await migrateLocalDecksToAccount(
-        custom.filter((deck) => deck.id.startsWith("custom-")),
+      const pendingCustom = custom.filter((deck) => deck.id.startsWith("custom-"));
+      const migratedIds = await migrateLocalDecksToAccount(pendingCustom);
+      removeCustomDecksByIds(migratedIds);
+
+      const remaining = readCustomDecks();
+      const leftoverCustom = remaining.filter((deck) =>
+        deck.id.startsWith("custom-"),
       );
-      const cloud = await fetchAccountDecks();
-      const overlays = custom.filter((deck) =>
+      const overlays = remaining.filter((deck) =>
         SEED_DECKS.some((seed) => seed.id === deck.id),
       );
       const overlayIds = new Set(overlays.map((deck) => deck.id));
       const seeds = SEED_DECKS.filter(
         (deck) => !hidden.has(deck.id) && !overlayIds.has(deck.id),
       );
-      return [...seeds, ...overlays, ...cloud];
+      const cloud = await fetchAccountDecks();
+      // Leftover custom-* only if migrate failed for those rows (retry next list).
+      return [...seeds, ...overlays, ...cloud, ...leftoverCustom];
     }
   } catch {
-    // Stay on localStorage until the account tables exist.
+    // Stay on localStorage until account tables / session are available.
   }
   return localDecks();
 }
@@ -133,13 +141,11 @@ export async function updateDeck(
   id: string,
   input: { name: string; description?: string; gameIds: string[] },
 ): Promise<Deck> {
-  if (isAccountDeckId(id) && (await getSignedInUserId())) {
-    try {
-      return await updateAccountDeck(id, input);
-    } catch {
-      // Fall through to local overlay.
-    }
+  const userId = await getSignedInUserId();
+  if (userId && isAccountDeckId(id)) {
+    return updateAccountDeck(id, input);
   }
+
   const deck: Deck = {
     id,
     name: input.name.trim(),
@@ -159,14 +165,12 @@ export async function updateDeck(
 }
 
 export async function deleteDeck(id: string): Promise<boolean> {
-  if (isAccountDeckId(id) && (await getSignedInUserId())) {
-    try {
-      await deleteAccountDeck(id);
-      return true;
-    } catch {
-      return false;
-    }
+  const userId = await getSignedInUserId();
+  if (userId && isAccountDeckId(id)) {
+    await deleteAccountDeck(id);
+    return true;
   }
+
   const custom = readCustomDecks();
   if (custom.some((deck) => deck.id === id)) {
     writeCustomDecks(custom.filter((deck) => deck.id !== id));

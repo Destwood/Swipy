@@ -1,20 +1,11 @@
 "use client";
 
-import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import HeartIcon from "@/assets/icons/heart.svg";
+import StarIcon from "@/assets/icons/star.svg";
 import { AuthMenu } from "@/features/auth/components/AuthMenu";
 import { SwipyLogo } from "./SwipyLogo";
 import styles from "./AppTopBar.module.css";
-
-interface Props {
-  children?: ReactNode;
-  right?: ReactNode;
-  showLikedLink?: boolean;
-  remainingLabel?: string;
-  showNav?: boolean;
-}
 
 const NAV = [
   { href: "/decks", label: "Decks", match: (path: string) => path.startsWith("/decks") },
@@ -25,52 +16,34 @@ const NAV = [
   },
 ] as const;
 
-export function AppTopBar({
-  children,
-  right,
-  showLikedLink = true,
-  remainingLabel,
-  showNav = true,
-}: Props) {
+export function AppTopBar() {
   const pathname = usePathname() ?? "";
 
   return (
     <div className={styles.root}>
       <div className={styles.left}>
-        {children ?? (
-          <>
-            <SwipyLogo size="bar" />
-            {showNav ? (
-              <nav className={styles.nav} aria-label="Primary">
-                {NAV.map((item) => {
-                  const active = item.match(pathname);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
-                      aria-current={active ? "page" : undefined}
-                    >
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </nav>
-            ) : null}
-          </>
-        )}
+        <SwipyLogo size="bar" />
+        <nav className={styles.nav} aria-label="Primary">
+          {NAV.map((item) => {
+            const active = item.match(pathname);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`${styles.navLink} ${active ? styles.navLinkActive : ""}`}
+                aria-current={active ? "page" : undefined}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
       <div className={styles.right}>
-        {showLikedLink && (
-          <Link href="/liked" className={styles.likedLink}>
-            <HeartIcon className={styles.likedIcon} aria-hidden />
-            Favorites
-          </Link>
-        )}
-        {remainingLabel !== undefined && (
-          <span className={styles.remainingLabel}>{remainingLabel}</span>
-        )}
-        {right}
+        <Link href="/liked" className={styles.likedLink}>
+          <StarIcon className={styles.likedIcon} aria-hidden />
+          Favorites
+        </Link>
         <AuthMenu />
       </div>
     </div>

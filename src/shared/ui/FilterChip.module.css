@@ -16,6 +16,14 @@
   @apply border-[rgba(45,212,191,0.45)] text-sw-accent;
 }
 
+.danger {
+  @apply border-[rgba(251,113,133,0.35)] bg-[rgba(251,113,133,0.1)] font-semibold text-sw-dislike;
+}
+
+.danger:hover {
+  @apply border-[rgba(251,113,133,0.5)] text-sw-dislike;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .chip,
   .chip:active {

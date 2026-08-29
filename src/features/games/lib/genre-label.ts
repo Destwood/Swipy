@@ -10,6 +10,7 @@ export function normalizeGenreLabel(raw: string): string {
   ) {
     return "RPG";
   }
+  if (/^platform/i.test(t)) return "Platform";
   return t;
 }
 

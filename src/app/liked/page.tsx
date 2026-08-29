@@ -2,28 +2,38 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import ChevronLeftIcon from "@/assets/icons/chevron-left.svg";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
 import { LikedRow } from "@/features/games/components/LikedRow";
-import { SwipyLogo } from "@/features/shell/components/SwipyLogo";
 import type { Game } from "@/features/games/data/games";
 import {
   listFavoriteGameIds,
   toggleFavoriteGame,
 } from "@/features/games/lib/game-favorites";
 import { getLibraryGamesByIds } from "@/features/games/lib/game-library";
+import { gameIsIgnored } from "@/features/games/lib/ignore-list";
+import { useIgnoreList } from "@/features/games/lib/use-ignore-list";
+import { PageBackLink } from "@/shared/ui/PageBackLink";
 import styles from "./page.module.css";
 
 export default function LikedPage() {
   const [games, setGames] = useState<Game[]>([]);
+  const ignore = useIgnoreList();
 
   function reload() {
-    setGames(getLibraryGamesByIds(listFavoriteGameIds()));
+    setGames(
+      getLibraryGamesByIds(listFavoriteGameIds()).filter(
+        (game) =>
+          !gameIsIgnored(game, {
+            genres: ignore.genres,
+            platforms: ignore.platforms,
+          }),
+      ),
+    );
   }
 
   useEffect(() => {
     reload();
-  }, []);
+  }, [ignore.ready, ignore.genres, ignore.platforms]);
 
   function onRemove(id: string) {
     toggleFavoriteGame(id);
@@ -32,29 +42,11 @@ export default function LikedPage() {
 
   return (
     <div className={styles.root}>
-      <AppTopBar
-        right={
-          <span className={styles.countBadge}>
-            {games.length} {games.length === 1 ? "favorite" : "favorites"}
-          </span>
-        }
-      >
-        <div className={styles.topBarLeft}>
-          <Link
-            href="/decks"
-            aria-label="Back to decks"
-            className={styles.backLink}
-          >
-            <ChevronLeftIcon width={14} height={14} aria-hidden />
-            Back
-          </Link>
-          <div className={styles.divider} />
-          <SwipyLogo size="bar" />
-        </div>
-      </AppTopBar>
+      <AppTopBar />
 
       <div className={styles.content}>
         <div className={styles.inner}>
+          <PageBackLink href="/decks">← Decks</PageBackLink>
           <div className={styles.header}>
             <h1 className={styles.title}>Favorites</h1>
             <span className={styles.count}>

@@ -1,0 +1,74 @@
+@reference "../../../app/globals.css";
+
+.overlay {
+  @apply fixed inset-0 z-[100] flex items-center justify-center bg-black/65 px-5 backdrop-blur-[6px];
+  animation: sw-dialog-fade 180ms ease both;
+}
+
+.dialog {
+  @apply flex max-h-[min(88dvh,760px)] w-full max-w-[460px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-sw-surface shadow-[0_24px_64px_rgba(0,0,0,0.55)];
+  animation: sw-dialog-up 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.header {
+  @apply shrink-0 border-b border-white/[0.06] px-6 py-5;
+}
+
+.title {
+  @apply m-0 font-display text-xl font-bold tracking-[-0.03em] text-sw-text;
+}
+
+.scroll {
+  @apply min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5;
+}
+
+.group + .group {
+  @apply mt-6;
+}
+
+.groupLabel {
+  @apply m-0 mb-2.5 font-mono text-[10px] tracking-[0.12em] text-sw-muted uppercase;
+}
+
+.chips {
+  @apply flex flex-wrap gap-2;
+}
+
+.divider {
+  @apply mx-0.5 h-6 w-px shrink-0 self-center bg-white/10;
+}
+
+.footer {
+  @apply grid shrink-0 grid-cols-2 gap-2 border-t border-white/[0.06] p-6;
+}
+
+.footerButton {
+  @apply w-full;
+}
+
+@keyframes sw-dialog-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sw-dialog-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .dialog {
+    animation: none;
+  }
+}

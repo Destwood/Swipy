@@ -4,28 +4,33 @@ import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { setActiveDeckId } from "@/features/decks/lib/deck-store";
-import { displayNameFromCurrentUser } from "@/features/session/lib/display-names";
-import {
-  createGuestSession,
-  startSessionSwiping,
-} from "@/features/session/lib/sessions";
+import { startSoloSession } from "@/features/session/lib/start-solo-session";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./UseInSessionDialog.module.css";
 
 type Props = {
   open: boolean;
-  deckId: string | null;
-  deckName?: string;
   onClose: () => void;
+  deckId?: string | null;
+  deckName?: string;
+  source?: "deck" | "home";
 };
 
-export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
+export function UseInSessionDialog({
+  open,
+  onClose,
+  deckId = null,
+  deckName,
+  source = "deck",
+}: Props) {
   const router = useRouter();
   const titleId = useId();
   const descId = useId();
   const [busyMode, setBusyMode] = useState<"solo" | "together" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const busy = busyMode !== null;
+  const fromHome = source === "home";
+  const canStart = fromHome || Boolean(deckId);
 
   useEffect(() => {
     if (!open) return;
@@ -47,28 +52,34 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
       setError(null);
       setBusyMode(null);
     }
-  }, [open, deckId]);
+  }, [open, deckId, source]);
 
   function startTogether() {
-    if (!deckId || busy) return;
+    if (!canStart || busy) return;
     setBusyMode("together");
+    if (fromHome) {
+      onClose();
+      router.push("/session");
+      return;
+    }
+    if (!deckId) return;
     setActiveDeckId(deckId);
     onClose();
     router.push("/session");
   }
 
   async function startSolo() {
-    if (!deckId || busy) return;
+    if (!canStart || busy) return;
     setBusyMode("solo");
     setError(null);
+    if (fromHome) {
+      onClose();
+      router.push("/session/pick-deck?intent=solo");
+      return;
+    }
+    if (!deckId) return;
     try {
-      setActiveDeckId(deckId);
-      const displayName = (await displayNameFromCurrentUser()) ?? "You";
-      const session = await createGuestSession({
-        deckId,
-        displayName,
-      });
-      await startSessionSwiping(session.sessionId);
+      await startSoloSession(deckId);
       onClose();
       router.push("/session/deck");
     } catch (e) {
@@ -95,12 +106,14 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
         className={styles.dialog}
       >
         <h2 id={titleId} className={styles.title}>
-          Use in session
+          {fromHome ? "Find a game" : "Use in session"}
         </h2>
         <p id={descId} className={styles.description}>
-          {deckName
-            ? `Play “${deckName}” alone, or open a lobby for friends.`
-            : "Play alone, or open a lobby for friends."}
+          {fromHome
+            ? "Choose a mode."
+            : deckName
+              ? `Play “${deckName}” alone, or open a lobby for friends.`
+              : "Play alone, or open a lobby for friends."}
         </p>
 
         {error ? <p className={styles.error}>{error}</p> : null}
@@ -110,7 +123,7 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
             <Button
               type="button"
               onClick={() => void startSolo()}
-              disabled={busy || !deckId}
+              disabled={busy || !canStart}
               variant={ButtonVariant.Accent}
               size={ButtonSize.Sm}
               className={styles.modeButton}
@@ -120,7 +133,7 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
             <Button
               type="button"
               onClick={() => void startTogether()}
-              disabled={busy || !deckId}
+              disabled={busy || !canStart}
               variant={ButtonVariant.Dark}
               size={ButtonSize.Sm}
               className={styles.modeButton}
@@ -128,16 +141,18 @@ export function UseInSessionDialog({ open, deckId, deckName, onClose }: Props) {
               {busyMode === "together" ? "Opening…" : "Together"}
             </Button>
           </div>
-          <Button
-            type="button"
-            onClick={onClose}
-            disabled={busy}
-            variant={ButtonVariant.Dark}
-            size={ButtonSize.Sm}
-            className={styles.modeButton}
-          >
-            Cancel
-          </Button>
+          {fromHome ? null : (
+            <Button
+              type="button"
+              onClick={onClose}
+              disabled={busy}
+              variant={ButtonVariant.Dark}
+              size={ButtonSize.Sm}
+              className={styles.modeButton}
+            >
+              Cancel
+            </Button>
+          )}
         </div>
       </div>
     </div>,

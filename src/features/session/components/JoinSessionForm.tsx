@@ -6,11 +6,22 @@ import { setActiveDeckId } from "@/features/decks/lib/deck-store";
 import { useSessionDisplayName } from "@/features/session/lib/use-session-display-name";
 import { joinGuestSession } from "@/features/session/lib/sessions";
 import { Button, ButtonVariant } from "@/shared/ui/Button";
+import { toast } from "@/shared/ui/toast";
 import styles from "./JoinSessionForm.module.css";
+
+function codeFromClipboard(raw: string): string | null {
+  const text = raw.trim().toUpperCase();
+  const fromUrl = text.match(/SWPY-[A-Z0-9]{4}/);
+  if (fromUrl) return fromUrl[0];
+  const compact = text.replace(/\s+/g, "");
+  const suffix = compact.replace(/^SWPY-?/, "");
+  if (/^[A-Z0-9]{4}$/.test(suffix)) return `SWPY-${suffix}`;
+  return null;
+}
 
 export function JoinSessionForm() {
   const router = useRouter();
-  const [code, setCode] = useState("SWPY-");
+  const [code, setCode] = useState("");
   const { displayName, setDisplayName, ready, askForName } =
     useSessionDisplayName("Guest");
   const [busy, setBusy] = useState(false);
@@ -29,6 +40,22 @@ export function JoinSessionForm() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to join");
       setBusy(false);
+    }
+  }
+
+  async function pasteCode() {
+    if (busy) return;
+    try {
+      const raw = await navigator.clipboard.readText();
+      const next = codeFromClipboard(raw);
+      if (!next) {
+        toast("No session code in clipboard");
+        return;
+      }
+      setCode(next);
+      setError(null);
+    } catch {
+      toast("Could not paste");
     }
   }
 
@@ -53,15 +80,30 @@ export function JoinSessionForm() {
         </label>
         ) : null}
 
-        <label className={styles.field}>
-          <span className={styles.fieldLabel}>Code</span>
+        <div className={styles.field}>
+          <div className={styles.fieldHeader}>
+            <label htmlFor="join-code" className={styles.fieldLabel}>
+              Code
+            </label>
+            <button
+              type="button"
+              className={styles.paste}
+              onClick={() => void pasteCode()}
+              disabled={busy || !ready}
+            >
+              Paste
+            </button>
+          </div>
           <input
+            id="join-code"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             placeholder="SWPY-XXXX"
             className={styles.codeInput}
+            autoComplete="off"
+            spellCheck={false}
           />
-        </label>
+        </div>
       </div>
 
       {error && <p className={styles.error}>{error}</p>}

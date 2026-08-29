@@ -28,6 +28,18 @@
   @apply font-mono text-[11px] tracking-[0.06em] text-white/30 uppercase;
 }
 
+.fieldHeader {
+  @apply flex items-center justify-between gap-2;
+}
+
+.paste {
+  @apply cursor-pointer rounded-md border-0 bg-transparent px-1.5 py-0.5 font-mono text-[11px] tracking-[0.06em] text-white/40 uppercase transition-colors hover:text-sw-accent;
+}
+
+.paste:disabled {
+  @apply cursor-default text-white/20;
+}
+
 .input {
   @apply rounded-xl border border-white/10 bg-sw-surface px-5 py-3 font-body text-sw-text outline-none focus:border-sw-accent/40;
 }

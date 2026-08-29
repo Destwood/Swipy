@@ -8,6 +8,13 @@ import {
   catalogSearchParams,
 } from "@/features/games/lib/catalog-query";
 import { upsertGames } from "@/features/games/lib/game-library";
+import {
+  EMPTY_IGNORE_LIST,
+  gameIsIgnored,
+  readIgnoreList,
+  subscribeIgnoreList,
+  type IgnoreList,
+} from "@/features/games/lib/ignore-list";
 import type { SortValue } from "@/features/games/lib/sort-games";
 
 type CatalogResponse = {
@@ -27,7 +34,13 @@ export function useCatalogGames(
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ignore, setIgnore] = useState<IgnoreList>(EMPTY_IGNORE_LIST);
   const loadingMoreRef = useRef(false);
+
+  useEffect(() => {
+    setIgnore(readIgnoreList());
+    return subscribeIgnoreList(setIgnore);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -111,5 +124,12 @@ export function useCatalogGames(
     })();
   }, [filters, sort, query, page, hasMore, loading]);
 
-  return { games, loading, loadingMore, error, hasMore, loadMore };
+  return {
+    games: games.filter((game) => !gameIsIgnored(game, ignore)),
+    loading,
+    loadingMore,
+    error,
+    hasMore,
+    loadMore,
+  };
 }

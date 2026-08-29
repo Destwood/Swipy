@@ -11,3 +11,7 @@
 .default {
   @apply border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.08)] text-[#aab4c2];
 }
+
+.compact {
+  @apply rounded-full border-0 bg-white/12 px-2 py-0.5 text-[9px] font-medium text-white/80;
+}

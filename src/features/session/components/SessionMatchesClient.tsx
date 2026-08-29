@@ -1,12 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import ChevronLeftIcon from "@/assets/icons/chevron-left.svg";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
-import { SwipyLogo } from "@/features/shell/components/SwipyLogo";
 import type { Game } from "@/features/games/data/games";
-import { steamStoreAppUrl } from "@/features/games/lib/steam";
+import { openSteamStore } from "@/features/games/lib/steam";
 import { MatchGameRow } from "@/features/session/components/MatchGameRow";
 import { VoteBreakdown } from "@/features/session/components/VoteBreakdown";
 import { getActiveSession, toUiMember } from "@/features/session/lib/session-context";
@@ -27,6 +24,7 @@ import {
 } from "@/features/session/lib/share-matches";
 import { fetchMembers, fetchVotes } from "@/features/session/lib/sessions";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
+import { PageBackLink } from "@/shared/ui/PageBackLink";
 import styles from "./SessionMatchesClient.module.css";
 
 const RESULT_GAME_KEY = "swipy.resultGameId";
@@ -127,7 +125,7 @@ export function SessionMatchesClient() {
         <Button
           type="button"
           onClick={() => {
-            window.location.href = steamStoreAppUrl(game.steamAppId!);
+            openSteamStore(game.steamAppId!);
           }}
           variant={ButtonVariant.Soft}
           size={ButtonSize.Sm}
@@ -163,14 +161,11 @@ export function SessionMatchesClient() {
             variant={variant}
             voteMeta={
               showStats ? (
-                <>
-                  <span className={styles.pctBadge}>{ranked.pct}%</span>
-                  <VoteBreakdown
-                    voters={ranked.voters}
-                    likes={ranked.likes}
-                    members={ranked.members}
-                  />
-                </>
+                <VoteBreakdown
+                  voters={ranked.voters}
+                  likes={ranked.likes}
+                  members={ranked.members}
+                />
               ) : null
             }
             action={variant === "hero" ? null : pickAction(ranked.game)}
@@ -209,31 +204,11 @@ export function SessionMatchesClient() {
 
   return (
     <div className={styles.root}>
-      <AppTopBar
-        right={
-          topPick ? (
-            <Link
-              href="/session/result"
-              onClick={() => pickGame(topPick.id)}
-              className={styles.pickLink}
-            >
-              Pick a game
-            </Link>
-          ) : null
-        }
-      >
-        <div className={styles.topBarLeft}>
-          <Link href="/session/deck" className={styles.backLink}>
-            <ChevronLeftIcon className={styles.backIcon} aria-hidden />
-            Deck
-          </Link>
-          <div className={styles.divider} />
-          <SwipyLogo size="bar" href="/" />
-        </div>
-      </AppTopBar>
+      <AppTopBar />
 
       <div className={styles.scroll}>
         <div className={styles.page}>
+          <PageBackLink href="/session/deck">← Deck</PageBackLink>
           <div className={styles.header}>
             <p className={styles.eyebrow}>
               {isSolo ? "Your list" : "Shared list"}

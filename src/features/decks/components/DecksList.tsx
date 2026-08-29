@@ -2,14 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import HeartIcon from "@/assets/icons/heart.svg";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import SearchIcon from "@/assets/icons/search.svg";
+import StarIcon from "@/assets/icons/star.svg";
+import StarOutlineIcon from "@/assets/icons/star-outline.svg";
 import type { Deck } from "@/features/decks/data/decks";
 import { deleteDeck, isUserDeck, listDecks } from "@/features/decks/lib/deck-store";
 import { useAuthUser } from "@/features/auth/lib/use-auth-user";
 import {
   ensureSeedLibrary,
+  ensureGamesInLibrary,
   getLibraryGamesByIds,
   hydrateSeedGamesFromIgdb,
 } from "@/features/games/lib/game-library";
@@ -18,6 +20,7 @@ import { FilterChip } from "@/shared/ui/FilterChip";
 import { HoverLift } from "@/shared/ui/HoverLift";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
+import { toast } from "@/shared/ui/toast";
 import { UseInSessionDialog } from "@/features/session/components/UseInSessionDialog";
 import styles from "./DecksList.module.css";
 
@@ -30,6 +33,8 @@ type FilterTab = "all" | "favorites";
 type DecksListProps = {
   mode?: "browse" | "pick";
   onPick?: (deckId: string) => void;
+  pickHint?: string;
+  back?: ReactNode;
 };
 
 type DeckView = Deck & {
@@ -69,7 +74,12 @@ function toDeckView(deck: Deck): DeckView {
   return { ...deck, covers, genres };
 }
 
-export function DecksList({ mode = "browse", onPick }: DecksListProps) {
+export function DecksList({
+  mode = "browse",
+  onPick,
+  pickHint,
+  back,
+}: DecksListProps) {
   const pickMode = mode === "pick";
   const { user, ready: authReady } = useAuthUser();
   const [decks, setDecks] = useState<DeckView[]>([]);
@@ -82,18 +92,22 @@ export function DecksList({ mode = "browse", onPick }: DecksListProps) {
 
   async function reload() {
     ensureSeedLibrary();
-    setDecks((await listDecks()).map(toDeckView));
+    const list = await listDecks();
+    const allIds = [...new Set(list.flatMap((d) => d.gameIds))];
+    if (allIds.length > 0) await ensureGamesInLibrary(allIds);
+    setDecks(list.map(toDeckView));
     setFavorites(readFavorites());
   }
 
   useEffect(() => {
     if (!authReady) return;
     let cancelled = false;
+    setHydrating(true);
     void (async () => {
       await hydrateSeedGamesFromIgdb();
       if (cancelled) return;
       await reload();
-      setHydrating(false);
+      if (!cancelled) setHydrating(false);
     })();
     return () => {
       cancelled = true;
@@ -130,9 +144,16 @@ export function DecksList({ mode = "browse", onPick }: DecksListProps) {
   }
 
   async function onDelete(id: string) {
-    if (!(await deleteDeck(id))) return;
-    setPendingDelete(null);
-    await reload();
+    try {
+      if (!(await deleteDeck(id))) {
+        toast("Could not delete deck");
+        return;
+      }
+      setPendingDelete(null);
+      await reload();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Could not delete deck");
+    }
   }
 
   return (
@@ -157,6 +178,7 @@ export function DecksList({ mode = "browse", onPick }: DecksListProps) {
       />
       <div className={styles.header}>
         <div>
+          {back}
           <h1 className={styles.title}>
             {pickMode ? "Select a deck" : "Decks"}
           </h1>
@@ -164,7 +186,7 @@ export function DecksList({ mode = "browse", onPick }: DecksListProps) {
             {hydrating
               ? "Loading games from IGDB…"
               : pickMode
-                ? "Pick one deck for this session."
+                ? (pickHint ?? "Pick one deck for this session.")
                 : `${decks.length} ${decks.length === 1 ? "deck" : "decks"} · ${totalGames} games total`}
           </p>
         </div>
@@ -209,7 +231,28 @@ export function DecksList({ mode = "browse", onPick }: DecksListProps) {
         </label>
       </div>
 
-      {filtered.length === 0 && search ? (
+      {hydrating || !authReady ? (
+        <ul className={styles.grid} aria-busy="true" aria-label="Loading decks">
+          {Array.from({ length: 6 }, (_, i) => (
+            <li key={`sk-${i}`} className={styles.skeletonCard} aria-hidden>
+              <div className={styles.skeletonMosaic}>
+                <div className={`${styles.skeletonCell} sw-shimmer`} />
+                <div className={`${styles.skeletonCell} sw-shimmer`} />
+                <div className={`${styles.skeletonCell} sw-shimmer`} />
+                <div className={`${styles.skeletonCell} sw-shimmer`} />
+              </div>
+              <div className={styles.skeletonBody}>
+                <div className={`${styles.skeletonTitle} sw-shimmer`} />
+                <div className={styles.skeletonTags}>
+                  <div className={`${styles.skeletonTag} sw-shimmer`} />
+                  <div className={`${styles.skeletonTag} sw-shimmer`} />
+                </div>
+                <div className={`${styles.skeletonMeta} sw-shimmer`} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : filtered.length === 0 && search ? (
         <div className={styles.emptySearch}>
           <p className={styles.emptyTitle}>No decks match “{search}”</p>
           <p className={styles.emptyText}>Try a different name or genre.</p>
@@ -313,9 +356,13 @@ function DeckCard({
             type="button"
             aria-label={isFavorite ? "Unfavorite" : "Favorite"}
             onClick={onToggleFav}
-            className={`${styles.iconButton} ${isFavorite ? styles.iconButtonFav : ""}`}
+            className={`${styles.iconButton} ${styles.favButton} ${isFavorite ? styles.iconButtonFav : ""}`}
           >
-            <HeartIcon className={styles.heartIcon} />
+            {isFavorite ? (
+              <StarIcon className={styles.favIcon} />
+            ) : (
+              <StarOutlineIcon className={styles.favIcon} />
+            )}
           </button>
 
           <div className={styles.menuWrap}>
@@ -366,7 +413,7 @@ function DeckCard({
         <div className={styles.titleSlot}>
           <div className={styles.titleRow}>
             <h3 className={styles.cardTitle}>{deck.name}</h3>
-            {isFavorite ? <HeartIcon className={styles.favDot} /> : null}
+            {isFavorite ? <StarIcon className={styles.favDot} /> : null}
           </div>
         </div>
 

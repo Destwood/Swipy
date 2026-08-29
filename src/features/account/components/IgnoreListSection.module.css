@@ -1,0 +1,21 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply flex flex-col gap-3;
+}
+
+.hint {
+  @apply m-0 font-body text-[13px] leading-relaxed text-white/45;
+}
+
+.gamesLink {
+  @apply w-fit font-body text-[13px] font-medium text-sw-accent no-underline hover:underline;
+}
+
+.groupLabel {
+  @apply m-0 mt-1 font-mono text-[11px] tracking-[0.04em] text-white/35 uppercase;
+}
+
+.chips {
+  @apply flex flex-wrap gap-1.5;
+}

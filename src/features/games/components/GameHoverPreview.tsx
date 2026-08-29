@@ -13,8 +13,11 @@ import {
 import { createPortal } from "react-dom";
 import ChevronLeftIcon from "@/assets/icons/chevron-left.svg";
 import ArrowRightIcon from "@/assets/icons/arrow-right.svg";
+import { GamePriceBadge } from "@/features/games/components/GamePriceBadge";
+import { SteamStoreButton } from "@/features/games/components/SteamStoreButton";
 import type { Game } from "@/features/games/data/games";
 import { gameCoverSrc } from "@/features/games/lib/igdb/image";
+import { ScreenshotGallery } from "@/features/session/components/ScreenshotGallery";
 import styles from "./GameHoverPreview.module.css";
 
 const SHOW_DELAY_MS = 260;
@@ -72,6 +75,7 @@ export function GameHoverPreview({
   const showTimer = useRef(0);
   const hideTimer = useRef(0);
   const [open, setOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
   const [pos, setPos] = useState<{
     top: number;
     left: number;
@@ -85,6 +89,7 @@ export function GameHoverPreview({
   const description = realDescription(game);
   const current = images[index] ?? images[0];
   const hasGallery = images.length > 1;
+  const galleryOpen = galleryIndex != null;
 
   const clearTimers = useCallback(() => {
     window.clearTimeout(showTimer.current);
@@ -92,15 +97,16 @@ export function GameHoverPreview({
   }, []);
 
   const scheduleShow = useCallback(() => {
-    if (!canHoverPreview()) return;
+    if (!canHoverPreview() || galleryOpen) return;
     clearTimers();
     showTimer.current = window.setTimeout(() => setOpen(true), SHOW_DELAY_MS);
-  }, [clearTimers]);
+  }, [clearTimers, galleryOpen]);
 
   const scheduleHide = useCallback(() => {
+    if (galleryOpen) return;
     clearTimers();
     hideTimer.current = window.setTimeout(() => setOpen(false), HIDE_DELAY_MS);
-  }, [clearTimers]);
+  }, [clearTimers, galleryOpen]);
 
   const step = useCallback(
     (dir: -1 | 1) => {
@@ -110,10 +116,18 @@ export function GameHoverPreview({
     [images.length],
   );
 
+  const openGallery = useCallback(() => {
+    if (images.length === 0) return;
+    clearTimers();
+    setGalleryIndex(index);
+    setOpen(false);
+  }, [clearTimers, images.length, index]);
+
   useEffect(() => () => clearTimers(), [clearTimers]);
 
   useEffect(() => {
     setIndex(0);
+    setGalleryIndex(null);
   }, [game.id]);
 
   const place = useCallback(() => {
@@ -147,6 +161,7 @@ export function GameHoverPreview({
     place();
     const frame = requestAnimationFrame(place);
     function onScroll() {
+      if (galleryOpen) return;
       setOpen(false);
     }
     window.addEventListener("resize", place);
@@ -156,10 +171,10 @@ export function GameHoverPreview({
       window.removeEventListener("resize", place);
       window.removeEventListener("scroll", onScroll, true);
     };
-  }, [open, place, index]);
+  }, [open, place, index, galleryOpen]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || galleryOpen) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         setOpen(false);
@@ -176,7 +191,7 @@ export function GameHoverPreview({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, step]);
+  }, [open, galleryOpen, step]);
 
   return (
     <div
@@ -205,16 +220,24 @@ export function GameHoverPreview({
               />
               <div className={styles.cardInner}>
                 <div className={styles.media}>
-                  <Image
-                    src={gameCoverSrc(current, "hero")}
-                    alt=""
-                    fill
-                    className={styles.image}
-                    sizes="272px"
-                    unoptimized={
-                      current.includes("igdb") || current.includes("rawg")
-                    }
-                  />
+                  <button
+                    type="button"
+                    className={styles.mediaHit}
+                    aria-label={`Open ${game.title} screenshots`}
+                    onClick={openGallery}
+                  >
+                    <Image
+                      src={gameCoverSrc(current, "hero")}
+                      alt=""
+                      fill
+                      className={styles.image}
+                      sizes="272px"
+                      loading="eager"
+                      unoptimized={
+                        current.includes("igdb") || current.includes("rawg")
+                      }
+                    />
+                  </button>
                   {hasGallery ? (
                     <>
                       <button
@@ -223,7 +246,9 @@ export function GameHoverPreview({
                         aria-label="Previous image"
                         onClick={() => step(-1)}
                       >
-                        <ChevronLeftIcon className={styles.navIcon} />
+                        <span className={styles.navFace}>
+                          <ChevronLeftIcon className={styles.navIcon} />
+                        </span>
                       </button>
                       <button
                         type="button"
@@ -231,7 +256,9 @@ export function GameHoverPreview({
                         aria-label="Next image"
                         onClick={() => step(1)}
                       >
-                        <ArrowRightIcon className={styles.navIcon} />
+                        <span className={styles.navFace}>
+                          <ArrowRightIcon className={styles.navIcon} />
+                        </span>
                       </button>
                       <span className={styles.counter}>
                         {index + 1}/{images.length}
@@ -241,16 +268,36 @@ export function GameHoverPreview({
                 </div>
                 <div className={styles.body}>
                   <p className={styles.title}>{game.title}</p>
-                  {release ? (
+                  {release ||
+                  (game.developer && game.developer !== "Unknown") ? (
                     <p className={styles.meta}>
-                      {release}
-                      {game.developer && game.developer !== "Unknown"
-                        ? ` · ${game.developer}`
-                        : ""}
+                      {[
+                        game.developer && game.developer !== "Unknown"
+                          ? game.developer
+                          : null,
+                        release,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </p>
+                  ) : null}
+                  {game.genres.length > 0 ? (
+                    <div className={styles.genres}>
+                      {game.genres.slice(0, 4).map((g) => (
+                        <span key={g} className={styles.chip}>
+                          {g}
+                        </span>
+                      ))}
+                    </div>
                   ) : null}
                   {description ? (
                     <p className={styles.description}>{description}</p>
+                  ) : null}
+                  {game.steamAppId ? (
+                    <div className={styles.footer}>
+                      <GamePriceBadge appId={game.steamAppId} size="sm" />
+                      <SteamStoreButton appId={game.steamAppId} size="sm" />
+                    </div>
                   ) : null}
                 </div>
               </div>
@@ -258,6 +305,16 @@ export function GameHoverPreview({
             document.body,
           )
         : null}
+
+      {galleryOpen && images[galleryIndex] ? (
+        <ScreenshotGallery
+          title={game.title}
+          images={images}
+          index={galleryIndex}
+          onClose={() => setGalleryIndex(null)}
+          onIndex={setGalleryIndex}
+        />
+      ) : null}
     </div>
   );
 }

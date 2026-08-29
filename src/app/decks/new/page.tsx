@@ -6,7 +6,7 @@ export default function NewDeckPage() {
   return (
     <div className={styles.root}>
       <AppTopBar />
-      <div className={styles.content}>
+      <div className={styles.content} data-deck-catalog-scroll>
         <CreateDeckForm />
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { Game } from "@/features/games/data/games";
-import { steamStoreAppUrl } from "@/features/games/lib/steam";
+import { openSteamStore } from "@/features/games/lib/steam";
 import { HoverLift } from "@/shared/ui/HoverLift";
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
   children: ReactNode;
 };
 
-/** Cover/tile wrapper: opens Steam client store when steamAppId is known. */
+/** Cover/tile wrapper: opens Steam store (web tab by default) when steamAppId is known. */
 export function SteamGameTile({
   game,
   className,
@@ -27,12 +27,15 @@ export function SteamGameTile({
     );
   }
 
+  const appId = game.steamAppId;
+
   return (
     <HoverLift
-      as="a"
+      as="button"
+      type="button"
       amount={amount}
       className={className}
-      href={steamStoreAppUrl(game.steamAppId)}
+      onClick={() => openSteamStore(appId)}
       aria-label={`Open ${game.title} in Steam`}
     >
       {children}

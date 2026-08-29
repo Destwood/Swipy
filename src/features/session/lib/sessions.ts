@@ -254,6 +254,21 @@ export async function castVote(input: {
   if (error) throw new Error(error.message);
 }
 
+export async function deleteVote(input: {
+  sessionId: string;
+  memberId: string;
+  gameId: string;
+}) {
+  const supabase = createGuestDataClient();
+  const { error } = await supabase
+    .from("votes")
+    .delete()
+    .eq("session_id", input.sessionId)
+    .eq("member_id", input.memberId)
+    .eq("game_id", input.gameId);
+  if (error) throw new Error(error.message);
+}
+
 export async function fetchVotes(sessionId: string): Promise<DbVote[]> {
   const supabase = createGuestDataClient();
   const { data, error } = await supabase

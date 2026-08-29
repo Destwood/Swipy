@@ -71,7 +71,9 @@ export function ScreenshotGallery({
         aria-label="Close gallery"
         onClick={onClose}
       >
-        <CloseIcon className={styles.closeIcon} />
+        <span className={styles.closeFace}>
+          <CloseIcon className={styles.closeIcon} />
+        </span>
       </button>
 
       {total > 1 ? (
@@ -84,7 +86,9 @@ export function ScreenshotGallery({
             onIndex((index - 1 + total) % total);
           }}
         >
-          <ChevronLeftIcon className={styles.navIcon} />
+          <span className={styles.navFace}>
+            <ChevronLeftIcon className={styles.navIcon} />
+          </span>
         </button>
       ) : null}
 
@@ -115,7 +119,9 @@ export function ScreenshotGallery({
             onIndex((index + 1) % total);
           }}
         >
-          <ArrowRightIcon className={styles.navIcon} />
+          <span className={styles.navFace}>
+            <ArrowRightIcon className={styles.navIcon} />
+          </span>
         </button>
       ) : null}
     </div>,

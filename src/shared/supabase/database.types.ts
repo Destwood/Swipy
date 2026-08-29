@@ -138,6 +138,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      ignored_games: {
+        Row: {
+          user_id: string;
+          game_id: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id?: string;
+          game_id: string;
+          created_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          game_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       session_games: {
         Row: {
           session_id: string;

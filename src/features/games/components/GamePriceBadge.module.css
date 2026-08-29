@@ -1,0 +1,59 @@
+@reference "../../../app/globals.css";
+
+.tag,
+.sale,
+.buy {
+  @apply inline-flex max-w-full shrink-0 items-center whitespace-nowrap leading-none;
+}
+
+.sale {
+  @apply gap-1;
+}
+
+.xs {
+  @apply text-[10px];
+}
+
+.sm {
+  @apply text-xs;
+}
+
+.amount {
+  @apply font-semibold text-white/80 tabular-nums;
+}
+
+.free {
+  @apply font-bold text-emerald-400;
+}
+
+.discount {
+  @apply rounded bg-emerald-500/20 font-bold text-emerald-400;
+}
+
+.xs .discount {
+  @apply px-[5px] py-px text-[8px] leading-tight;
+}
+
+.sm .discount {
+  @apply px-1.5 py-0.5 text-[9px] leading-tight;
+}
+
+.buy {
+  @apply flex-wrap items-baseline gap-2;
+}
+
+.buyDiscount {
+  @apply rounded bg-emerald-500/20 px-2 py-0.5 text-[11px] font-bold text-emerald-400;
+}
+
+.buyAmount {
+  @apply text-xl font-black text-white tabular-nums;
+}
+
+.buy.free {
+  @apply text-xl font-black;
+}
+
+.original {
+  @apply text-sm text-white/35 line-through tabular-nums;
+}

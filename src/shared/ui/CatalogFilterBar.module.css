@@ -1,7 +1,7 @@
 @reference "../../app/globals.css";
 
 .root {
-  @apply sticky top-0 z-20 flex flex-col gap-0 bg-sw-bg/95 backdrop-blur-[12px];
+  @apply sticky top-0 z-[1] flex flex-col gap-0 bg-sw-bg/95 backdrop-blur-[12px];
   margin-inline: calc(-1 * var(--sw-page-pad-x, 0px));
   padding-inline: var(--sw-page-pad-x, 0px);
   padding-top: 0.35rem;

@@ -9,13 +9,16 @@ import { deleteDeck, getDeckById, isUserDeck } from "@/features/decks/lib/deck-s
 import type { Game } from "@/features/games/data/games";
 import {
   ensureSeedLibrary,
-  getLibraryGamesByIds,
+  ensureGamesInLibrary,
   hydrateSeedGamesFromIgdb,
 } from "@/features/games/lib/game-library";
 import { FadeIn } from "@/shared/ui/FadeIn";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
+import { toast } from "@/shared/ui/toast";
 import { UseInSessionDialog } from "@/features/session/components/UseInSessionDialog";
+import { GamePriceBadge } from "@/features/games/components/GamePriceBadge";
+import { MetacriticBadge } from "@/features/games/components/MetacriticBadge";
 import { SteamGameTile } from "@/features/games/components/SteamGameTile";
 import { gameCoverSrc } from "@/features/games/lib/igdb/image";
 import { normalizeGenreLabel } from "@/features/games/lib/genre-label";
@@ -25,24 +28,57 @@ type Props = {
   deckId: string;
 };
 
+function GamesSkeleton({ count }: { count: number }) {
+  return (
+    <ul className={styles.grid} aria-busy="true" aria-label="Loading games">
+      {Array.from({ length: count }, (_, i) => (
+        <li key={`sk-${i}`} className={styles.skeletonTile} aria-hidden>
+          <div className={`${styles.skeletonCover} sw-shimmer`} />
+          <div className={styles.tileBody}>
+            <div className={`${styles.skeletonTitle} sw-shimmer`} />
+            <div className={`${styles.skeletonMeta} sw-shimmer`} />
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function DeckDetail({ deckId }: Props) {
   const router = useRouter();
   const [deck, setDeck] = useState<Deck | null | undefined>(undefined);
   const [games, setGames] = useState<Game[]>([]);
+  const [gamesLoading, setGamesLoading] = useState(true);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [useOpen, setUseOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    setDeck(undefined);
+    setGames([]);
+    setGamesLoading(true);
+
     void (async () => {
       await hydrateSeedGamesFromIgdb();
       if (cancelled) return;
       ensureSeedLibrary();
       const found = await getDeckById(deckId);
       if (cancelled) return;
-      setDeck(found ?? null);
-      setGames(found ? getLibraryGamesByIds(found.gameIds) : []);
+
+      if (!found) {
+        setDeck(null);
+        setGames([]);
+        setGamesLoading(false);
+        return;
+      }
+
+      setDeck(found);
+      const loaded = await ensureGamesInLibrary(found.gameIds);
+      if (cancelled) return;
+      setGames(loaded);
+      setGamesLoading(false);
     })();
+
     return () => {
       cancelled = true;
     };
@@ -50,15 +86,32 @@ export function DeckDetail({ deckId }: Props) {
 
   async function onConfirmDelete() {
     if (!deck) return;
-    if (!(await deleteDeck(deck.id))) return;
-    setConfirmOpen(false);
-    router.push("/decks");
+    try {
+      if (!(await deleteDeck(deck.id))) {
+        toast("Could not delete deck");
+        return;
+      }
+      setConfirmOpen(false);
+      router.push("/decks");
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Could not delete deck");
+    }
   }
 
   if (deck === undefined) {
     return (
       <div className={styles.page}>
-        <p className={styles.meta}>Loading…</p>
+        <Link href="/decks" className={styles.backLink}>
+          ← Decks
+        </Link>
+        <div className={styles.header}>
+          <div className={styles.headerText}>
+            <div className={`${styles.skeletonHeading} sw-shimmer`} />
+            <div className={`${styles.skeletonSub} sw-shimmer`} />
+          </div>
+        </div>
+        <h2 className={styles.sectionTitle}>Games in this deck</h2>
+        <GamesSkeleton count={16} />
       </div>
     );
   }
@@ -81,6 +134,8 @@ export function DeckDetail({ deckId }: Props) {
       </div>
     );
   }
+
+  const skeletonCount = Math.min(24, Math.max(8, deck.gameIds.length || 12));
 
   return (
     <div className={styles.page}>
@@ -145,10 +200,14 @@ export function DeckDetail({ deckId }: Props) {
 
       <h2 className={styles.sectionTitle}>Games in this deck</h2>
 
-      {games.length === 0 ? (
+      {gamesLoading ? (
+        <GamesSkeleton count={skeletonCount} />
+      ) : games.length === 0 ? (
         <div className={styles.empty}>
           <p className={styles.emptyTitle}>No games yet</p>
-          <p className={styles.emptyText}>Add games from the catalog to fill this deck.</p>
+          <p className={styles.emptyText}>
+            Add games from the catalog to fill this deck.
+          </p>
           <Button
             href={`/decks/${encodeURIComponent(deck.id)}/edit`}
             variant={ButtonVariant.Dark}
@@ -173,27 +232,20 @@ export function DeckDetail({ deckId }: Props) {
                       game.image.includes("igdb") || game.image.includes("rawg")
                     }
                   />
+                  {game.metacritic != null ? (
+                    <MetacriticBadge score={game.metacritic} />
+                  ) : null}
                 </div>
                 <div className={styles.tileBody}>
                   <h3 className={styles.gameTitle}>{game.title}</h3>
-                  <p className={styles.gameMeta}>
-                    {game.year || "—"}
-                    {game.genres[0]
-                      ? ` · ${normalizeGenreLabel(game.genres[0])}`
-                      : ""}
-                    {game.steamAppId ? " · Steam" : ""}
-                  </p>
-                  <div className={styles.tileFooter}>
-                    {game.genres[0] ? (
-                      <span className={styles.tag}>
-                        {normalizeGenreLabel(game.genres[0])}
-                      </span>
-                    ) : (
-                      <span />
-                    )}
-                    {game.metacritic != null ? (
-                      <span className={styles.score}>{game.metacritic}</span>
-                    ) : null}
+                  <div className={styles.metaRow}>
+                    <p className={styles.gameMeta}>
+                      {game.year || "—"}
+                      {game.genres[0]
+                        ? ` · ${normalizeGenreLabel(game.genres[0])}`
+                        : ""}
+                    </p>
+                    <GamePriceBadge appId={game.steamAppId} size="xs" />
                   </div>
                 </div>
               </SteamGameTile>

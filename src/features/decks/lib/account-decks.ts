@@ -152,22 +152,37 @@ export async function deleteAccountDeck(id: string) {
   if (error) throw new Error(error.message);
 }
 
-export async function migrateLocalDecksToAccount(local: Deck[]) {
+/**
+ * Uploads remaining local `custom-*` decks to the signed-in account.
+ * Returns local ids that were successfully inserted (caller should drop them from localStorage).
+ * Does not skip when the account already has decks — each leftover local deck is still uploaded.
+ */
+export async function migrateLocalDecksToAccount(local: Deck[]): Promise<string[]> {
   const userId = await getSignedInUserId();
-  if (!userId || local.length === 0) return;
+  if (!userId) return [];
 
-  const flag = `swipy.decksMigrated.${userId}`;
-  if (localStorage.getItem(flag)) return;
+  const pending = local.filter((deck) => deck.id.startsWith("custom-"));
+  if (pending.length === 0) return [];
 
-  const existing = await fetchAccountDecks();
-  if (existing.length === 0) {
-    for (const deck of local) {
+  // Drop legacy "migrated once" flag that skipped leftovers when cloud already had decks.
+  try {
+    localStorage.removeItem(`swipy.decksMigrated.${userId}`);
+  } catch {
+    /* ignore */
+  }
+
+  const migratedIds: string[] = [];
+  for (const deck of pending) {
+    try {
       await insertAccountDeck({
         name: deck.name,
         description: deck.description,
         gameIds: deck.gameIds,
       });
+      migratedIds.push(deck.id);
+    } catch {
+      // Leave this deck in localStorage for a later retry.
     }
   }
-  localStorage.setItem(flag, "1");
+  return migratedIds;
 }

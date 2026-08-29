@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import SteamIcon from "@/assets/icons/steam.svg";
 import SteamDbIcon from "@/assets/icons/steamdb-light.svg";
 import { GameFavoriteButton } from "@/features/games/components/GameFavoriteButton";
+import { GamePriceBadge } from "@/features/games/components/GamePriceBadge";
 import { GenreTag } from "@/features/games/components/GenreTag";
+import { SteamStoreButton } from "@/features/games/components/SteamStoreButton";
 import type { Game } from "@/features/games/data/games";
-import { steamDbUrl, steamStoreWebUrl } from "@/features/games/lib/steam";
+import { steamDbUrl } from "@/features/games/lib/steam";
 import {
   getCachedSteamMedia,
   setCachedSteamMedia,
@@ -171,34 +172,18 @@ export function MatchHeroCard({ game, rank, voteMeta }: Props) {
             </div>
           ) : null}
 
-          {voteMeta ? <div className={styles.heroVotes}>{voteMeta}</div> : null}
-
           <div className={styles.heroActions}>
             {game.steamAppId ? (
               <>
-                <Button
-                  href={steamStoreWebUrl(game.steamAppId)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant={ButtonVariant.Accent}
-                  size={ButtonSize.Sm}
-                  className={styles.heroSteam}
-                >
-                  <SteamIcon
-                    width={15}
-                    height={15}
-                    className={styles.heroSteamIcon}
-                    aria-hidden
-                  />
-                  Open in Steam
-                </Button>
+                <GamePriceBadge appId={game.steamAppId} size="sm" />
+                <SteamStoreButton appId={game.steamAppId} size="row" />
                 <Button
                   href={steamDbUrl(game.steamAppId)}
                   target="_blank"
                   rel="noopener noreferrer"
                   variant={ButtonVariant.Soft}
                   size={ButtonSize.Sm}
-                  className={styles.heroSteam}
+                  className={styles.heroSteamDb}
                 >
                   <SteamDbIcon
                     width={15}
@@ -213,6 +198,8 @@ export function MatchHeroCard({ game, rank, voteMeta }: Props) {
               <span className={styles.noSteam}>No Steam link</span>
             )}
           </div>
+
+          {voteMeta ? <div className={styles.heroVotes}>{voteMeta}</div> : null}
         </div>
       </article>
 
