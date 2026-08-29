@@ -7,10 +7,19 @@ import { CATALOG_FILTER_OPTIONS } from "@/features/games/lib/catalog-filters";
 import {
   EMPTY_INFINITE_FILTERS,
   INFINITE_GENRE_OPTIONS,
+  filtersToKey,
+  infiniteFiltersActive,
+  readInfiniteFilters,
   sortActiveFirst,
   writeInfiniteFilters,
   type InfiniteFilterState,
 } from "@/features/session/lib/infinite-filters";
+import {
+  getOrCreateInfiniteSession,
+  readInfiniteSession,
+  startNewInfiniteSession,
+} from "@/features/session/lib/infinite-session";
+import { infiniteRunLabel } from "@/features/session/lib/swipe-run";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import { FilterChip } from "@/shared/ui/FilterChip";
 import styles from "./InfiniteModeDialog.module.css";
@@ -56,11 +65,27 @@ export function InfiniteModeDialog({ open, onClose }: Props) {
   }, [open, onClose]);
 
   useEffect(() => {
-    if (open) setDraft(EMPTY_INFINITE_FILTERS);
+    if (open) setDraft(readInfiniteFilters());
   }, [open]);
 
   function start() {
     writeInfiniteFilters(draft);
+    const filterKey = filtersToKey(draft);
+    const label = infiniteRunLabel(
+      infiniteFiltersActive(draft)
+        ? [
+            ...draft.platforms,
+            ...(draft.crossplayOnly ? ["Crossplay"] : []),
+            ...draft.genres,
+          ].join(" · ")
+        : null,
+    );
+    const existing = readInfiniteSession();
+    if (existing?.filterKey === filterKey) {
+      getOrCreateInfiniteSession({ label, filterKey });
+    } else {
+      startNewInfiniteSession({ label, filterKey });
+    }
     onClose();
     router.push("/infinite");
   }

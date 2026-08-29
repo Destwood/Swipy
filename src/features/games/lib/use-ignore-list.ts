@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createBrowserSupabaseClient } from "@/shared/supabase/client";
 import {
   EMPTY_IGNORE_LIST,
+  hydrateIgnoreList,
   readIgnoreList,
   subscribeIgnoreList,
   toggleIgnoredGenre,
@@ -18,7 +20,18 @@ export function useIgnoreList() {
   useEffect(() => {
     setList(readIgnoreList());
     setReady(true);
-    return subscribeIgnoreList(setList);
+    const unsub = subscribeIgnoreList(setList);
+    void hydrateIgnoreList().then(setList);
+    const supabase = createBrowserSupabaseClient();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      void hydrateIgnoreList().then(setList);
+    });
+    return () => {
+      unsub();
+      subscription.unsubscribe();
+    };
   }, []);
 
   function setNext(next: IgnoreList) {

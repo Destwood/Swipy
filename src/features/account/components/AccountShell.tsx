@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { useAuthUser } from "@/features/auth/lib/use-auth-user";
+import { AccountContentSkeleton } from "@/features/account/components/AccountContentSkeleton";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
 import styles from "./AccountShell.module.css";
 
@@ -35,7 +36,25 @@ export function AccountShell({ title, children }: Props) {
     return (
       <div className={styles.root}>
         <AppTopBar />
-        <div className={styles.loading}>Loading account…</div>
+        <div className={styles.scroll}>
+          <div className={styles.page}>
+            <nav className={styles.nav} aria-label="Account sections">
+              {NAV.map((item) => (
+                <span
+                  key={item.href}
+                  className={`${styles.navLink} opacity-40`}
+                  aria-hidden
+                >
+                  {item.label}
+                </span>
+              ))}
+            </nav>
+            <div className={styles.main}>
+              <h1 className={styles.title}>{title}</h1>
+              <AccountContentSkeleton />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

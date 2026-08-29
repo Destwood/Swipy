@@ -1,5 +1,9 @@
 import { SEED_IGDB_IDS } from "@/features/decks/data/decks";
 import { type Game } from "@/features/games/data/games";
+import {
+  fetchCachedGamesFromDb,
+  upsertCachedGamesToDb,
+} from "@/features/games/lib/cached-games-db";
 
 const LIBRARY_KEY = "swipy.gamesLibrary";
 const SEED_HYDRATE_KEY = "swipy.seedIgdb.v7";
@@ -45,6 +49,7 @@ export function upsertGames(games: Game[]) {
     map[game.id] = game;
   }
   writeLibrary(map);
+  void upsertCachedGamesToDb(games);
 }
 
 export function listLibraryGames(): Game[] {
@@ -66,11 +71,38 @@ export function getLibraryGamesByIds(ids: string[]): Game[] {
 }
 
 export async function ensureGamesInLibrary(ids: string[]): Promise<Game[]> {
-  const present = new Set(getLibraryGamesByIds(ids).map((game) => game.id));
-  const missing = ids.filter((id) => !present.has(id));
+  const library = readLibrary();
+  const present = new Set<string>();
+  const staleSteamIds: string[] = [];
+
+  for (const id of ids) {
+    const game = library[id];
+    if (!game) continue;
+    present.add(id);
+    if (id.startsWith("igdb-") && !game.steamAppId) {
+      staleSteamIds.push(id);
+    }
+  }
+
+  let missing = ids.filter((id) => !present.has(id));
+
+  if (missing.length > 0) {
+    const fromDb = await fetchCachedGamesFromDb(missing);
+    if (fromDb.length > 0) {
+      upsertGames(fromDb);
+      for (const game of fromDb) {
+        present.add(game.id);
+        if (game.id.startsWith("igdb-") && !game.steamAppId) {
+          staleSteamIds.push(game.id);
+        }
+      }
+      missing = ids.filter((id) => !present.has(id));
+    }
+  }
+
   const igdbIds = [
     ...new Set(
-      missing
+      [...missing, ...staleSteamIds]
         .map((id) => (id.startsWith("igdb-") ? Number(id.slice(5)) : NaN))
         .filter((n) => Number.isFinite(n) && n > 0),
     ),

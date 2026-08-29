@@ -8,8 +8,9 @@ const STEAM_SOURCE = 1;
 
 export type IgdbExternalGame = {
   uid?: string;
-  external_game_source?: number;
-  category?: number;
+  external_game_source?: number | { id?: number };
+  /** Legacy IGDB field — same enum as external_game_source (Steam = 1). */
+  category?: number | { id?: number };
 };
 
 export type IgdbMultiplayerMode = {
@@ -49,10 +50,27 @@ export type IgdbGame = {
 export function extractSteamAppId(externalGames?: IgdbExternalGame[]): string | undefined {
   if (!externalGames?.length) return undefined;
   const steam = externalGames.find((g) => {
-    const source = g.external_game_source ?? g.category;
-    return source === STEAM_SOURCE && Boolean(g.uid) && /^\d+$/.test(g.uid!);
+    const source =
+      externalSourceId(g.external_game_source) ??
+      externalSourceId(g.category);
+    return (
+      source === STEAM_SOURCE &&
+      Boolean(g.uid) &&
+      /^\d+$/.test(String(g.uid))
+    );
   });
-  return steam?.uid;
+  return steam?.uid ? String(steam.uid) : undefined;
+}
+
+function externalSourceId(
+  source: number | { id?: number } | undefined,
+): number | undefined {
+  if (source == null) return undefined;
+  if (typeof source === "number") return source;
+  if (typeof source === "object" && typeof source.id === "number") {
+    return source.id;
+  }
+  return undefined;
 }
 
 function normalizeMode(name: string): string | null {

@@ -167,7 +167,7 @@
 }
 
 .menu {
-  @apply absolute top-9 right-0 z-50 w-[148px] rounded-[10px] border border-white/10 bg-sw-surface2 p-1 shadow-[0_16px_40px_rgba(0,0,0,0.5)];
+  @apply absolute top-9 right-0 z-50 w-[148px] overflow-hidden rounded-[10px] border border-white/10 bg-[#1a1e27] p-1 shadow-[0_16px_40px_rgba(0,0,0,0.5)];
 }
 
 .menuItem {

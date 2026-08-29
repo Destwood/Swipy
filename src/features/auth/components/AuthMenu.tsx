@@ -135,6 +135,13 @@ export function AuthMenu() {
               Integrations
             </Link>
             <Link
+              href="/history"
+              className={styles.menuLink}
+              onClick={() => setOpen(false)}
+            >
+              History
+            </Link>
+            <Link
               href="/ignored"
               className={styles.menuLink}
               onClick={() => setOpen(false)}

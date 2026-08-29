@@ -61,10 +61,11 @@ export function JoinSessionForm() {
 
   return (
     <div className={styles.page}>
-      <p className={styles.eyebrow}>Join session</p>
+      <p className={styles.eyebrow}>Join lobby</p>
       <h1 className={styles.title}>Enter the code</h1>
       <p className={styles.subtitle}>
-        Ask the host for the session code, then jump into the lobby.
+        Enter the host&apos;s code or open their lobby link. Guests pick a
+        nickname; signed-in players join straight away.
       </p>
 
       <div className={styles.form}>

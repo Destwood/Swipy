@@ -58,6 +58,16 @@ export function saveMembership(code: string, membership: StoredMembership) {
   writeMemberships(map);
 }
 
+export function listStoredMemberships(): Array<
+  StoredMembership & { code: string }
+> {
+  const map = readMemberships();
+  return Object.entries(map).map(([code, membership]) => ({
+    code,
+    ...membership,
+  }));
+}
+
 export function setActiveSession(session: ActiveSession) {
   sessionStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(session));
   saveMembership(session.code, {

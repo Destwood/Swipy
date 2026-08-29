@@ -1,0 +1,36 @@
+@reference "../../../app/globals.css";
+
+.toolbar {
+  @apply flex shrink-0 items-stretch gap-1.5;
+}
+
+.menuWrap {
+  @apply relative flex;
+}
+
+.copyLabel {
+  @apply inline-flex items-center gap-1.5;
+}
+
+.copyIcon {
+  @apply h-3.5 w-3.5 shrink-0 opacity-90;
+}
+
+.menuTrigger {
+  @apply min-w-0 px-3 tracking-[0.2em] sm:px-3.5;
+}
+
+.menu {
+  @apply absolute top-[calc(100%+6px)] right-0 z-[60] w-[180px] overflow-hidden rounded-[10px] border border-white/10 p-1 shadow-[0_16px_40px_rgba(0,0,0,0.55)];
+  background-color: #1a1e27;
+  isolation: isolate;
+}
+
+.menuItem {
+  @apply block w-full cursor-pointer rounded-[7px] border-none px-2.5 py-1.5 text-left font-body text-[13px] text-sw-text no-underline transition-colors hover:bg-[#252a36] disabled:cursor-not-allowed disabled:opacity-50;
+  background-color: #1a1e27;
+}
+
+.menuDivider {
+  @apply mx-1 my-0.5 h-px bg-white/10;
+}

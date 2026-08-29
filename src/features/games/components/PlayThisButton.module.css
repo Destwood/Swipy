@@ -1,0 +1,9 @@
+@reference "../../../app/globals.css";
+
+.unavailable {
+  @apply min-w-[5.5rem] cursor-default opacity-100;
+}
+
+.unavailable:disabled {
+  @apply opacity-100;
+}

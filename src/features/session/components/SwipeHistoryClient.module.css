@@ -1,0 +1,56 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
+}
+
+.loading {
+  @apply flex flex-1 items-center justify-center font-mono text-sm text-white/30;
+}
+
+.scroll {
+  @apply min-h-0 flex-1 overflow-y-auto;
+}
+
+.page {
+  @apply mx-auto max-w-[960px] pb-16;
+  padding-inline: var(--sw-page-pad-x);
+  padding-top: var(--sw-page-pad-y);
+}
+
+.header {
+  @apply mb-8;
+}
+
+.eyebrow {
+  @apply mb-2 font-mono text-[11px] tracking-[0.08em] text-sw-accent uppercase;
+}
+
+.title {
+  @apply font-display leading-none font-extrabold tracking-[-0.04em] text-sw-text;
+  font-size: var(--sw-title);
+}
+
+.subtitle {
+  @apply mt-2 font-body text-sm text-sw-text/45;
+}
+
+.empty {
+  @apply font-body text-sw-text/45;
+}
+
+.list {
+  @apply m-0 flex list-none flex-col gap-2.5 p-0;
+}
+
+.dayGroups {
+  @apply flex flex-col gap-6;
+}
+
+.daySection {
+  @apply flex flex-col gap-2.5;
+}
+
+.dayHeading {
+  @apply m-0 font-display text-sm font-bold tracking-[-0.02em] text-sw-text/70;
+}

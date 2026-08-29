@@ -46,7 +46,7 @@
 }
 
 .sessionChrome {
-  @apply pointer-events-none absolute top-4 left-5 z-20 flex items-start gap-3;
+  @apply pointer-events-none absolute top-4 left-5 z-[100] flex items-start gap-3;
 }
 
 .sessionChromeWide {
@@ -65,7 +65,7 @@
 
 a.chromeChip,
 .chromeChip {
-  @apply mb-0 inline-flex h-8 items-center rounded-lg border border-white/15 bg-black/45 px-2.5 font-mono text-[11px] font-normal tracking-[0.02em] text-white/70 no-underline normal-case backdrop-blur-[8px];
+  @apply mb-0 inline-flex h-8 cursor-pointer items-center rounded-lg border border-white/15 bg-black/45 px-2.5 font-mono text-[11px] font-normal tracking-[0.02em] text-white/70 no-underline normal-case backdrop-blur-[8px];
 }
 
 a.chromeChip:hover,
@@ -79,6 +79,14 @@ button.chromeChip:disabled {
 
 .chromeEnd {
   @apply ml-auto flex items-center gap-2;
+}
+
+.chromeEndPopover {
+  @apply relative pr-1;
+}
+
+.matchesChip {
+  @apply px-3.5;
 }
 
 .chromeStart {
@@ -119,7 +127,7 @@ button.chromeChip:disabled {
 }
 
 .trashFab {
-  @apply absolute z-20 grid h-12 w-12 cursor-pointer place-items-center rounded-full border border-white/15 bg-black/50 text-white/70 backdrop-blur-[8px];
+  @apply absolute z-[100] grid h-12 w-12 cursor-pointer place-items-center rounded-full border border-white/15 bg-black/50 text-white/70 backdrop-blur-[8px];
   bottom: 1.25rem;
   left: 1.25rem;
 }
@@ -187,6 +195,10 @@ button.chromeChip:disabled {
 
 .swipeSettle {
   transition: transform 0.22s ease-out;
+}
+
+.swipeInstant {
+  transition: none;
 }
 
 .swipeIdleMotion {

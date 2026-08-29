@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
+import { MatchResultsPageSkeleton } from "@/features/session/components/skeletons/MatchResultsPageSkeleton";
 import type { Game } from "@/features/games/data/games";
 import {
   ensureSeedLibrary,
@@ -112,7 +113,13 @@ export function SharedMatchesClient() {
   }, [searchParams]);
 
   if (!ready) {
-    return <div className={styles.loading}>Loading shared matches…</div>;
+    return (
+      <MatchResultsPageSkeleton
+        eyebrow="Shared results"
+        title="Matches"
+        subtitle="Loading shared session snapshot…"
+      />
+    );
   }
 
   const isSolo = (payload?.members ?? 0) <= 1;

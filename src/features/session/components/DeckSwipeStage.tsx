@@ -161,7 +161,13 @@ export function DeckSwipeStage({
                 </div>
               )}
               <div
-                className={`${styles.swipeLayer} ${swipe.dragging ? "" : styles.swipeSettle}`}
+                className={`${styles.swipeLayer} ${
+                  swipe.instant
+                    ? styles.swipeInstant
+                    : swipe.dragging
+                      ? ""
+                      : styles.swipeSettle
+                }`}
                 style={{
                   transform: `translateX(${swipe.offset}px) rotate(${swipe.offset / 18}deg)`,
                 }}

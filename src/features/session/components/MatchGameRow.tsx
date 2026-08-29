@@ -6,10 +6,10 @@ import { GameFavoriteButton } from "@/features/games/components/GameFavoriteButt
 import { GameHoverPreview } from "@/features/games/components/GameHoverPreview";
 import { GamePriceBadge } from "@/features/games/components/GamePriceBadge";
 import { GenreTag } from "@/features/games/components/GenreTag";
+import { PlayThisButton } from "@/features/games/components/PlayThisButton";
 import type { Game } from "@/features/games/data/games";
 import { openSteamStore, steamStoreUrl } from "@/features/games/lib/steam";
 import { MatchHeroCard } from "@/features/session/components/MatchHeroCard";
-import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./SessionMatchesClient.module.css";
 
 type Props = {
@@ -19,6 +19,7 @@ type Props = {
   voteMeta?: ReactNode;
   action?: ReactNode;
   variant?: "compact" | "hero";
+  priceAlign?: "foot" | "center";
 };
 
 export function MatchGameRow({
@@ -28,6 +29,7 @@ export function MatchGameRow({
   voteMeta,
   action,
   variant = "compact",
+  priceAlign = "foot",
 }: Props) {
   const steamHref = game.steamAppId ? steamStoreUrl(game.steamAppId) : null;
 
@@ -50,19 +52,12 @@ export function MatchGameRow({
   );
 
   const defaultAction =
-    action ??
-    (steamHref ? (
-      <Button
-        type="button"
-        onClick={openSteam}
-        variant={ButtonVariant.Soft}
-        size={ButtonSize.Sm}
-      >
-        Play this
-      </Button>
-    ) : (
-      <span className={styles.noSteam}>No Steam</span>
-    ));
+    action ?? <PlayThisButton steamAppId={game.steamAppId} />;
+
+  const priceCentered = priceAlign === "center";
+  const priceBadge = game.steamAppId ? (
+    <GamePriceBadge appId={game.steamAppId} size="lg" />
+  ) : null;
 
   const compactBody = (
     <>
@@ -79,14 +74,16 @@ export function MatchGameRow({
         />
       </div>
       <div className={styles.content}>
-        <div className={styles.titleRow}>
-          <div className={styles.gameTitle}>{game.title}</div>
-          <div className={styles.price}>
-            <GamePriceBadge appId={game.steamAppId} size="sm" />
-          </div>
-        </div>
+        <div className={styles.gameTitle}>{game.title}</div>
         {genres}
-        {voteMeta ? <div className={styles.voteMeta}>{voteMeta}</div> : null}
+        {!priceCentered || voteMeta ? (
+          <div className={styles.contentFoot}>
+            {voteMeta ? <div className={styles.voteMeta}>{voteMeta}</div> : <span />}
+            {!priceCentered && priceBadge ? (
+              <div className={styles.price}>{priceBadge}</div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </>
   );
@@ -119,6 +116,9 @@ export function MatchGameRow({
             )}
           </GameHoverPreview>
         </div>
+        {priceCentered && priceBadge ? (
+          <div className={styles.priceSide}>{priceBadge}</div>
+        ) : null}
         <GameFavoriteButton gameId={game.id} className={styles.rowFav} />
         <div className={styles.rowAction}>{defaultAction}</div>
       </div>

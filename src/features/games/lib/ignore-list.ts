@@ -1,4 +1,6 @@
 import type { Game } from "@/features/games/data/games";
+import { getSignedInUserId } from "@/features/decks/lib/account-decks";
+import { createBrowserSupabaseClient } from "@/shared/supabase/client";
 import { gameHasGenre } from "@/features/games/lib/genre-label";
 
 export type IgnoreList = {
@@ -80,6 +82,63 @@ export function writeIgnoreList(next: IgnoreList) {
     /* ignore */
   }
   window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: next }));
+  void syncIgnoreListToDb(next);
+}
+
+async function syncIgnoreListToDb(list: IgnoreList) {
+  const userId = await getSignedInUserId();
+  if (!userId) return;
+  const supabase = createBrowserSupabaseClient();
+  const { error } = await supabase.from("user_preferences").upsert(
+    {
+      user_id: userId,
+      ignored_genres: list.genres,
+      ignored_platforms: list.platforms,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id" },
+  );
+  if (error) console.warn("user_preferences upsert failed", error.message);
+}
+
+export async function hydrateIgnoreList(): Promise<IgnoreList> {
+  const local = readIgnoreList();
+  const userId = await getSignedInUserId();
+  if (!userId) return local;
+
+  const supabase = createBrowserSupabaseClient();
+  const { data, error } = await supabase
+    .from("user_preferences")
+    .select("ignored_genres, ignored_platforms")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) return local;
+
+  if (!data) {
+    if (local.genres.length > 0 || local.platforms.length > 0) {
+      await syncIgnoreListToDb(local);
+    }
+    return local;
+  }
+
+  const remote: IgnoreList = {
+    genres: data.ignored_genres ?? [],
+    platforms: data.ignored_platforms ?? [],
+  };
+  const remoteEmpty = remote.genres.length === 0 && remote.platforms.length === 0;
+  const localHasData = local.genres.length > 0 || local.platforms.length > 0;
+  if (remoteEmpty && localHasData) {
+    await syncIgnoreListToDb(local);
+    return local;
+  }
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: remote }));
+  return remote;
 }
 
 export function subscribeIgnoreList(onChange: (next: IgnoreList) => void) {

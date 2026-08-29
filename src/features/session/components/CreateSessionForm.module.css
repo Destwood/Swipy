@@ -54,7 +54,11 @@
 }
 
 .codeSection {
-  @apply flex justify-center border-t border-white/[0.06] pt-5;
+  @apply flex flex-col items-center gap-3 border-t border-white/[0.06] pt-5;
+}
+
+.linkHint {
+  @apply max-w-xs text-center font-mono text-[11px] leading-relaxed text-white/25;
 }
 
 .newDeckLink {

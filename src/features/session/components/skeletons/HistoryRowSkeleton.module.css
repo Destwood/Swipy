@@ -1,0 +1,45 @@
+@reference "../../../../app/globals.css";
+
+.row {
+  @apply flex w-full items-stretch overflow-hidden rounded-2xl border border-white/[0.06] bg-sw-surface;
+}
+
+.mosaic {
+  @apply h-[72px] w-[112px] shrink-0;
+}
+
+.body {
+  @apply flex min-w-0 flex-1 flex-col justify-center gap-2 px-3.5 py-2.5;
+}
+
+.title {
+  @apply h-4 w-[min(280px,55%)] rounded-md;
+}
+
+.tags {
+  @apply flex gap-1.5;
+}
+
+.tag {
+  @apply h-5 w-12 rounded-[5px];
+}
+
+.meta {
+  @apply h-3 w-32 rounded-md;
+}
+
+.toolbar {
+  @apply flex shrink-0 items-center gap-2 px-3 py-2.5;
+}
+
+.btn {
+  @apply h-7 rounded-[7px];
+}
+
+.btnOpen {
+  @apply h-[34px] w-14 rounded-[10px];
+}
+
+.btnMenu {
+  @apply h-[34px] w-[34px] rounded-[10px];
+}

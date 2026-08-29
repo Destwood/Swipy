@@ -1,0 +1,29 @@
+@reference "../../../app/globals.css";
+
+.panelTitle {
+  @apply mb-4 h-5 w-32 rounded-md;
+}
+
+.avatar {
+  @apply border-none;
+}
+
+.name {
+  @apply h-6 w-40 rounded-md;
+}
+
+.email {
+  @apply mt-2 h-3 w-52 rounded-md;
+}
+
+.button {
+  @apply mt-4 h-9 w-28 rounded-[10px];
+}
+
+.line {
+  @apply h-4 w-full max-w-md rounded-md;
+}
+
+.lineShort {
+  @apply mt-3 h-4 w-full max-w-sm rounded-md;
+}

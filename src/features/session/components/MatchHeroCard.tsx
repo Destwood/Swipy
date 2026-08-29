@@ -172,31 +172,46 @@ export function MatchHeroCard({ game, rank, voteMeta }: Props) {
             </div>
           ) : null}
 
-          <div className={styles.heroActions}>
-            {game.steamAppId ? (
-              <>
-                <GamePriceBadge appId={game.steamAppId} size="sm" />
-                <SteamStoreButton appId={game.steamAppId} size="row" />
+          <div className={styles.heroBottomRow}>
+            <div className={styles.heroActions}>
+              {game.steamAppId ? (
+                <>
+                  <SteamStoreButton appId={game.steamAppId} size="row" />
+                  <Button
+                    href={steamDbUrl(game.steamAppId)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant={ButtonVariant.Soft}
+                    size={ButtonSize.Sm}
+                    className={styles.heroSteamDb}
+                  >
+                    <SteamDbIcon
+                      width={15}
+                      height={15}
+                      className={styles.heroSteamIcon}
+                      aria-hidden
+                    />
+                    Open in SteamDB
+                  </Button>
+                </>
+              ) : (
                 <Button
-                  href={steamDbUrl(game.steamAppId)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant={ButtonVariant.Soft}
+                  type="button"
+                  disabled
+                  variant={ButtonVariant.Dark}
                   size={ButtonSize.Sm}
-                  className={styles.heroSteamDb}
+                  className={styles.noSteamBtn}
+                  aria-disabled
                 >
-                  <SteamDbIcon
-                    width={15}
-                    height={15}
-                    className={styles.heroSteamIcon}
-                    aria-hidden
-                  />
-                  Open in SteamDB
+                  No Steam
                 </Button>
-              </>
-            ) : (
-              <span className={styles.noSteam}>No Steam link</span>
-            )}
+              )}
+            </div>
+            {game.steamAppId ? (
+              <div className={styles.heroPrice}>
+                <GamePriceBadge appId={game.steamAppId} size="lg" />
+              </div>
+            ) : null}
           </div>
 
           {voteMeta ? <div className={styles.heroVotes}>{voteMeta}</div> : null}

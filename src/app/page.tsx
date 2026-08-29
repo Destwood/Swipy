@@ -35,8 +35,8 @@ export default function HomePage() {
             <HomeFindGame />
             <HomeInfiniteMode />
           </div>
-          <Button href="/decks" variant={ButtonVariant.Dark}>
-            Manage decks
+          <Button href="/session/join" variant={ButtonVariant.Dark}>
+            Join lobby
           </Button>
         </div>
       </div>

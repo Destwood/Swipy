@@ -12,6 +12,49 @@ How to use:
 
 ## [Unreleased]
 
+### Roadmap (4.0)
+
+Full **Steam account linking**, library sync, and deeper store integration — building on the Steam prices / Open in Steam work in 0.4.x.
+
+## [0.4.1] - 2026-08-29
+
+Patch release: infinite-mode session continuity, swipe history, lobby invites, match-results polish, and Steam metadata fixes.
+
+### Added
+
+- **Swipe history** at `/history` (all modes) and `/infinite/history` (solo runs): grouped by day, copy link, transform to deck, **delete** from the ··· menu
+- **Infinite match results** at `/infinite/matches` with liked hero cards and compact rejected rows
+- **Infinite session popover** (Matches chip): live liked/skipped list, **return to swipe list** (back arrow), Finish / View results
+- **Lobby invite link** on session create (**Copy lobby link**); guests open `/session/lobby/[code]` — nickname for guests, auto-join when signed in
+- **Page loading skeletons** (history, matches, swipe deck, account, liked/ignored lists) with header kept visible via `PageLoadingShell`
+- **`PlayThisButton`**: disabled **No Steam** state keeps row layout when a game has no store listing
+- Cloud **cached games** + **swipe history** Supabase tables (SQL in `supabase/`)
+
+### Changed
+
+- Home secondary action: **Join lobby** (was Manage decks); create-session secondary button matches
+- Infinite mode **persists swipe session** in `localStorage` (position, votes, loaded catalog) — returning from results restores the deck where you left off
+- Each **Finish** creates a new history entry; **View results** reopens the last snapshot without losing active swipes
+- Match results: **Copy link** in toolbar; rejected-row prices vertically centered; history/match rows use matching **Open** / **···** button sizes
+- History row menus: solid opaque dropdown, correct z-index when open
+- Requeue control in infinite Matches popover: back arrow + “Return to swipe list” copy
+- Join page copy unified to **Join lobby**
+
+### Fixed
+
+- **Steam app id** parsing when IGDB returns `external_game_source` as an object; stale library entries re-fetch from IGDB (e.g. Red Dead Redemption)
+- Infinite **session restore** race (empty filters on mount no longer wipe votes or reset stream index)
+- Swipe deck skeleton CSS `@reference` path (broke infinite mode on filter load)
+- Match row / popover **cursor-pointer** and chrome z-index for Matches chip
+- Global toast cap (**max 3**); share/copy no longer flickers disabled state on click
+- Co-op history item cover ids (`game_id` vs `gameId`)
+
+### Deploy notes (0.4.1)
+
+1. **Supabase SQL** (if not applied): `supabase/swipe_history.sql`, `supabase/cached_games.sql`, `supabase/swipe_history_active.sql` — run in SQL editor; verify with `supabase/verify_schema.sql`.
+2. **Build**: `npm ci && npm run build`.
+3. **Prod**: merge to `main` and push; smoke-test `/infinite` → swipe → results → back, lobby link join (guest + signed-in), and `/history`.
+
 ## [0.4.0] - 2026-08-29
 
 Infinite mode, swipe polish, account UX, Steam pricing, and ignored-games sync.

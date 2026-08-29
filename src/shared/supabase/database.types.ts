@@ -156,6 +156,114 @@ export type Database = {
         };
         Relationships: [];
       };
+      favorite_games: {
+        Row: {
+          user_id: string;
+          game_id: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id?: string;
+          game_id: string;
+          created_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          game_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      user_preferences: {
+        Row: {
+          user_id: string;
+          ignored_genres: string[];
+          ignored_platforms: string[];
+          updated_at: string;
+        };
+        Insert: {
+          user_id?: string;
+          ignored_genres?: string[];
+          ignored_platforms?: string[];
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          ignored_genres?: string[];
+          ignored_platforms?: string[];
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      cached_games: {
+        Row: {
+          game_id: string;
+          data: Record<string, unknown>;
+          cached_at: string;
+        };
+        Insert: {
+          game_id: string;
+          data: Record<string, unknown>;
+          cached_at?: string;
+        };
+        Update: {
+          game_id?: string;
+          data?: Record<string, unknown>;
+          cached_at?: string;
+        };
+        Relationships: [];
+      };
+      swipe_history: {
+        Row: {
+          id: string;
+          user_id: string;
+          mode: "infinite" | "deck";
+          label: string;
+          saved: boolean;
+          deck_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          mode: "infinite" | "deck";
+          label: string;
+          saved?: boolean;
+          deck_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          mode?: "infinite" | "deck";
+          label?: string;
+          saved?: boolean;
+          deck_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      swipe_history_votes: {
+        Row: {
+          history_id: string;
+          game_id: string;
+          value: VoteValue;
+          position: number;
+        };
+        Insert: {
+          history_id: string;
+          game_id: string;
+          value: VoteValue;
+          position?: number;
+        };
+        Update: {
+          history_id?: string;
+          game_id?: string;
+          value?: VoteValue;
+          position?: number;
+        };
+        Relationships: [];
+      };
       session_games: {
         Row: {
           session_id: string;

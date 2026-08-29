@@ -227,7 +227,21 @@ export function CreateDeckForm({ deckId }: Props) {
       {catalogError ? <p className={styles.apiHint}>{catalogError}</p> : null}
       {error && <p className={styles.error}>{error}</p>}
 
-      {!loading && catalog.length === 0 ? (
+      {loading && catalog.length === 0 ? (
+        <ul
+          className={styles.catalogGrid}
+          aria-busy="true"
+          aria-label="Loading games"
+        >
+          {Array.from({ length: 24 }, (_, i) => (
+            <li
+              key={`sk-${i}`}
+              className={`${styles.skeletonCard} sw-shimmer`}
+              aria-hidden
+            />
+          ))}
+        </ul>
+      ) : !loading && catalog.length === 0 ? (
         <p className={styles.empty}>No games found. Try another search.</p>
       ) : (
         <ul

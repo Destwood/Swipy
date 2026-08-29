@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
+import { GameListRowSkeleton } from "@/features/games/components/GameListRowSkeleton";
 import { IgnoredRow } from "@/features/games/components/IgnoredRow";
 import type { Game } from "@/features/games/data/games";
 import {
@@ -16,14 +17,18 @@ import styles from "./page.module.css";
 export default function IgnoredGamesPage() {
   const ignored = useIgnoredGames();
   const [games, setGames] = useState<Game[]>([]);
+  const [gamesLoading, setGamesLoading] = useState(false);
 
   useEffect(() => {
+    if (!ignored.ready) return;
     const ids = ignored.entries.map((row) => row.gameId);
     if (ids.length === 0) {
       setGames([]);
+      setGamesLoading(false);
       return;
     }
     let cancelled = false;
+    setGamesLoading(true);
     void (async () => {
       await ensureGamesInLibrary(ids);
       if (cancelled) return;
@@ -35,11 +40,14 @@ export default function IgnoredGamesPage() {
           .map((row) => byId.get(row.gameId))
           .filter((game): game is Game => game != null),
       );
+      setGamesLoading(false);
     })();
     return () => {
       cancelled = true;
     };
-  }, [ignored.entries]);
+  }, [ignored.entries, ignored.ready]);
+
+  const loading = !ignored.ready || gamesLoading;
 
   return (
     <div className={styles.root}>
@@ -55,7 +63,13 @@ export default function IgnoredGamesPage() {
             </span>
           </div>
 
-          {games.length === 0 ? (
+          {loading && ignored.entries.length > 0 ? (
+            <ul className={styles.list} aria-busy="true" aria-label="Loading ignored games">
+              {Array.from({ length: Math.min(ignored.entries.length, 6) }, (_, i) => (
+                <GameListRowSkeleton key={`sk-${i}`} showAction />
+              ))}
+            </ul>
+          ) : games.length === 0 ? (
             <div className={styles.empty}>
               <p className={styles.emptyTitle}>Nothing ignored yet</p>
               <p className={styles.emptyText}>

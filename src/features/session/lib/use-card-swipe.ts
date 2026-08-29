@@ -9,6 +9,9 @@ import {
 
 const COMMIT_PX = 108;
 const FLY_PX = 460;
+const FLY_MS = 220;
+/** Cap live drag so release never animates from extreme off-screen offsets. */
+const MAX_DRAG_PX = 420;
 
 type Decision = "like" | "dislike" | null;
 
@@ -20,9 +23,12 @@ export function useCardSwipe(input: {
 }) {
   const [offset, setOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
-  const [seenId, setSeenId] = useState(input.cardId);
+  const [committing, setCommitting] = useState(false);
+  const [instant, setInstant] = useState(false);
   const layerRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
+  const committingRef = useRef(false);
+  const flyTimerRef = useRef<number | null>(null);
   const pointerIdRef = useRef<number | null>(null);
   const originX = useRef(0);
   const liveX = useRef(0);
@@ -31,14 +37,26 @@ export function useCardSwipe(input: {
   onLikeRef.current = input.onLike;
   onSkipRef.current = input.onSkip;
 
-  if (seenId !== input.cardId) {
-    setSeenId(input.cardId);
+  const clearFlyTimer = useCallback(() => {
+    if (flyTimerRef.current != null) {
+      window.clearTimeout(flyTimerRef.current);
+      flyTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
     setOffset(0);
     setDragging(false);
+    setCommitting(false);
+    setInstant(true);
     draggingRef.current = false;
+    committingRef.current = false;
     pointerIdRef.current = null;
     liveX.current = 0;
-  }
+    clearFlyTimer();
+    const frame = requestAnimationFrame(() => setInstant(false));
+    return () => cancelAnimationFrame(frame);
+  }, [input.cardId, clearFlyTimer]);
 
   const releaseCapture = useCallback(() => {
     const el = layerRef.current;
@@ -54,34 +72,66 @@ export function useCardSwipe(input: {
   }, []);
 
   const finish = useCallback(() => {
-    if (!draggingRef.current) return;
+    if (!draggingRef.current || committingRef.current) return;
     draggingRef.current = false;
     releaseCapture();
     pointerIdRef.current = null;
     setDragging(false);
     const x = liveX.current;
     liveX.current = 0;
+
     if (x > COMMIT_PX) {
+      committingRef.current = true;
+      setCommitting(true);
       setOffset(FLY_PX);
-      onLikeRef.current();
-    } else if (x < -COMMIT_PX) {
-      setOffset(-FLY_PX);
-      onSkipRef.current();
-    } else {
-      setOffset(0);
+      clearFlyTimer();
+      flyTimerRef.current = window.setTimeout(() => {
+        flyTimerRef.current = null;
+        committingRef.current = false;
+        setCommitting(false);
+        setInstant(true);
+        setOffset(0);
+        onLikeRef.current();
+        requestAnimationFrame(() => setInstant(false));
+      }, FLY_MS);
+      return;
     }
-  }, [releaseCapture]);
+
+    if (x < -COMMIT_PX) {
+      committingRef.current = true;
+      setCommitting(true);
+      setOffset(-FLY_PX);
+      clearFlyTimer();
+      flyTimerRef.current = window.setTimeout(() => {
+        flyTimerRef.current = null;
+        committingRef.current = false;
+        setCommitting(false);
+        setInstant(true);
+        setOffset(0);
+        onSkipRef.current();
+        requestAnimationFrame(() => setInstant(false));
+      }, FLY_MS);
+      return;
+    }
+
+    setOffset(0);
+  }, [clearFlyTimer, releaseCapture]);
 
   const onPointerMove = useCallback((clientX: number) => {
     if (!draggingRef.current) return;
-    const x = clientX - originX.current;
+    const raw = clientX - originX.current;
+    const x = Math.max(-MAX_DRAG_PX, Math.min(MAX_DRAG_PX, raw));
     liveX.current = x;
     setOffset(x);
   }, []);
 
   const onPointerDown = useCallback(
     (e: PointerEvent<HTMLDivElement>) => {
-      if (!input.enabled || e.button !== 0) return;
+      if (!input.enabled || committingRef.current || e.button !== 0) return;
+      clearFlyTimer();
+      committingRef.current = false;
+      setCommitting(false);
+      setInstant(false);
       e.preventDefault();
       draggingRef.current = true;
       pointerIdRef.current = e.pointerId;
@@ -91,7 +141,7 @@ export function useCardSwipe(input: {
       setOffset(0);
       e.currentTarget.setPointerCapture(e.pointerId);
     },
-    [input.enabled],
+    [clearFlyTimer, input.enabled],
   );
 
   const onLayerPointerMove = useCallback(
@@ -114,24 +164,25 @@ export function useCardSwipe(input: {
       onPointerMove(e.clientX);
     };
 
-    const onWindowPointerEnd = () => {
+    const onWindowPointerEnd = (e: globalThis.PointerEvent) => {
+      if (pointerIdRef.current != null && e.pointerId !== pointerIdRef.current) {
+        return;
+      }
       finish();
     };
 
     window.addEventListener("pointermove", onWindowPointerMove);
     window.addEventListener("pointerup", onWindowPointerEnd);
     window.addEventListener("pointercancel", onWindowPointerEnd);
-    window.addEventListener("mouseup", onWindowPointerEnd);
-    window.addEventListener("blur", onWindowPointerEnd);
 
     return () => {
       window.removeEventListener("pointermove", onWindowPointerMove);
       window.removeEventListener("pointerup", onWindowPointerEnd);
       window.removeEventListener("pointercancel", onWindowPointerEnd);
-      window.removeEventListener("mouseup", onWindowPointerEnd);
-      window.removeEventListener("blur", onWindowPointerEnd);
     };
   }, [dragging, finish, onPointerMove]);
+
+  useEffect(() => () => clearFlyTimer(), [clearFlyTimer]);
 
   const decision: Decision =
     offset > 72 ? "like" : offset < -72 ? "dislike" : null;
@@ -139,6 +190,8 @@ export function useCardSwipe(input: {
   return {
     offset,
     dragging,
+    committing,
+    instant,
     decision,
     layerRef: layerRef as RefObject<HTMLDivElement>,
     bind: {

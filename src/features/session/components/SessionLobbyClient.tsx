@@ -14,7 +14,9 @@ import {
   setActiveSession,
   toUiMember,
   type ActiveSession,
+  type DbSession,
 } from "@/features/session/lib/session-context";
+import { buildLobbyInviteUrl } from "@/features/session/lib/session-invite";
 import { useSessionDisplayName } from "@/features/session/lib/use-session-display-name";
 import {
   fetchMembers,
@@ -72,11 +74,13 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
   const [isHost, setIsHost] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [needsJoin, setNeedsJoin] = useState(false);
+  const [sessionStatus, setSessionStatus] = useState<DbSession["status"]>("lobby");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigatedToDeck = useRef(false);
-  const { displayName, setDisplayName, ready: nameReady, askForName } =
+  const autoJoinStarted = useRef(false);
+  const { displayName, setDisplayName, ready: nameReady, askForName, isLoggedIn } =
     useSessionDisplayName("Guest");
 
   const reloadLobby = useCallback(async () => {
@@ -90,6 +94,7 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
 
     setSessionId(session.id);
     setActiveDeckId(session.deck_id);
+    setSessionStatus(session.status);
 
     const active = resolveActiveForCode(code, session.id, session.deck_id);
     if (!active) {
@@ -103,7 +108,7 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
       );
       setLoading(false);
       if (session.status === "swiping") {
-        setError("This session already started. Ask the host for a new lobby.");
+        setError(null);
       }
       return;
     }
@@ -165,7 +170,7 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
     };
   }, [sessionId, needsJoin, reloadLobby]);
 
-  async function onJoin() {
+  const onJoin = useCallback(async () => {
     if (busy || !nameReady) return;
     setBusy(true);
     setError(null);
@@ -175,11 +180,26 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
       setNeedsJoin(false);
       await reloadLobby();
     } catch (e) {
+      autoJoinStarted.current = false;
       setError(e instanceof Error ? e.message : "Failed to join");
     } finally {
       setBusy(false);
     }
-  }
+  }, [busy, nameReady, code, displayName, reloadLobby]);
+
+  useEffect(() => {
+    if (
+      loading ||
+      !needsJoin ||
+      !nameReady ||
+      askForName ||
+      autoJoinStarted.current
+    ) {
+      return;
+    }
+    autoJoinStarted.current = true;
+    void onJoin();
+  }, [loading, needsJoin, nameReady, askForName, onJoin]);
 
   async function onStart() {
     const active = getActiveSession();
@@ -196,10 +216,9 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
   }
 
   const readyCount = members.filter((m) => m.status !== "waiting").length;
-  const inviteUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/session/lobby/${encodeURIComponent(code)}`
-      : code;
+  const inviteUrl = buildLobbyInviteUrl(code);
+  const joiningAsGuest = needsJoin && askForName;
+  const autoJoining = needsJoin && isLoggedIn && (busy || !nameReady);
 
   return (
     <div className={styles.root}>
@@ -231,34 +250,54 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
             <p className={styles.waitingText}>Loading lobby…</p>
           ) : needsJoin ? (
             <div className={styles.actions}>
-              {askForName ? (
-                <label className={styles.joinField}>
-                  <span className={styles.joinLabel}>Your name</span>
-                  <input
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className={styles.joinInput}
-                    autoComplete="nickname"
-                  />
-                </label>
+              {sessionStatus === "swiping" ? (
+                <p className={styles.waitingText}>
+                  This session already started. You can still join and swipe at
+                  your own pace.
+                </p>
               ) : null}
-              <Button
-                type="button"
-                onClick={() => void onJoin()}
-                disabled={busy || !nameReady}
-                variant={ButtonVariant.Accent}
-              >
-                {busy ? "Joining…" : "Join lobby"}
-              </Button>
+              {autoJoining ? (
+                <p className={styles.waitingText}>Joining lobby…</p>
+              ) : null}
+              {needsJoin && !askForName && error && !busy ? (
+                <Button
+                  type="button"
+                  onClick={() => void onJoin()}
+                  variant={ButtonVariant.Accent}
+                >
+                  Try again
+                </Button>
+              ) : null}
+              {joiningAsGuest ? (
+                <>
+                  <label className={styles.joinField}>
+                    <span className={styles.joinLabel}>Your name</span>
+                    <input
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      className={styles.joinInput}
+                      autoComplete="nickname"
+                    />
+                  </label>
+                  <Button
+                    type="button"
+                    onClick={() => void onJoin()}
+                    disabled={busy || !nameReady}
+                    variant={ButtonVariant.Accent}
+                  >
+                    {busy ? "Joining…" : "Join lobby"}
+                  </Button>
+                </>
+              ) : null}
             </div>
           ) : (
             <>
               <section className={styles.invite} aria-label="Invite">
                 <div className={styles.inviteCopy}>
                   <p className={styles.inviteTitle}>Invite friends</p>
-                  <p className={styles.inviteText}>
-                    Share the code or link while everyone joins.
-                  </p>
+              <p className={styles.inviteText}>
+                Share the code or link while everyone joins.
+              </p>
                 </div>
                 <SessionCodeCopy
                   code={code}

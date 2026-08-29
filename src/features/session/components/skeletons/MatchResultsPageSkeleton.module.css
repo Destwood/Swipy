@@ -1,0 +1,93 @@
+@reference "../../../../app/globals.css";
+
+.sectionHeader {
+  @apply mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1;
+}
+
+.sectionTitle {
+  @apply h-5 w-24 rounded-md;
+}
+
+.sectionMeta {
+  @apply h-3.5 w-16 rounded-md;
+}
+
+.heroList {
+  @apply m-0 grid list-none grid-cols-1 gap-5 p-0;
+}
+
+.heroCard {
+  @apply grid grid-cols-1 overflow-hidden rounded-2xl border border-white/[0.06] bg-sw-surface md:grid-cols-[260px_minmax(0,1fr)];
+}
+
+.heroCover {
+  @apply min-h-[240px] md:min-h-full;
+}
+
+.heroBody {
+  @apply flex flex-col gap-3 px-5 py-5;
+}
+
+.heroTitle {
+  @apply h-8 w-[min(420px,80%)] rounded-lg;
+}
+
+.heroTags {
+  @apply flex gap-2;
+}
+
+.heroTag {
+  @apply h-6 w-16 rounded-md;
+}
+
+.heroMeta {
+  @apply h-4 w-48 rounded-md;
+}
+
+.heroActions {
+  @apply mt-2 flex gap-2;
+}
+
+.heroAction {
+  @apply h-9 w-28 rounded-[10px];
+}
+
+.list {
+  @apply m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2;
+}
+
+.compactRow {
+  @apply flex items-stretch gap-4 rounded-xl px-4 py-3.5;
+}
+
+.thumb {
+  @apply h-[72px] w-[72px] shrink-0 rounded-[10px];
+}
+
+.compactBody {
+  @apply flex min-w-0 flex-1 flex-col justify-center gap-2 py-0.5;
+}
+
+.compactTitle {
+  @apply h-4 w-[min(240px,90%)] rounded-md;
+}
+
+.compactTags {
+  @apply flex gap-1.5;
+}
+
+.compactTag {
+  @apply h-4 w-12 rounded-[5px];
+}
+
+.compactPrice {
+  @apply h-5 w-14 shrink-0 self-center rounded-md;
+}
+
+.compactFav {
+  @apply h-8 w-8 shrink-0 self-center rounded-lg;
+}
+
+.compactAction {
+  @apply h-8 w-[5.5rem] shrink-0 self-center rounded-[10px];
+}

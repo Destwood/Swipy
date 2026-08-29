@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuthUser } from "@/features/auth/lib/use-auth-user";
 import { googleAvatarUrl } from "@/features/auth/lib/google-avatar";
+import { AccountContentSkeleton } from "@/features/account/components/AccountContentSkeleton";
 import { AccountShell } from "@/features/account/components/AccountShell";
 import shell from "@/features/account/components/AccountShell.module.css";
 import { createBrowserSupabaseClient } from "@/shared/supabase/client";
@@ -16,7 +17,7 @@ export function AccountProfilePage() {
   if (!ready || !user) {
     return (
       <AccountShell title="Profile">
-        <p className={shell.email}>Loading…</p>
+        <AccountContentSkeleton />
       </AccountShell>
     );
   }

@@ -3,7 +3,7 @@ import styles from "./GamePriceBadge.module.css";
 
 type Props = {
   appId?: string;
-  size?: "xs" | "sm";
+  size?: "xs" | "sm" | "md" | "lg";
   variant?: "tag" | "buy";
 };
 

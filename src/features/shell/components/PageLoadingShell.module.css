@@ -1,0 +1,9 @@
+@reference "../../../app/globals.css";
+
+.root {
+  @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
+}
+
+.loading {
+  @apply flex flex-1 items-center justify-center font-mono text-sm text-white/30;
+}

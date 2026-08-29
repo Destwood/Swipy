@@ -27,7 +27,7 @@
 }
 
 .inline {
-  @apply flex h-auto min-w-0 rounded-none;
+  @apply flex h-auto min-w-0 cursor-pointer rounded-none;
 }
 
 .card {

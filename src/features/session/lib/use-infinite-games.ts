@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Game } from "@/features/games/data/games";
 import { CATALOG_PAGE_SIZE } from "@/features/games/lib/catalog-query";
-import { upsertGames } from "@/features/games/lib/game-library";
+import {
+  ensureGamesInLibrary,
+  upsertGames,
+} from "@/features/games/lib/game-library";
 import {
   EMPTY_IGNORE_LIST,
   gameIsIgnored,
@@ -13,12 +16,17 @@ import {
 } from "@/features/games/lib/ignore-list";
 import {
   EMPTY_INFINITE_FILTERS,
+  filtersToKey,
   gameMatchesInfiniteFilters,
   infiniteFilterSearchParams,
   readInfiniteFilters,
   subscribeInfiniteFilters,
   type InfiniteFilterState,
 } from "@/features/session/lib/infinite-filters";
+import {
+  patchInfiniteSession,
+  readInfiniteSession,
+} from "@/features/session/lib/infinite-session";
 
 type CatalogResponse = {
   results?: Game[];
@@ -41,10 +49,12 @@ function filterGames(
 }
 
 export function useInfiniteGames(bannedIds: string[]) {
-  const [filters, setFilters] = useState<InfiniteFilterState>(
-    EMPTY_INFINITE_FILTERS,
+  const [filters, setFilters] = useState<InfiniteFilterState>(() =>
+    typeof window !== "undefined" ? readInfiniteFilters() : EMPTY_INFINITE_FILTERS,
   );
-  const [ignore, setIgnore] = useState<IgnoreList>(EMPTY_IGNORE_LIST);
+  const [ignore, setIgnore] = useState<IgnoreList>(() =>
+    typeof window !== "undefined" ? readIgnoreList() : EMPTY_IGNORE_LIST,
+  );
   const [rawGames, setRawGames] = useState<Game[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -82,6 +92,42 @@ export function useInfiniteGames(bannedIds: string[]) {
     loadingMoreRef.current = false;
 
     void (async () => {
+      const filterKey = filtersToKey(filters);
+      const saved = readInfiniteSession();
+      const restoreIds =
+        saved && saved.loadedGameIds.length > 0
+          ? saved.loadedGameIds
+          : saved?.votes.map((vote) => vote.gameId) ?? [];
+      const hasSavedProgress = Boolean(
+        saved &&
+          (saved.votes.length > 0 ||
+            saved.streamIndex > 0 ||
+            saved.loadedGameIds.length > 0),
+      );
+      const canRestore =
+        saved &&
+        restoreIds.length > 0 &&
+        (saved.filterKey === filterKey || hasSavedProgress);
+
+      if (canRestore) {
+        try {
+          const loaded = await ensureGamesInLibrary(restoreIds);
+          const byId = new Map(loaded.map((game) => [game.id, game]));
+          const ordered = restoreIds
+            .map((id) => byId.get(id))
+            .filter((game): game is Game => Boolean(game));
+          if (!controller.signal.aborted && ordered.length > 0) {
+            setRawGames(ordered);
+            setPage(saved.catalogPage ?? 1);
+            setHasMore(saved.catalogHasMore ?? true);
+            setLoading(false);
+            return;
+          }
+        } catch {
+          /* fall through to network fetch */
+        }
+      }
+
       try {
         const params = infiniteFilterSearchParams(
           filters,
@@ -102,6 +148,10 @@ export function useInfiniteGames(bannedIds: string[]) {
         upsertGames(results);
         setRawGames(results);
         setHasMore(Boolean(data.next));
+        patchInfiniteSession({
+          catalogPage: 1,
+          catalogHasMore: Boolean(data.next),
+        });
       } catch {
         if (controller.signal.aborted) return;
         setError("Network error — could not load games");
@@ -143,6 +193,10 @@ export function useInfiniteGames(bannedIds: string[]) {
         });
         setPage(nextPage);
         setHasMore(Boolean(data.next) && results.length > 0);
+        patchInfiniteSession({
+          catalogPage: nextPage,
+          catalogHasMore: Boolean(data.next) && results.length > 0,
+        });
       } catch {
         setError("Network error — could not load more games");
       } finally {

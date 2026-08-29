@@ -14,7 +14,9 @@ import {
   setSessionCreateDeckId,
 } from "@/features/session/lib/session-create-deck";
 import { SessionCodeCopy } from "@/features/session/components/SessionCodeCopy";
+import { buildLobbyInviteUrl } from "@/features/session/lib/session-invite";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
+import { toast } from "@/shared/ui/toast";
 import styles from "./CreateSessionForm.module.css";
 
 export function CreateSessionForm() {
@@ -27,6 +29,11 @@ export function CreateSessionForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionCode, setSessionCode] = useState("SWPY-····");
+  const [inviteOrigin, setInviteOrigin] = useState("");
+
+  useEffect(() => {
+    setInviteOrigin(window.location.origin);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,6 +78,19 @@ export function CreateSessionForm() {
 
   const selected = decks.find((d) => d.id === deckId);
   const canOpenLobby = Boolean(deckId) && !busy && ready && !decksLoading;
+  const inviteUrl = inviteOrigin
+    ? buildLobbyInviteUrl(sessionCode, inviteOrigin)
+    : "";
+
+  async function copyInviteLink() {
+    if (!inviteUrl || sessionCode.includes("·")) return;
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      toast("Link copied");
+    } catch {
+      toast("Could not copy link");
+    }
+  }
 
   return (
     <div className={styles.page}>
@@ -120,10 +140,19 @@ export function CreateSessionForm() {
         </div>
 
         <div className={styles.codeSection}>
-          <SessionCodeCopy
-            code={sessionCode}
-            hint="Share after you open the lobby"
-          />
+          <SessionCodeCopy code={sessionCode} hint="Tap to copy code" />
+          <Button
+            type="button"
+            variant={ButtonVariant.Dark}
+            size={ButtonSize.Sm}
+            disabled={sessionCode.includes("·")}
+            onClick={() => void copyInviteLink()}
+          >
+            Copy lobby link
+          </Button>
+          <p className={styles.linkHint}>
+            Friends open the link to join — works after you open the lobby.
+          </p>
         </div>
 
         <Link href="/decks/new" className={styles.newDeckLink}>
@@ -143,7 +172,7 @@ export function CreateSessionForm() {
           {busy ? "Creating…" : "Open lobby"}
         </Button>
         <Button href="/session/join" variant={ButtonVariant.Dark}>
-          I have a code
+          Join lobby
         </Button>
       </div>
     </div>

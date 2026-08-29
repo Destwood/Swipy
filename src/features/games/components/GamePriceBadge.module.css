@@ -18,6 +18,14 @@
   @apply text-xs;
 }
 
+.md {
+  @apply text-base;
+}
+
+.lg {
+  @apply text-lg;
+}
+
 .amount {
   @apply font-semibold text-white/80 tabular-nums;
 }
@@ -36,6 +44,26 @@
 
 .sm .discount {
   @apply px-1.5 py-0.5 text-[9px] leading-tight;
+}
+
+.md .discount {
+  @apply px-2 py-0.5 text-[10px] leading-tight;
+}
+
+.md .amount {
+  @apply text-lg font-bold text-white;
+}
+
+.lg .discount {
+  @apply px-2 py-0.5 text-[11px] leading-tight;
+}
+
+.lg .amount {
+  @apply text-xl font-black text-white;
+}
+
+.lg.free {
+  @apply text-xl font-black;
 }
 
 .buy {

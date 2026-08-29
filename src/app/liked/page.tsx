@@ -2,11 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { createBrowserSupabaseClient } from "@/shared/supabase/client";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
+import { GameListRowSkeleton } from "@/features/games/components/GameListRowSkeleton";
 import { LikedRow } from "@/features/games/components/LikedRow";
 import type { Game } from "@/features/games/data/games";
 import {
+  hydrateFavoriteGames,
   listFavoriteGameIds,
+  subscribeFavoriteGames,
   toggleFavoriteGame,
 } from "@/features/games/lib/game-favorites";
 import { getLibraryGamesByIds } from "@/features/games/lib/game-library";
@@ -17,6 +21,7 @@ import styles from "./page.module.css";
 
 export default function LikedPage() {
   const [games, setGames] = useState<Game[]>([]);
+  const [ready, setReady] = useState(false);
   const ignore = useIgnoreList();
 
   function reload() {
@@ -32,7 +37,26 @@ export default function LikedPage() {
   }
 
   useEffect(() => {
+    if (!ignore.ready) return;
+    let cancelled = false;
     reload();
+    void hydrateFavoriteGames().then(() => {
+      if (cancelled) return;
+      reload();
+      setReady(true);
+    });
+    const unsub = subscribeFavoriteGames(reload);
+    const supabase = createBrowserSupabaseClient();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      void hydrateFavoriteGames().then(() => reload());
+    });
+    return () => {
+      cancelled = true;
+      unsub();
+      subscription.unsubscribe();
+    };
   }, [ignore.ready, ignore.genres, ignore.platforms]);
 
   function onRemove(id: string) {
@@ -54,7 +78,13 @@ export default function LikedPage() {
             </span>
           </div>
 
-          {games.length === 0 ? (
+          {(!ready || !ignore.ready) && games.length === 0 ? (
+            <ul className={styles.list} aria-busy="true" aria-label="Loading favorites">
+              {Array.from({ length: 6 }, (_, i) => (
+                <GameListRowSkeleton key={`sk-${i}`} showAction />
+              ))}
+            </ul>
+          ) : games.length === 0 ? (
             <div className={styles.empty}>
               <p className={styles.emptyTitle}>No favorites yet</p>
               <p className={styles.emptyText}>

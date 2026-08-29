@@ -1,0 +1,49 @@
+@reference "../../../../app/globals.css";
+
+.root {
+  @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
+}
+
+.stage {
+  @apply relative flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-6;
+}
+
+.chrome {
+  @apply mb-4 flex w-full max-w-[min(360px,92vw)] items-center justify-between gap-3;
+}
+
+.chip {
+  @apply h-8 rounded-lg;
+}
+
+.chipWide {
+  @apply w-28;
+}
+
+.chipNarrow {
+  @apply w-20;
+}
+
+.card {
+  @apply relative aspect-[3/4] w-full max-w-[min(360px,92vw)] overflow-hidden rounded-[28px] border border-white/10;
+}
+
+.cardMeta {
+  @apply absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5;
+}
+
+.cardTitle {
+  @apply h-6 w-[min(240px,75%)] rounded-md;
+}
+
+.cardTags {
+  @apply flex gap-2;
+}
+
+.cardTag {
+  @apply h-5 w-14 rounded-md;
+}
+
+.hint {
+  @apply mt-6 h-3 w-48 rounded-md;
+}

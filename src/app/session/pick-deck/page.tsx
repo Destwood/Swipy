@@ -4,6 +4,7 @@ import { Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DecksList } from "@/features/decks/components/DecksList";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
+import { PageLoadingShell } from "@/features/shell/components/PageLoadingShell";
 import { setSessionCreateDeckId } from "@/features/session/lib/session-create-deck";
 import { setActiveDeckId } from "@/features/decks/lib/deck-store";
 import { startSoloSession } from "@/features/session/lib/start-solo-session";
@@ -60,7 +61,7 @@ function SessionPickDeckPageInner() {
 
 export default function SessionPickDeckPage() {
   return (
-    <Suspense fallback={<div className={styles.root} aria-busy="true" />}>
+    <Suspense fallback={<PageLoadingShell />}>
       <SessionPickDeckPageInner />
     </Suspense>
   );

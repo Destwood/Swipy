@@ -24,7 +24,18 @@
   @apply h-[30px] w-[30px] border-2 border-white/45;
   transition:
     top 0.1s ease-in-out,
-    left 0.1s ease-in-out;
+    left 0.1s ease-in-out,
+    width 0.14s ease,
+    height 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.outlinePointer {
+  @apply h-9 w-9 border-sw-accent/70;
+}
+
+.dotPointer {
+  @apply h-2 w-2 bg-sw-accent;
 }
 
 @media (prefers-reduced-motion: reduce) {

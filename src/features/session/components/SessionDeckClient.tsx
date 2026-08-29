@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
+import { SwipeDeckPageSkeleton } from "@/features/session/components/skeletons/SwipeDeckPageSkeleton";
 import type { Game } from "@/features/games/data/games";
 import { getDeckById, setActiveDeckId } from "@/features/decks/lib/deck-store";
 import {
@@ -158,7 +159,7 @@ export function SessionDeckClient() {
   })();
 
   if (!ready) {
-    return <div className={styles.loading}>Loading deck…</div>;
+    return <SwipeDeckPageSkeleton />;
   }
 
   if (error && games.length === 0) {

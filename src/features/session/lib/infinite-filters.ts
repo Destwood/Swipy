@@ -107,6 +107,14 @@ export function gameMatchesInfiniteFilters(
   return true;
 }
 
+export function filtersToKey(filters: InfiniteFilterState): string {
+  return JSON.stringify({
+    g: [...filters.genres].sort(),
+    p: [...filters.platforms].sort(),
+    c: filters.crossplayOnly,
+  });
+}
+
 export function infiniteFilterSearchParams(
   filters: InfiniteFilterState,
   page: number,

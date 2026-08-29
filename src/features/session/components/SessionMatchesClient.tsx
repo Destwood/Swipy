@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
+import { MatchResultsPageSkeleton } from "@/features/session/components/skeletons/MatchResultsPageSkeleton";
 import type { Game } from "@/features/games/data/games";
 import { openSteamStore } from "@/features/games/lib/steam";
 import { MatchGameRow } from "@/features/session/components/MatchGameRow";
+import { ResultsPageToolbar } from "@/features/session/components/ResultsPageToolbar";
 import { VoteBreakdown } from "@/features/session/components/VoteBreakdown";
 import { getActiveSession, toUiMember } from "@/features/session/lib/session-context";
 import {
@@ -25,6 +27,7 @@ import {
 import { fetchMembers, fetchVotes } from "@/features/session/lib/sessions";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import { PageBackLink } from "@/shared/ui/PageBackLink";
+import { toast } from "@/shared/ui/toast";
 import styles from "./SessionMatchesClient.module.css";
 
 const RESULT_GAME_KEY = "swipy.resultGameId";
@@ -111,7 +114,8 @@ export function SessionMatchesClient() {
       const token = encodeShareMatchesToken(payload);
       const url = buildShareMatchesUrl(window.location.origin, token);
       await navigator.clipboard.writeText(url);
-      setShareHint(`Link copied · valid until ${formatShareExpiry(payload.exp)}`);
+      toast("Link copied");
+      setShareHint(`Valid until ${formatShareExpiry(payload.exp)}`);
     } catch {
       setShareHint("Could not copy link. Check clipboard permissions.");
     } finally {
@@ -179,6 +183,7 @@ export function SessionMatchesClient() {
     games: Game[],
     showRank = true,
     variant: "compact" | "hero" = "compact",
+    priceAlign: "foot" | "center" = "foot",
   ) {
     return (
       <ul className={variant === "hero" ? styles.heroList : styles.list}>
@@ -188,6 +193,7 @@ export function SessionMatchesClient() {
             game={game}
             rank={showRank ? index + 1 : undefined}
             variant={variant}
+            priceAlign={variant === "compact" ? priceAlign : "foot"}
             action={variant === "hero" ? null : pickAction(game)}
           />
         ))}
@@ -196,7 +202,15 @@ export function SessionMatchesClient() {
   }
 
   if (!ready) {
-    return <div className={styles.loading}>Computing matches…</div>;
+    return (
+      <MatchResultsPageSkeleton
+        backHref="/session/deck"
+        backLabel="← Deck"
+        eyebrow="Your list"
+        title="Results"
+        subtitle="Games you liked or skipped. Open Steam from the cover or title."
+      />
+    );
   }
 
   const hasAny =
@@ -209,16 +223,34 @@ export function SessionMatchesClient() {
       <div className={styles.scroll}>
         <div className={styles.page}>
           <PageBackLink href="/session/deck">← Deck</PageBackLink>
-          <div className={styles.header}>
-            <p className={styles.eyebrow}>
-              {isSolo ? "Your list" : "Shared list"}
-            </p>
-            <h1 className={styles.title}>{isSolo ? "Results" : "Matches"}</h1>
-            <p className={styles.subtitle}>
-              {isSolo
-                ? "Games you liked or skipped. Open Steam from the cover or title."
-                : "Agreement by how many people liked each game. Open Steam or share the list."}
-            </p>
+          <div className={styles.headerRow}>
+            <div className={styles.headerMain}>
+              <p className={styles.eyebrow}>
+                {isSolo ? "Your list" : "Shared list"}
+              </p>
+              <h1 className={styles.title}>{isSolo ? "Results" : "Matches"}</h1>
+              <p className={styles.subtitle}>
+                {isSolo
+                  ? "Games you liked or skipped. Open Steam from the cover or title."
+                  : "Agreement by how many people liked each game. Open Steam or share the list."}
+              </p>
+            </div>
+            {shareGames.length > 0 ? (
+              <ResultsPageToolbar
+                onCopyLink={() => void shareResults()}
+                menuItems={[
+                  ...(topPick
+                    ? [
+                        {
+                          label: "Continue to result",
+                          href: "/session/result",
+                          onClick: () => pickGame(topPick.id),
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+            ) : null}
           </div>
 
           {error && <p className={styles.error}>{error}</p>}
@@ -271,21 +303,11 @@ export function SessionMatchesClient() {
                   {rejected.length} {rejected.length === 1 ? "game" : "games"}
                 </span>
               </div>
-              {renderGameList(rejected)}
+              {renderGameList(rejected, true, "compact", "center")}
             </section>
           ) : null}
 
           <div className={styles.footer}>
-            {shareGames.length > 0 ? (
-              <Button
-                type="button"
-                onClick={() => void shareResults()}
-                disabled={shareBusy}
-                variant={ButtonVariant.Soft}
-              >
-                {shareBusy ? "Copying…" : "Share with friends"}
-              </Button>
-            ) : null}
             {topPick && (
               <Button
                 href="/session/result"
