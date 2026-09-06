@@ -18,7 +18,7 @@ import { useIgnoreList } from "@/features/games/lib/use-ignore-list";
 import { useIgnoredGames } from "@/features/games/lib/use-ignored-games";
 import {
   filtersToKey,
-  infiniteFiltersActive,
+  infiniteFilterLabel,
 } from "@/features/session/lib/infinite-filters";
 import {
   consumeRequeueHead,
@@ -67,13 +67,7 @@ export function DeckPreviewClient({ mode }: Props) {
     ? stream.loading === false && ignoredGames.ready
     : deckReady;
 
-  const filterLabel = infiniteFiltersActive(stream.filters)
-    ? [
-        ...stream.filters.platforms,
-        ...(stream.filters.crossplayOnly ? ["Crossplay"] : []),
-        ...stream.filters.genres,
-      ].join(" · ")
-    : null;
+  const filterLabel = infiniteFilterLabel(stream.filters);
   const runLabel = infinite ? infiniteRunLabel(filterLabel) : deckName;
   const filterKey = infinite ? filtersToKey(stream.filters) : "";
 

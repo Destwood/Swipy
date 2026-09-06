@@ -8,7 +8,7 @@ import {
   EMPTY_INFINITE_FILTERS,
   INFINITE_GENRE_OPTIONS,
   filtersToKey,
-  infiniteFiltersActive,
+  infiniteFilterLabel,
   readInfiniteFilters,
   sortActiveFirst,
   writeInfiniteFilters,
@@ -35,6 +35,10 @@ function toggleValue(list: string[], value: string): string[] {
     : [...list, value];
 }
 
+function toggleMode(current: string, next: string): string {
+  return current === next ? "All" : next;
+}
+
 export function InfiniteModeDialog({ open, onClose }: Props) {
   const router = useRouter();
   const titleId = useId();
@@ -48,6 +52,7 @@ export function InfiniteModeDialog({ open, onClose }: Props) {
     () => sortActiveFirst(INFINITE_GENRE_OPTIONS, draft.genres),
     [draft.genres],
   );
+  const showPlayers = draft.mode === "Co-op";
 
   useEffect(() => {
     if (!open) return;
@@ -71,15 +76,7 @@ export function InfiniteModeDialog({ open, onClose }: Props) {
   function start() {
     writeInfiniteFilters(draft);
     const filterKey = filtersToKey(draft);
-    const label = infiniteRunLabel(
-      infiniteFiltersActive(draft)
-        ? [
-            ...draft.platforms,
-            ...(draft.crossplayOnly ? ["Crossplay"] : []),
-            ...draft.genres,
-          ].join(" · ")
-        : null,
-    );
+    const label = infiniteRunLabel(infiniteFilterLabel(draft));
     const existing = readInfiniteSession();
     if (existing?.filterKey === filterKey) {
       getOrCreateInfiniteSession({ label, filterKey });
@@ -142,6 +139,47 @@ export function InfiniteModeDialog({ open, onClose }: Props) {
               >
                 Crossplay
               </FilterChip>
+            </div>
+          </section>
+
+          <section className={styles.group}>
+            <p className={styles.groupLabel}>Play</p>
+            <div className={styles.chips}>
+              {CATALOG_FILTER_OPTIONS.modes.map((mode) => (
+                <FilterChip
+                  key={mode.value}
+                  active={draft.mode === mode.value}
+                  onClick={() => {
+                    const nextMode = toggleMode(draft.mode, mode.value);
+                    setDraft((current) => ({
+                      ...current,
+                      mode: nextMode,
+                      players: nextMode === "Co-op" ? current.players : "All",
+                    }));
+                  }}
+                >
+                  {mode.label}
+                </FilterChip>
+              ))}
+              {showPlayers ? (
+                <>
+                  <span className={styles.divider} aria-hidden />
+                  {CATALOG_FILTER_OPTIONS.players.map((p) => (
+                    <FilterChip
+                      key={p.value}
+                      active={draft.players === p.value}
+                      onClick={() =>
+                        setDraft((current) => ({
+                          ...current,
+                          players: toggleMode(current.players, p.value),
+                        }))
+                      }
+                    >
+                      {p.label}
+                    </FilterChip>
+                  ))}
+                </>
+              ) : null}
             </div>
           </section>
 
