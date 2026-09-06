@@ -111,9 +111,14 @@ export function parseInfiniteFilterParams(
       ?.split(",")
       .map((value) => value.trim())
       .filter(Boolean) ?? [];
+  const mode = searchParams.get("mode") || "All";
+  const players =
+    mode === "Co-op" ? searchParams.get("players") || "All" : "All";
   return {
     genres,
     platforms,
+    mode,
+    players,
     crossplayOnly: searchParams.get("crossplay") === "1",
   };
 }
@@ -144,6 +149,14 @@ function infiniteWhereClauses(filters: InfiniteFilterState): string[] {
   ];
   if (platformIds.length > 0) {
     clauses.push(`platforms = (${platformIds.join(",")})`);
+  }
+
+  const mode = MODE_WHERE[filters.mode];
+  if (mode) clauses.push(mode);
+
+  if (filters.mode === "Co-op") {
+    const players = PLAYERS_WHERE[filters.players];
+    if (players) clauses.push(players);
   }
 
   if (filters.crossplayOnly) clauses.push(...crossplayClauses());

@@ -16,6 +16,14 @@ How to use:
 
 Full **Steam account linking**, library sync, and deeper store integration — building on the Steam prices / Open in Steam work in 0.4.x.
 
+## [0.4.2] - 2026-09-06
+
+Hotfix: infinite-mode filters for co-op and player count.
+
+### Added
+
+- **Infinite mode** dialog: **Play** filters (Solo / Multiplayer / Co-op) plus co-op player buckets (2 / 3–4 / 5+), wired through IGDB catalog queries
+
 ## [0.4.1] - 2026-08-29
 
 Patch release: infinite-mode session continuity, swipe history, lobby invites, match-results polish, and Steam metadata fixes.

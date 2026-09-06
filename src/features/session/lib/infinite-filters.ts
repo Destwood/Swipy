@@ -1,10 +1,13 @@
 import type { Game } from "@/features/games/data/games";
+import { CATALOG_FILTER_OPTIONS } from "@/features/games/lib/catalog-filters";
 import { IGNORE_GENRE_OPTIONS } from "@/features/games/lib/ignore-list";
 import { gameHasGenre } from "@/features/games/lib/genre-label";
 
 export type InfiniteFilterState = {
   genres: string[];
   platforms: string[];
+  mode: string;
+  players: string;
   crossplayOnly: boolean;
 };
 
@@ -13,11 +16,22 @@ export const INFINITE_GENRE_OPTIONS = IGNORE_GENRE_OPTIONS;
 export const EMPTY_INFINITE_FILTERS: InfiniteFilterState = {
   genres: [],
   platforms: [],
+  mode: "All",
+  players: "All",
   crossplayOnly: false,
 };
 
 const STORAGE_KEY = "swipy.infiniteFilters";
 const CHANGE_EVENT = "swipy:infinite-filters";
+
+function matchesPlayers(game: Game, players: string): boolean {
+  if (players === "All") return true;
+  const max = game.coopMaxPlayers ?? 0;
+  if (players === "2") return max === 2;
+  if (players === "3–4") return max >= 3 && max <= 4;
+  if (players === "5+") return max >= 5;
+  return true;
+}
 
 function parse(raw: string | null): InfiniteFilterState {
   if (!raw) return EMPTY_INFINITE_FILTERS;
@@ -29,9 +43,21 @@ function parse(raw: string | null): InfiniteFilterState {
     const platforms = Array.isArray(parsed.platforms)
       ? parsed.platforms.filter((p): p is string => typeof p === "string")
       : [];
+    const mode =
+      typeof parsed.mode === "string" && parsed.mode.trim()
+        ? parsed.mode
+        : "All";
+    const players =
+      mode === "Co-op" &&
+      typeof parsed.players === "string" &&
+      parsed.players.trim()
+        ? parsed.players
+        : "All";
     return {
       genres,
       platforms,
+      mode,
+      players,
       crossplayOnly: parsed.crossplayOnly === true,
     };
   } catch {
@@ -82,6 +108,8 @@ export function infiniteFiltersActive(filters: InfiniteFilterState): boolean {
   return (
     filters.genres.length > 0 ||
     filters.platforms.length > 0 ||
+    filters.mode !== "All" ||
+    filters.players !== "All" ||
     filters.crossplayOnly
   );
 }
@@ -103,6 +131,12 @@ export function gameMatchesInfiniteFilters(
       return false;
     }
   }
+  if (filters.mode !== "All" && !(game.modes ?? []).includes(filters.mode)) {
+    return false;
+  }
+  if (filters.mode === "Co-op" && !matchesPlayers(game, filters.players)) {
+    return false;
+  }
   if (filters.crossplayOnly && !game.crossplay) return false;
   return true;
 }
@@ -111,8 +145,31 @@ export function filtersToKey(filters: InfiniteFilterState): string {
   return JSON.stringify({
     g: [...filters.genres].sort(),
     p: [...filters.platforms].sort(),
+    m: filters.mode,
+    n: filters.players,
     c: filters.crossplayOnly,
   });
+}
+
+export function infiniteFilterLabel(filters: InfiniteFilterState): string | null {
+  if (!infiniteFiltersActive(filters)) return null;
+  const parts: string[] = [];
+  if (filters.mode !== "All") {
+    const mode = CATALOG_FILTER_OPTIONS.modes.find(
+      (item) => item.value === filters.mode,
+    );
+    parts.push(mode?.label ?? filters.mode);
+  }
+  if (filters.players !== "All") {
+    const players = CATALOG_FILTER_OPTIONS.players.find(
+      (item) => item.value === filters.players,
+    );
+    parts.push(players?.label ?? filters.players);
+  }
+  parts.push(...filters.platforms);
+  if (filters.crossplayOnly) parts.push("Crossplay");
+  parts.push(...filters.genres);
+  return parts.join(" · ");
 }
 
 export function infiniteFilterSearchParams(
@@ -129,6 +186,10 @@ export function infiniteFilterSearchParams(
   }
   if (filters.platforms.length > 0) {
     params.set("platforms", filters.platforms.join(","));
+  }
+  if (filters.mode !== "All") params.set("mode", filters.mode);
+  if (filters.mode === "Co-op" && filters.players !== "All") {
+    params.set("players", filters.players);
   }
   if (filters.crossplayOnly) params.set("crossplay", "1");
   return params;
