@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Bricolage_Grotesque, DM_Sans, DM_Mono } from "next/font/google";
 import { Grain } from "@/features/shell/components/Grain";
 import { CustomCursor } from "@/features/custom-cursor";
@@ -44,6 +45,7 @@ export default function RootLayout({
         <CustomCursor />
         <div className={styles.main}>{children}</div>
         <ToastHost />
+        <Analytics />
       </body>
     </html>
   );
