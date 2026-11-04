@@ -5,6 +5,10 @@ import { AppTopBar } from "@/features/shell/components/AppTopBar";
 import { MatchResultsPageSkeleton } from "@/features/session/components/skeletons/MatchResultsPageSkeleton";
 import type { Game } from "@/features/games/data/games";
 import { openSteamStore } from "@/features/games/lib/steam";
+import {
+  ensureGamesInLibrary,
+  hydrateSeedGamesFromIgdb,
+} from "@/features/games/lib/game-library";
 import { MatchGameRow } from "@/features/session/components/MatchGameRow";
 import { ResultsPageToolbar } from "@/features/session/components/ResultsPageToolbar";
 import { VoteBreakdown } from "@/features/session/components/VoteBreakdown";
@@ -57,6 +61,12 @@ export function SessionMatchesClient() {
         fetchMembers(active.sessionId),
         fetchVotes(active.sessionId),
       ]);
+
+      await hydrateSeedGamesFromIgdb();
+      const voteGameIds = [...new Set(votes.map((vote) => vote.game_id))];
+      if (voteGameIds.length > 0) {
+        await ensureGamesInLibrary(voteGameIds);
+      }
 
       const counts = countLikesByGame(votes);
       const solo = members.length <= 1;

@@ -35,6 +35,10 @@
   @apply text-sw-text/70;
 }
 
+.viewGames {
+  @apply ml-3 cursor-pointer border-0 bg-transparent p-0 font-body text-sm text-sw-accent/80 transition-colors hover:text-sw-accent;
+}
+
 .readyCount {
   @apply shrink-0 font-mono text-xs text-white/25;
 }
@@ -43,8 +47,12 @@
   @apply mb-4 font-body text-sm text-sw-dislike;
 }
 
+.layout {
+  @apply mb-10 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px];
+}
+
 .invite {
-  @apply mb-8 flex flex-col gap-5 rounded-2xl border border-white/[0.06] bg-sw-surface/80 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8;
+  @apply order-first flex flex-col gap-5 rounded-2xl border border-white/[0.06] bg-sw-surface/80 px-5 py-5 lg:order-none;
 }
 
 .inviteCopy {
@@ -64,7 +72,7 @@
 }
 
 .memberList {
-  @apply m-0 mb-10 flex list-none flex-col gap-0.5 p-0;
+  @apply m-0 flex list-none flex-col gap-0.5 p-0;
 }
 
 .actions {

@@ -53,14 +53,6 @@
   @apply shrink-0;
 }
 
-.codeSection {
-  @apply flex flex-col items-center gap-3 border-t border-white/[0.06] pt-5;
-}
-
-.linkHint {
-  @apply max-w-xs text-center font-mono text-[11px] leading-relaxed text-white/25;
-}
-
 .newDeckLink {
   @apply text-center font-body text-sm text-sw-accent/80 transition-colors hover:text-sw-accent;
 }

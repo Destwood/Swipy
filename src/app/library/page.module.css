@@ -4,38 +4,30 @@
   @apply flex h-full min-h-0 flex-1 flex-col bg-sw-bg;
 }
 
-.content {
-  @apply min-h-0 flex-1 overflow-y-auto;
+.body {
+  @apply flex min-h-0 flex-1;
 }
+
+.content {
+  @apply min-h-0 min-w-0 flex-1 overflow-y-auto;
+}
+
+.dock {
+  @apply hidden h-full w-[340px] shrink-0 border-l border-white/[0.06] bg-sw-surface lg:block;
+}
+
 
 .inner {
   @apply mx-auto max-w-[1200px] pb-16;
   padding-inline: var(--sw-page-pad-x);
-  padding-top: var(--sw-page-pad-y);
 }
 
 .toolbar {
-  @apply mb-3 flex flex-col gap-3;
-}
-
-.searchRow {
-  @apply flex flex-wrap items-center gap-2;
-}
-
-.searchInput {
-  @apply min-w-0 flex-1 rounded-[9px] border border-white/[0.08] bg-sw-surface px-3.5 py-2 font-body text-sm text-sw-text outline-none transition-colors placeholder:text-white/25 focus:border-sw-accent/40 sm:max-w-[320px];
-}
-
-.searchButton {
-  @apply cursor-pointer rounded-[9px] border border-white/[0.08] bg-white/[0.04] px-3.5 py-2 font-body text-sm text-sw-text transition-colors hover:border-white/15 hover:bg-white/[0.08] disabled:cursor-default disabled:opacity-50;
-}
-
-.searchClear {
-  @apply cursor-pointer rounded-[9px] border-0 bg-transparent px-2 py-2 font-body text-sm text-white/40 transition-colors hover:text-sw-text;
+  @apply relative z-20 mb-5;
 }
 
 .count {
-  @apply mb-5 font-mono text-xs text-white/30;
+  @apply mb-4 font-mono text-xs text-white/60;
 }
 
 .error {
@@ -47,64 +39,87 @@
   align-items: stretch;
 }
 
+.grid.gridDocked {
+  @apply lg:grid-cols-5 xl:grid-cols-6;
+}
+
 .gridItem {
   @apply min-h-0 min-w-0 w-full;
 }
 
-.tile {
-  @apply flex h-full w-full min-w-0 flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-sw-surface text-inherit no-underline;
+.card {
+  container-type: inline-size;
+  @apply relative aspect-[2/3] h-full w-full overflow-hidden rounded-xl border border-white/[0.06] bg-sw-surface;
   transition:
+    transform 180ms ease,
     border-color 180ms ease,
     background-color 180ms ease,
     box-shadow 180ms ease;
 }
 
-.coverWrap {
-  @apply relative aspect-[3/4] w-full shrink-0 overflow-hidden rounded-t-[11px] bg-sw-surface2;
+.tile {
+  @apply absolute inset-0 block h-full w-full min-w-0 cursor-pointer appearance-none border-0 bg-transparent p-0 text-left text-inherit no-underline;
 }
 
 .coverImage {
   @apply object-cover transition-transform duration-300 ease-out;
 }
 
-.tile:hover .coverImage {
+.card:hover .coverImage {
   transform: scale(1.04);
 }
 
-.tileBody {
-  @apply relative flex min-h-0 flex-1 flex-col px-2.5 pt-2.5 pb-2.5;
+.favorite {
+  @apply absolute top-1.5 right-1.5 z-[2];
 }
 
-.gameTitle {
-  @apply m-0 mb-1 h-[3.75em] font-display text-[12px] leading-[1.25] font-bold tracking-[-0.02em] text-sw-text;
+.priceSlot {
+  @apply pointer-events-none absolute right-1.5 bottom-1.5 z-[1];
+}
+
+.price {
+  @apply inline-flex items-stretch overflow-hidden whitespace-nowrap rounded-md border border-white/10 bg-black/70 text-sm backdrop-blur-[6px];
+}
+
+.priceDiscount {
+  @apply flex items-center bg-[#34d399] px-2 py-1.5 text-[13px] font-bold text-sw-bg;
+}
+
+.priceOriginal {
+  @apply hidden items-center pl-2 text-xs text-white/50 line-through tabular-nums 2xl:flex;
+}
+
+.priceAmount {
+  @apply flex items-center px-2 py-1.5 text-sm font-semibold text-white tabular-nums;
+}
+
+.priceFree {
+  @apply items-center px-2 py-1.5 text-sm font-bold text-emerald-400;
+}
+
+.caption {
+  @apply absolute inset-x-0 bottom-0 flex flex-col gap-0.5 bg-gradient-to-t from-black/85 via-black/45 to-transparent px-2.5 pt-8 pb-2.5 pr-14 text-left;
+}
+
+.captionTitle {
+  @apply font-display text-xs leading-tight font-bold tracking-[-0.02em] text-white;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   overflow: hidden;
 }
 
-.metaRow {
-  @apply mt-auto flex min-h-[14px] items-center justify-between gap-1;
+.captionMeta {
+  @apply font-body text-[11px] text-white/55;
 }
 
-.gameMeta {
-  @apply m-0 min-w-0 truncate font-body text-[11px] text-white/35;
+.srOnly {
+  @apply absolute -m-px h-px w-px overflow-hidden border-0 p-0 whitespace-nowrap;
+  clip: rect(0, 0, 0, 0);
 }
 
 .skeletonTile {
-  @apply flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-sw-surface;
-}
-
-.skeletonCover {
-  @apply aspect-[3/4] w-full bg-white/[0.04];
-}
-
-.skeletonTitle {
-  @apply mb-2 h-3.5 w-[86%] rounded-sm bg-white/[0.07];
-}
-
-.skeletonMeta {
-  @apply h-2.5 w-[52%] rounded-sm bg-white/[0.05];
+  @apply aspect-[2/3] rounded-xl border border-white/[0.06] bg-sw-surface;
 }
 
 .empty {
@@ -140,7 +155,7 @@
     transition: none;
   }
 
-  .tile:hover .coverImage {
+  .card:hover .coverImage {
     transform: none;
   }
 
@@ -148,5 +163,24 @@
   .toTop:active {
     transition: none;
     transform: none;
+  }
+}
+
+.emptyAction {
+  @apply mt-4 cursor-pointer rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 font-body text-sm text-sw-text transition-colors hover:border-sw-accent/35 hover:text-sw-accent;
+}
+
+@container (max-width: 125px) {
+  .price {
+    @apply flex-col items-stretch;
+  }
+
+  .priceDiscount {
+    @apply justify-center px-1.5 py-0.5;
+  }
+
+  .priceAmount,
+  .priceFree {
+    @apply justify-center px-1.5 py-1;
   }
 }

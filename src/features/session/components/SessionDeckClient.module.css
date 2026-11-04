@@ -50,12 +50,12 @@
 }
 
 .sessionChromeWide {
-  right: 1.25rem;
+  right: 10rem;
 }
 
 @media (min-width: 1024px) {
   .sessionChromeWide {
-    right: min(360px, 32vw);
+    right: calc(min(310px, 27vw) + 10rem);
   }
 }
 
@@ -65,44 +65,58 @@
 
 a.chromeChip,
 .chromeChip {
-  @apply mb-0 inline-flex h-8 cursor-pointer items-center rounded-lg border border-white/15 bg-black/45 px-2.5 font-mono text-[11px] font-normal tracking-[0.02em] text-white/70 no-underline normal-case backdrop-blur-[8px];
+  @apply mb-0 inline-flex h-[34px] cursor-pointer items-center gap-[7px] rounded-[9px] border border-white/[0.075] bg-[rgba(16,19,24,0.72)] px-[11px] font-body text-[11px] font-semibold tracking-normal text-white/60 no-underline normal-case backdrop-blur-[10px] transition-colors duration-150;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.025);
 }
 
 a.chromeChip:hover,
 button.chromeChip:hover:not(:disabled) {
-  @apply border-white/25 text-sw-text;
+  @apply border-white/[0.16] bg-white/[0.06] text-white;
+}
+
+.modeChip {
+  @apply cursor-default font-mono text-[10px] font-medium tracking-[0.03em] text-white/60;
+}
+
+button.modeChipAction {
+  @apply cursor-pointer;
+}
+
+.liveDot {
+  @apply h-[5px] w-[5px] rounded-full bg-sw-like;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.55);
+}
+
+.chipIcon {
+  @apply h-3.5 w-3.5 text-sw-like;
+}
+
+.chipGlyph {
+  @apply h-3.5 w-3.5 shrink-0;
+}
+
+.chipCount {
+  @apply grid h-[21px] min-w-[21px] place-items-center rounded-md bg-white/[0.07] px-[5px] font-mono text-[9px] leading-none font-medium text-white/70;
 }
 
 button.chromeChip:disabled {
   @apply cursor-default opacity-30;
 }
 
-.chromeEnd {
-  @apply ml-auto flex items-center gap-2;
-}
-
 .chromeEndPopover {
-  @apply relative pr-1;
+  @apply relative;
 }
 
 .matchesChip {
-  @apply px-3.5;
+  @apply pr-[7px];
 }
 
 .chromeStart {
-  @apply flex flex-col items-start gap-2.5;
+  @apply flex flex-wrap items-center gap-2;
 }
 
 .chromeNav {
   @apply flex flex-wrap items-center gap-2;
-}
-
-.undoChip {
-  @apply px-3.5;
-}
-
-.remainingLabel {
-  @apply font-mono text-[13px] tracking-[0.02em] text-white/28;
 }
 
 .deckName {
@@ -126,27 +140,134 @@ button.chromeChip:disabled {
   @apply pointer-events-none absolute top-14 right-4 left-4 z-20 text-center font-body text-sm text-sw-dislike lg:right-[min(360px,32vw)];
 }
 
-.trashFab {
-  @apply absolute z-[100] grid h-12 w-12 cursor-pointer place-items-center rounded-full border border-white/15 bg-black/50 text-white/70 backdrop-blur-[8px];
-  bottom: 1.25rem;
-  left: 1.25rem;
-}
-
-.trashFab:hover {
-  @apply border-[rgba(251,113,133,0.45)] bg-black/65 text-sw-dislike;
-}
-
-.trashIcon {
-  @apply h-5 w-5;
-}
-
 .body {
-  @apply flex min-h-0 min-w-0 flex-1;
+  @apply relative flex min-h-0 min-w-0 flex-1;
 }
 
 .deckArea {
   @apply relative flex min-h-0 min-w-0 flex-1 flex-col;
   --sw-card-w: min(360px, calc(var(--sw-card-h) * 0.735));
+}
+
+.sidebarSlot {
+  @apply relative flex h-full min-h-0 shrink-0;
+  width: 0;
+}
+
+.sidebarClip {
+  @apply flex h-full min-h-0 w-full overflow-hidden opacity-0;
+}
+
+.sidebarDock {
+  @apply absolute top-4 right-full z-[100] mr-4 flex items-center;
+}
+
+.dockToggle {
+  @apply shrink-0 overflow-hidden opacity-0;
+  width: 0;
+}
+
+.dockToggleInner {
+  @apply flex w-max items-center pl-[7px];
+}
+
+.sidebarSlotAnimated {
+  transition: width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sidebarSlotAnimated > .sidebarClip {
+  transition: opacity 0.26s ease-out;
+}
+
+.sidebarSlotAnimated .dockToggle {
+  transition:
+    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.26s ease-out;
+}
+
+@media (min-width: 1024px) {
+  .sidebarSlotOpen {
+    width: min(360px, 32vw);
+  }
+
+  .sidebarSlotCompact {
+    width: min(310px, 27vw);
+  }
+
+  .sidebarSlotOpen > .sidebarClip,
+  .sidebarSlotCompact > .sidebarClip {
+    @apply opacity-100;
+  }
+
+  .dockToggleVisible {
+    @apply opacity-100;
+    width: 41px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebarSlotAnimated,
+  .sidebarSlotAnimated > .sidebarClip,
+  .sidebarSlotAnimated .dockToggle {
+    transition: none;
+  }
+}
+
+button.sidebarToggle {
+  @apply hidden w-[34px] shrink-0 justify-center px-0 lg:inline-flex;
+}
+
+.dockFallback {
+  @apply absolute top-4 right-4 z-[100] flex items-center gap-[7px];
+}
+
+.sidebarToggleIcon {
+  @apply h-4 w-4;
+}
+
+.edgePulse {
+  @apply pointer-events-none absolute top-0 bottom-0 z-[1];
+  width: calc((100% - var(--sw-card-w)) / 2 + 3rem);
+  opacity: 0;
+  animation: edgePulse 0.55s ease-out;
+}
+
+.edgePulseLike {
+  @apply right-0;
+  background: linear-gradient(
+    to left,
+    rgba(52, 211, 153, 0.28),
+    rgba(52, 211, 153, 0.08) 55%,
+    transparent
+  );
+}
+
+.edgePulseSkip {
+  @apply left-0;
+  background: linear-gradient(
+    to right,
+    rgba(251, 113, 133, 0.28),
+    rgba(251, 113, 133, 0.08) 55%,
+    transparent
+  );
+}
+
+@keyframes edgePulse {
+  0% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edgePulse {
+    animation-duration: 0.01s;
+  }
 }
 
 .skipRail,
@@ -185,7 +306,15 @@ button.chromeChip:disabled {
 }
 
 .nextCard {
-  @apply pointer-events-none absolute inset-0 z-0 origin-bottom scale-[0.955] translate-y-3.5 overflow-hidden rounded-2xl bg-sw-surface shadow-[0_16px_48px_rgba(0,0,0,0.6)];
+  @apply pointer-events-none absolute inset-0 z-0 origin-bottom overflow-hidden rounded-2xl bg-sw-surface;
+  transition:
+    scale 0.22s ease-out,
+    translate 0.22s ease-out;
+}
+
+.ghostLayer {
+  @apply pointer-events-none absolute inset-0 z-[3];
+  will-change: transform, opacity;
 }
 
 .swipeLayer {
@@ -194,7 +323,13 @@ button.chromeChip:disabled {
 }
 
 .swipeSettle {
-  transition: transform 0.22s ease-out;
+  transition:
+    transform 0.22s ease-out,
+    opacity 0.22s ease-in;
+}
+
+.preloadCard {
+  @apply pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-2xl opacity-0;
 }
 
 .swipeInstant {
@@ -229,6 +364,25 @@ button.chromeChip:disabled {
 
 .stampLike {
   @apply right-5 rotate-12 border-sw-like text-sw-like;
+}
+
+.deckAreaIgnore {
+  --sw-card-h: min(
+    var(--sw-card-max-h),
+    calc(100dvh - var(--sw-swipe-chrome) - 3.5rem)
+  );
+}
+
+.ignoreButton {
+  @apply absolute left-1/2 top-full z-[1] mt-5 inline-flex h-[30px] -translate-x-1/2 cursor-pointer items-center gap-[7px] rounded-[7px] border-0 bg-transparent px-[9px] font-body text-[10px] whitespace-nowrap text-white/30 transition-colors duration-150;
+}
+
+.ignoreButton:hover {
+  @apply bg-sw-dislike/[0.06] text-sw-dislike/80;
+}
+
+.ignoreIcon {
+  @apply h-3.5 w-3.5;
 }
 
 .stampSkip {

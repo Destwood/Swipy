@@ -8,6 +8,10 @@
   @apply relative flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-6;
 }
 
+.cardArea {
+  @apply flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-6;
+}
+
 .chrome {
   @apply mb-4 flex w-full max-w-[min(360px,92vw)] items-center justify-between gap-3;
 }

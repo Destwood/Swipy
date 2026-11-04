@@ -1,0 +1,178 @@
+@reference "../globals.css";
+
+.root {
+  @apply sticky top-0 z-[5] flex flex-col bg-sw-bg;
+  margin-inline: calc(-1 * var(--sw-page-pad-x, 0px));
+  padding-inline: var(--sw-page-pad-x, 0px);
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.root button:focus-visible,
+.root input:focus-visible {
+  outline: 2px solid var(--color-sw-accent);
+  outline-offset: 2px;
+}
+
+.header {
+  @apply flex items-center gap-3;
+}
+
+.search {
+  @apply relative min-w-0 flex-1;
+}
+
+.searchRow {
+  @apply relative flex items-center;
+}
+
+.searchIcon {
+  @apply pointer-events-none absolute left-4 h-[18px] w-[18px] text-white/40;
+}
+
+.input {
+  @apply h-12 min-w-0 flex-1 rounded-xl border border-white/[0.08] bg-sw-surface pr-11 pl-12 font-body text-[15px] text-sw-text outline-none transition-colors placeholder:text-white/30 focus:border-sw-accent/40;
+}
+
+.clear {
+  @apply absolute right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-white/40 transition-colors hover:text-sw-text;
+}
+
+.clearIcon {
+  @apply h-3 w-3;
+}
+
+.suggestions {
+  @apply absolute top-[calc(100%+6px)] right-0 left-0 z-40 m-0 max-h-72 w-full list-none overflow-y-auto rounded-xl border border-white/10 bg-sw-surface p-1 shadow-[0_16px_40px_rgba(0,0,0,0.55)];
+}
+
+.option {
+  @apply flex w-full cursor-pointer items-baseline justify-between gap-3 rounded-lg border-0 bg-transparent px-3 py-2 text-left transition-colors hover:bg-white/[0.06];
+}
+
+.optionActive {
+  @apply bg-white/[0.08];
+}
+
+.optionTitle {
+  @apply min-w-0 truncate font-body text-sm text-sw-text;
+}
+
+.optionMeta {
+  @apply shrink-0 font-mono text-[11px] text-white/60;
+}
+
+.hint {
+  @apply px-3 py-2 font-body text-sm text-white/60;
+}
+
+.sortWrap {
+  @apply relative shrink-0;
+}
+
+.iconButton,
+.filtersButton {
+  @apply flex h-12 cursor-pointer items-center justify-center rounded-xl border border-white/[0.08] bg-sw-surface font-body text-[15px] text-sw-text/85 transition-colors hover:border-white/15 hover:text-sw-text;
+}
+
+.iconButton {
+  @apply w-12;
+}
+
+.buttonActive {
+  @apply border-sw-accent/35 text-sw-accent;
+}
+
+.filtersButton {
+  @apply shrink-0 gap-2 px-4 sm:px-5;
+}
+
+.buttonIcon {
+  @apply h-5 w-5 shrink-0;
+}
+
+.filtersLabel {
+  @apply hidden sm:inline;
+}
+
+.filtersCount {
+  @apply inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-sw-accent px-1.5 font-mono text-[11px] leading-none font-semibold text-sw-bg;
+}
+
+.sortMenu {
+  @apply absolute top-[calc(100%+6px)] right-0 z-40 m-0 w-40 list-none rounded-xl border border-white/10 bg-sw-surface p-1 shadow-[0_16px_40px_rgba(0,0,0,0.55)];
+}
+
+.sortOption {
+  @apply w-full cursor-pointer rounded-lg border-0 bg-transparent px-3 py-2 text-left font-body text-sm text-sw-text/80 transition-colors hover:bg-white/[0.06] hover:text-sw-text;
+}
+
+.sortOptionActive {
+  @apply font-semibold text-sw-accent;
+}
+
+.filtersWrap {
+  @apply relative shrink-0;
+}
+
+.backdrop {
+  @apply fixed inset-0 z-[60] bg-black/55;
+}
+
+.drawer {
+  @apply fixed inset-y-0 right-0 z-[61] flex w-full flex-col overflow-hidden border-l border-white/10 bg-sw-surface shadow-[-16px_0_48px_rgba(0,0,0,0.5)] sm:w-[400px];
+  animation: drawer-in 180ms ease-out;
+}
+
+.drawer:focus-visible {
+  outline: none;
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer {
+    animation: none;
+  }
+}
+
+.chipRow {
+  @apply mt-3 flex items-center gap-2 overflow-x-auto pb-0.5;
+  scrollbar-width: none;
+}
+
+.chipRow::-webkit-scrollbar {
+  display: none;
+}
+
+.baseChip,
+.activeChip {
+  @apply inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 font-body text-[13px] whitespace-nowrap;
+}
+
+.baseChip {
+  @apply border-white/10 bg-white/[0.04] text-sw-text/80;
+}
+
+.activeChip {
+  @apply border-[rgba(45,212,191,0.35)] bg-sw-accent-d pr-1.5 font-semibold text-sw-accent;
+}
+
+.activeChipRemove {
+  @apply flex h-5 w-5 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-sw-accent transition-colors hover:bg-white/10;
+}
+
+.activeChipIcon {
+  @apply h-2.5 w-2.5;
+}
+

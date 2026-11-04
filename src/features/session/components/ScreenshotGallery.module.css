@@ -1,7 +1,7 @@
 @reference "../../../app/globals.css";
 
 .root {
-  @apply fixed inset-0 z-[80] flex items-center justify-center bg-black/82 p-4;
+  @apply fixed inset-0 z-[200] flex items-center justify-center bg-black/82 p-4;
 }
 
 .close {

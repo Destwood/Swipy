@@ -81,7 +81,3 @@
 .buy.free {
   @apply text-xl font-black;
 }
-
-.original {
-  @apply text-sm text-white/35 line-through tabular-nums;
-}

@@ -1,0 +1,101 @@
+@reference "../globals.css";
+
+.root {
+  @apply flex flex-col gap-1;
+}
+
+.disabled {
+  @apply opacity-40;
+}
+
+.head {
+  @apply flex items-baseline justify-between gap-3;
+}
+
+.title {
+  @apply font-mono text-[11px] tracking-[0.08em] text-white/60 uppercase;
+}
+
+.value {
+  @apply font-mono text-xs text-sw-accent;
+}
+
+.control {
+  @apply relative h-8 w-full;
+}
+
+.track,
+.fill {
+  @apply pointer-events-none absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full;
+}
+
+.track {
+  @apply inset-x-0 bg-white/10;
+}
+
+.fill {
+  @apply bg-sw-accent;
+}
+
+.input {
+  @apply pointer-events-none absolute inset-0 m-0 h-full w-full appearance-none bg-transparent p-0;
+}
+
+.input::-webkit-slider-runnable-track {
+  @apply h-8 bg-transparent;
+}
+
+.input::-moz-range-track {
+  @apply h-8 bg-transparent;
+}
+
+.input::-webkit-slider-thumb {
+  @apply pointer-events-auto h-5 w-5 cursor-grab appearance-none rounded-full border-2 border-sw-accent bg-sw-text shadow-[0_2px_6px_rgba(0,0,0,0.5)] transition-transform;
+  margin-top: 0.375rem;
+}
+
+.input::-moz-range-thumb {
+  @apply pointer-events-auto box-border h-5 w-5 cursor-grab rounded-full border-2 border-sw-accent bg-sw-text shadow-[0_2px_6px_rgba(0,0,0,0.5)] transition-transform;
+}
+
+.input:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+
+.input:hover::-moz-range-thumb {
+  transform: scale(1.1);
+}
+
+.input:active::-webkit-slider-thumb {
+  @apply cursor-grabbing;
+  transform: scale(1.18);
+}
+
+.input:active::-moz-range-thumb {
+  @apply cursor-grabbing;
+  transform: scale(1.18);
+}
+
+.input:disabled::-webkit-slider-thumb {
+  @apply cursor-not-allowed;
+  transform: none;
+}
+
+.input:disabled::-moz-range-thumb {
+  @apply cursor-not-allowed;
+  transform: none;
+}
+
+.input:focus-visible {
+  outline: none;
+}
+
+.input:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-sw-accent);
+  outline-offset: 2px;
+}
+
+.input:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--color-sw-accent);
+  outline-offset: 2px;
+}

@@ -1,4 +1,7 @@
-import type { CatalogFilterState } from "@/features/games/lib/catalog-filters";
+import {
+  setExtraFilterParams,
+  type CatalogFilterState,
+} from "@/features/games/lib/catalog-filters";
 import type { SortValue } from "@/features/games/lib/sort-games";
 
 export const CATALOG_PAGE_SIZE = 24;
@@ -19,7 +22,8 @@ export function catalogSearchParams(input: {
   if (input.filters.genre !== "All") params.set("genre", input.filters.genre);
   if (input.filters.mode !== "All") params.set("mode", input.filters.mode);
   if (input.filters.players !== "All") params.set("players", input.filters.players);
-  if (input.filters.platform !== "All") params.set("platform", input.filters.platform);
+  params.set("platform", input.filters.platform);
   if (input.filters.crossplayOnly) params.set("crossplay", "1");
+  setExtraFilterParams(params, input.filters);
   return params;
 }

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Game } from "@/features/games/data/games";
-import { CATALOG_PAGE_SIZE } from "@/features/games/lib/catalog-query";
 import {
   ensureGamesInLibrary,
   upsertGames,
@@ -21,12 +20,17 @@ import {
   infiniteFilterSearchParams,
   readInfiniteFilters,
   subscribeInfiniteFilters,
+  writeInfiniteFilters,
   type InfiniteFilterState,
 } from "@/features/session/lib/infinite-filters";
 import {
   patchInfiniteSession,
   readInfiniteSession,
 } from "@/features/session/lib/infinite-session";
+import { readSeenSkipSet } from "@/features/session/lib/seen-games";
+
+export const INFINITE_PAGE_SIZE = 20;
+export const INFINITE_PREFETCH_REMAINING = 10;
 
 type CatalogResponse = {
   results?: Game[];
@@ -39,13 +43,27 @@ function filterGames(
   infinite: InfiniteFilterState,
   ignore: IgnoreList,
   banned: Set<string>,
+  frozen: Set<string>,
+  skip: Set<string>,
 ) {
   return games.filter(
     (game) =>
       !banned.has(game.id) &&
       !gameIsIgnored(game, ignore) &&
-      gameMatchesInfiniteFilters(game, infinite),
+      (frozen.has(game.id) ||
+        (!skip.has(game.id) && gameMatchesInfiniteFilters(game, infinite))),
   );
+}
+
+function readSkipIds(filters: InfiniteFilterState): Set<string> {
+  if (!filters.skipSeen) return new Set();
+  return readSeenSkipSet(readInfiniteSession()?.id ?? "");
+}
+
+function readFrozenIds(): Set<string> {
+  const saved = readInfiniteSession();
+  if (!saved) return new Set();
+  return new Set(saved.loadedGameIds.slice(0, saved.frozenCount ?? 0));
 }
 
 export function useInfiniteGames(bannedIds: string[]) {
@@ -54,6 +72,12 @@ export function useInfiniteGames(bannedIds: string[]) {
   );
   const [ignore, setIgnore] = useState<IgnoreList>(() =>
     typeof window !== "undefined" ? readIgnoreList() : EMPTY_IGNORE_LIST,
+  );
+  const [frozen, setFrozen] = useState<Set<string>>(() =>
+    typeof window !== "undefined" ? readFrozenIds() : new Set(),
+  );
+  const [skipIds, setSkipIds] = useState<Set<string>>(() =>
+    typeof window !== "undefined" ? readSkipIds(readInfiniteFilters()) : new Set(),
   );
   const [rawGames, setRawGames] = useState<Game[]>([]);
   const [page, setPage] = useState(1);
@@ -80,10 +104,13 @@ export function useInfiniteGames(bannedIds: string[]) {
     filters,
     ignore,
     new Set(bannedIds),
+    frozen,
+    skipIds,
   );
 
   useEffect(() => {
     const controller = new AbortController();
+    setSkipIds(readSkipIds(filters));
     setRawGames([]);
     setPage(1);
     setHasMore(true);
@@ -117,6 +144,9 @@ export function useInfiniteGames(bannedIds: string[]) {
             .map((id) => byId.get(id))
             .filter((game): game is Game => Boolean(game));
           if (!controller.signal.aborted && ordered.length > 0) {
+            setFrozen(
+              new Set(restoreIds.slice(0, saved.frozenCount ?? 0)),
+            );
             setRawGames(ordered);
             setPage(saved.catalogPage ?? 1);
             setHasMore(saved.catalogHasMore ?? true);
@@ -132,7 +162,7 @@ export function useInfiniteGames(bannedIds: string[]) {
         const params = infiniteFilterSearchParams(
           filters,
           1,
-          CATALOG_PAGE_SIZE,
+          INFINITE_PAGE_SIZE,
         );
         const res = await fetch(`/api/games?${params.toString()}`, {
           signal: controller.signal,
@@ -146,6 +176,7 @@ export function useInfiniteGames(bannedIds: string[]) {
         }
         const results = data.results ?? [];
         upsertGames(results);
+        setFrozen(new Set());
         setRawGames(results);
         setHasMore(Boolean(data.next));
         patchInfiniteSession({
@@ -176,7 +207,7 @@ export function useInfiniteGames(bannedIds: string[]) {
         const params = infiniteFilterSearchParams(
           filters,
           nextPage,
-          CATALOG_PAGE_SIZE,
+          INFINITE_PAGE_SIZE,
         );
         const res = await fetch(`/api/games?${params.toString()}`);
         const data = (await res.json()) as CatalogResponse;
@@ -206,9 +237,21 @@ export function useInfiniteGames(bannedIds: string[]) {
     })();
   }, [filters, page, hasMore, loading]);
 
+  const applyFilters = useCallback(
+    (next: InfiniteFilterState, seenIds: string[]) => {
+      setFrozen(new Set(seenIds));
+      setSkipIds(readSkipIds(next));
+      setRawGames([]);
+      setLoading(true);
+      writeInfiniteFilters(next);
+    },
+    [],
+  );
+
   return {
     games,
     filters,
+    applyFilters,
     loading,
     loadingMore,
     error,

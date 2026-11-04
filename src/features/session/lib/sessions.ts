@@ -205,8 +205,9 @@ export async function fetchSession(sessionId: string): Promise<DbSession> {
     .from("sessions")
     .select()
     .eq("id", sessionId)
-    .single();
-  if (error || !data) throw new Error(error?.message ?? "Session not found");
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Session not found");
   return data;
 }
 

@@ -1,11 +1,15 @@
 @reference "../../../app/globals.css";
 
 .root {
-  @apply absolute inset-0 overflow-hidden rounded-2xl bg-sw-surface shadow-[0_32px_80px_rgba(0,0,0,0.75),0_0_0_1px_rgba(255,255,255,0.06)];
+  @apply absolute inset-0 overflow-hidden rounded-2xl bg-sw-surface shadow-[0_0_0_1px_rgba(255,255,255,0.06)];
 }
 
 .dimmed {
   @apply opacity-60;
+}
+
+.skeleton {
+  @apply pointer-events-none absolute inset-0 bg-white/[0.04];
 }
 
 .cover {
@@ -30,7 +34,11 @@
 }
 
 .genreRow {
-  @apply mb-2 flex min-h-[1.25rem] items-center gap-2;
+  @apply mb-2 flex min-h-[1.25rem] items-center justify-between gap-2;
+}
+
+.genreTags {
+  @apply flex min-w-0 items-center gap-2;
 }
 
 .title {

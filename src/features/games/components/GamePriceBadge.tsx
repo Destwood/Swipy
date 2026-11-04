@@ -29,9 +29,6 @@ export function GamePriceBadge({
         <span data-price-badge className={styles.buy}>
           <span className={styles.buyDiscount}>−{price.discountPercent}%</span>
           <span className={styles.buyAmount}>{price.formatted}</span>
-          {price.originalFormatted ? (
-            <span className={styles.original}>{price.originalFormatted}</span>
-          ) : null}
         </span>
       );
     }

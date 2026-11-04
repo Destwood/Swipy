@@ -1,4 +1,8 @@
-import type { CatalogFilterState } from "@/features/games/lib/catalog-filters";
+import {
+  DEFAULT_PLATFORM,
+  parseExtraFilters,
+  type CatalogFilterState,
+} from "@/features/games/lib/catalog-filters";
 import type { InfiniteFilterState } from "@/features/session/lib/infinite-filters";
 import type { SortValue } from "@/features/games/lib/sort-games";
 
@@ -84,8 +88,9 @@ export function parseCatalogFilters(
     genre: searchParams.get("genre") || "All",
     mode: searchParams.get("mode") || "All",
     players: searchParams.get("players") || "All",
-    platform: searchParams.get("platform") || "All",
+    platform: searchParams.get("platform") || DEFAULT_PLATFORM,
     crossplayOnly: searchParams.get("crossplay") === "1",
+    ...parseExtraFilters(searchParams),
   };
 }
 
@@ -120,6 +125,8 @@ export function parseInfiniteFilterParams(
     mode,
     players,
     crossplayOnly: searchParams.get("crossplay") === "1",
+    skipSeen: false,
+    extra: parseExtraFilters(searchParams),
   };
 }
 
@@ -209,27 +216,43 @@ function whereClauses(
   return clauses;
 }
 
+export type CatalogSearchField = "name" | "developer" | "summary";
+
+export const CATALOG_SEARCH_FIELDS: CatalogSearchField[] = [
+  "name",
+  "developer",
+  "summary",
+];
+
+function searchClause(field: CatalogSearchField, q: string): string {
+  if (field === "developer") return `involved_companies.company.name ~ *"${q}"*`;
+  if (field === "summary") return `summary ~ *"${q}"*`;
+  // Prefer prefix match so short autocomplete ("Por") hits Portal, not "Sports".
+  return q.includes(" ") ? `name ~ *"${q}"*` : `name ~ "${q}"*`;
+}
+
+export function cleanCatalogQuery(q: string): string {
+  return q.replace(/["\\*]/g, "").trim();
+}
+
 export function buildIgdbCatalogQuery(input: {
   q: string;
   page: number;
   pageSize: number;
   filters: CatalogFilterState;
   sort: SortValue;
+  field?: CatalogSearchField;
 }): string {
   const offset = (input.page - 1) * input.pageSize;
   const limit = `limit ${input.pageSize}; offset ${offset};`;
   // IGDB `search "..."` is poor for short prefixes (e.g. "Por" → 0 hits).
   // `name ~ *"por"*` does case-insensitive contains and works for autocomplete.
-  const q = input.q.replace(/["\\*]/g, "").trim();
+  const q = cleanCatalogQuery(input.q);
 
   if (q) {
-    // Prefer prefix match so short autocomplete ("Por") hits Portal, not "Sports".
-    const nameClause = q.includes(" ")
-      ? `name ~ *"${q}"*`
-      : `name ~ "${q}"*`;
     const where = `where ${[
       ...whereClauses(input.filters, { searching: true }),
-      nameClause,
+      searchClause(input.field ?? "name", q),
     ].join(" & ")};`;
     return `${GAME_FIELDS} ${where} ${SORT_CLAUSE[input.sort]} ${limit}`;
   }

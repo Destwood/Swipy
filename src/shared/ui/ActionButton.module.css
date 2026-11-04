@@ -56,30 +56,70 @@
   opacity: 1;
 }
 
+.stack {
+  @apply pointer-events-none relative z-[1] flex flex-col items-center gap-[7px];
+}
+
+.label {
+  @apply hidden items-center gap-[5px] font-body text-[10px] font-medium sm:flex;
+}
+
+.labelLike {
+  @apply text-sw-like/70;
+}
+
+.labelSkip {
+  @apply text-sw-dislike/70;
+}
+
 .face {
-  @apply pointer-events-none relative z-[1] flex shrink-0 items-center justify-center rounded-full border-[1.5px] transition-all duration-[180ms] ease-out;
+  @apply flex shrink-0 items-center justify-center rounded-full border-[1.5px] border-current bg-white/[0.025] transition-all duration-200 ease-out;
   width: var(--sw-action);
   height: var(--sw-action);
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .like {
-  @apply border-[rgba(52,211,153,0.28)] bg-[rgba(52,211,153,0.1)] text-sw-like;
-}
-
-.hitLike:hover .like {
-  @apply border-[rgba(52,211,153,0.5)] bg-[rgba(52,211,153,0.2)] shadow-[0_0_28px_rgba(52,211,153,0.18)];
+  @apply text-sw-like/70;
 }
 
 .dislike {
-  @apply border-[rgba(251,113,133,0.28)] bg-[rgba(251,113,133,0.1)] text-sw-dislike;
+  @apply text-sw-dislike/70;
 }
 
-.hitSkip:hover .dislike {
-  @apply border-[rgba(251,113,133,0.5)] bg-[rgba(251,113,133,0.2)] shadow-[0_0_28px_rgba(251,113,133,0.18)];
+.hit:hover .face,
+.active .face {
+  @apply scale-[1.04] text-white;
+}
+
+.hitLike:hover .like,
+.active .like {
+  @apply border-sw-like bg-sw-like/[0.13] shadow-[0_0_20px_rgba(52,211,153,0.1)];
+}
+
+.hitSkip:hover .dislike,
+.active .dislike {
+  @apply border-sw-dislike bg-sw-dislike/[0.13] shadow-[0_0_20px_rgba(251,113,133,0.1)];
 }
 
 .icon {
-  @apply block;
-  width: 34%;
-  height: 34%;
+  @apply block overflow-visible;
+  width: 40%;
+  height: 40%;
+  fill: none;
+  shape-rendering: geometricPrecision;
+}
+
+.icon path {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.like .icon path {
+  stroke-width: 2;
+}
+
+.dislike .icon path {
+  stroke-width: 2;
 }

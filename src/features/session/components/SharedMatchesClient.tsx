@@ -64,7 +64,7 @@ export function SharedMatchesClient() {
       const missing = decoded.ids.filter((id) => !getLibraryGameById(id));
       const igdbIds = missing
         .map((id) => id.replace(/^igdb-/, ""))
-        .filter((id) => /^\d+$/.test(id));
+        .filter((id) => /^(steam-)?\d+$/.test(id));
       if (igdbIds.length > 0) {
         try {
           const res = await fetch(

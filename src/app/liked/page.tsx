@@ -70,7 +70,7 @@ export default function LikedPage() {
 
       <div className={styles.content}>
         <div className={styles.inner}>
-          <PageBackLink href="/decks">← Decks</PageBackLink>
+          <PageBackLink href="/">← Home</PageBackLink>
           <div className={styles.header}>
             <h1 className={styles.title}>Favorites</h1>
             <span className={styles.count}>

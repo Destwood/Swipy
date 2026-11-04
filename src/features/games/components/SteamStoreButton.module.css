@@ -46,3 +46,7 @@
 .md .icon {
   @apply h-5 w-5 text-white;
 }
+
+.external {
+  @apply ml-auto h-3.5 w-3.5 shrink-0 text-white/45;
+}

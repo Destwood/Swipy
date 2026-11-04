@@ -16,6 +16,27 @@ How to use:
 
 Full **Steam account linking**, library sync, and deeper store integration — building on the Steam prices / Open in Steam work in 0.4.x.
 
+## [0.5.0] - 2026-11-04
+
+Swipe screen, infinite mode filters and library overhaul.
+
+### Added
+
+- **Game details sidebar** on the swipe screen with three states (full, compact with wider screenshots, hidden), smooth transitions, and a title row with the collapse toggle; favorite sits next to the studio and year; **Matches** is docked to the sidebar edge and moves with it
+- **Infinite mode filters** reworked into accordions: platforms, play, genres, mood, price and sale, reviews and Steam Deck, release period (last month and upcoming together, **All time**, year range) and **Has demo**
+- **Change games** from the top-left chip in infinite mode: new filters apply to upcoming games while swiped ones are kept
+- **Skip recently viewed** switch in the Infinite mode dialog: hides games from your earlier runs of the last 30 days
+- **Library** filters panel with price, review and release ranges, sort and active filter chips; ignored games page under the account
+
+### Changed
+
+- **Start swiping** always begins a new infinite run; the previous run is saved to history for signed-in users
+- Card art for Steam games uses sharper portrait art; like and skip buttons are smoother
+- Steam button in the sidebar keeps a fixed width and shows only the discounted price when a sale is active
+- Gallery viewer now opens above all page controls
+- Swipe counters above the card were removed
+- Filter changes in infinite mode keep the page and show a skeleton only in the deck area
+
 ## [0.4.2] - 2026-09-06
 
 Hotfix: infinite-mode filters for co-op and player count.

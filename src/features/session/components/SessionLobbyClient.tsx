@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
 import { MemberRow } from "@/features/session/components/MemberRow";
 import { SessionCodeCopy } from "@/features/session/components/SessionCodeCopy";
+import { SessionGamesDialog } from "@/features/session/components/SessionGamesDialog";
 import type { SessionMember } from "@/features/session/data/session";
 import { getDeckById, setActiveDeckId } from "@/features/decks/lib/deck-store";
 import {
@@ -70,6 +71,8 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
   const router = useRouter();
   const code = normalizeCode(rawCode);
   const [deckLabel, setDeckLabel] = useState("…");
+  const [deckName, setDeckName] = useState("Deck");
+  const [gamesOpen, setGamesOpen] = useState(false);
   const [members, setMembers] = useState<SessionMember[]>([]);
   const [isHost, setIsHost] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -122,6 +125,7 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
     ]);
 
     const deck = await getDeckById(freshSession.deck_id);
+    setDeckName(deck?.name ?? (freshSession.deck_name || "Deck"));
     setDeckLabel(
       deck
         ? `${deck.name} · ${deck.gameIds.length} games`
@@ -129,12 +133,21 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
     );
     setMembers(dbMembers.map(toUiMember));
     setLoading(false);
+    setSessionStatus(freshSession.status);
+  }, [code]);
 
-    if (freshSession.status === "swiping" && !navigatedToDeck.current) {
-      navigatedToDeck.current = true;
-      router.push("/session/deck");
+  useEffect(() => {
+    if (
+      needsJoin ||
+      gamesOpen ||
+      sessionStatus !== "swiping" ||
+      navigatedToDeck.current
+    ) {
+      return;
     }
-  }, [code, router]);
+    navigatedToDeck.current = true;
+    router.push("/session/deck");
+  }, [needsJoin, gamesOpen, sessionStatus, router]);
 
   useEffect(() => {
     let cancelled = false;
@@ -235,6 +248,15 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
               </h1>
               <p className={styles.deckLabel}>
                 Deck: <span className={styles.deckName}>{deckLabel}</span>
+                {!needsJoin && !loading ? (
+                  <button
+                    type="button"
+                    className={styles.viewGames}
+                    onClick={() => setGamesOpen(true)}
+                  >
+                    View games
+                  </button>
+                ) : null}
               </p>
             </div>
             {!needsJoin ? (
@@ -292,28 +314,30 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
             </div>
           ) : (
             <>
-              <section className={styles.invite} aria-label="Invite">
-                <div className={styles.inviteCopy}>
-                  <p className={styles.inviteTitle}>Invite friends</p>
-              <p className={styles.inviteText}>
-                Share the code or link while everyone joins.
-              </p>
-                </div>
-                <SessionCodeCopy
-                  code={code}
-                  copyValue={inviteUrl}
-                  label="Session code"
-                  hint="Click to copy lobby link"
-                  align="start"
-                  className={styles.inviteCode}
-                />
-              </section>
+              <div className={styles.layout}>
+                <ul className={styles.memberList}>
+                  {members.map((member) => (
+                    <MemberRow key={member.id} member={member} />
+                  ))}
+                </ul>
 
-              <ul className={styles.memberList}>
-                {members.map((member) => (
-                  <MemberRow key={member.id} member={member} />
-                ))}
-              </ul>
+                <section className={styles.invite} aria-label="Invite">
+                  <div className={styles.inviteCopy}>
+                    <p className={styles.inviteTitle}>Invite friends</p>
+                    <p className={styles.inviteText}>
+                      Share the code or link while everyone joins.
+                    </p>
+                  </div>
+                  <SessionCodeCopy
+                    code={code}
+                    copyValue={inviteUrl}
+                    label="Session code"
+                    hint="Click to copy lobby link"
+                    align="start"
+                    className={styles.inviteCode}
+                  />
+                </section>
+              </div>
 
               <div className={styles.actions}>
                 {isHost ? (
@@ -327,7 +351,9 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
                   </Button>
                 ) : (
                   <p className={styles.waitingText}>
-                    Waiting for host to start…
+                    {sessionStatus === "swiping"
+                      ? "Session started"
+                      : "Waiting for host to start…"}
                   </p>
                 )}
               </div>
@@ -335,6 +361,14 @@ export function SessionLobbyClient({ code: rawCode }: Props) {
           )}
         </div>
       </div>
+
+      <SessionGamesDialog
+        open={gamesOpen}
+        sessionId={sessionId}
+        deckName={deckName}
+        started={sessionStatus === "swiping"}
+        onClose={() => setGamesOpen(false)}
+      />
     </div>
   );
 }

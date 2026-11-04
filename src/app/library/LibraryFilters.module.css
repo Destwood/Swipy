@@ -1,0 +1,121 @@
+@reference "../globals.css";
+
+.panel {
+  @apply flex h-full min-h-0 flex-col;
+}
+
+.panel button:focus-visible {
+  outline: 2px solid var(--color-sw-accent);
+  outline-offset: 2px;
+}
+
+.header {
+  @apply flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.06] px-5 py-4;
+}
+
+.title {
+  @apply font-display text-base font-bold tracking-[-0.02em] text-sw-text;
+}
+
+.headerActions {
+  @apply flex items-center gap-1;
+}
+
+.textButton {
+  @apply inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2.5 py-1 font-body text-sm text-white/70 transition-colors hover:bg-white/[0.06] hover:text-sw-text;
+}
+
+.pinned {
+  @apply bg-sw-accent-d text-sw-accent hover:bg-sw-accent-d hover:text-sw-accent;
+}
+
+.pinIcon {
+  @apply h-4 w-4;
+}
+
+.closeButton {
+  @apply flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-white/70 transition-colors hover:bg-white/[0.06] hover:text-sw-text;
+}
+
+.closeIcon {
+  @apply h-3.5 w-3.5;
+}
+
+.scroll {
+  @apply flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-5 py-5;
+}
+
+.footer {
+  @apply shrink-0 border-t border-white/[0.06] p-4;
+}
+
+.doneButton {
+  @apply h-11 w-full cursor-pointer rounded-xl border-0 bg-sw-accent font-body text-sm font-semibold text-sw-bg transition-colors hover:bg-sw-like;
+}
+
+.section {
+  @apply flex shrink-0 flex-col gap-2;
+}
+
+.sectionLabel {
+  @apply font-mono text-[11px] tracking-[0.08em] text-white/60 uppercase;
+}
+
+.segmented {
+  @apply flex w-full gap-1 rounded-xl border border-white/[0.06] bg-sw-bg/60 p-1;
+}
+
+.segment {
+  @apply min-h-9 min-w-0 flex-1 cursor-pointer truncate rounded-lg border-0 bg-transparent px-1 py-2 font-body text-xs text-white/55 transition-colors hover:text-sw-text sm:px-2 sm:text-[13px];
+}
+
+.segmentActive {
+  @apply bg-sw-accent-d font-semibold text-sw-accent;
+}
+
+.switchRow {
+  @apply flex w-full shrink-0 cursor-pointer items-center justify-between gap-4 rounded-xl border border-white/[0.06] bg-sw-bg/60 px-3.5 py-3 text-left transition-colors hover:border-white/15;
+}
+
+.switchText {
+  @apply flex min-w-0 flex-col gap-0.5;
+}
+
+.switchTitle {
+  @apply font-body text-sm text-sw-text;
+}
+
+.switchHint {
+  @apply font-body text-xs text-white/60;
+}
+
+.switchTrack {
+  @apply relative h-6 w-10 shrink-0 rounded-full bg-white/[0.12] transition-colors;
+}
+
+.switchTrackOn {
+  @apply bg-sw-accent;
+}
+
+.switchThumb {
+  @apply absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform;
+}
+
+.switchTrackOn .switchThumb {
+  transform: translateX(16px);
+}
+
+.chips {
+  @apply flex flex-wrap gap-1.5;
+}
+
+.platformNote {
+  @apply m-0 font-body text-xs text-white/60;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switchThumb,
+  .switchTrack {
+    transition: none;
+  }
+}

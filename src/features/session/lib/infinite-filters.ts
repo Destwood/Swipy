@@ -1,5 +1,17 @@
 import type { Game } from "@/features/games/data/games";
-import { CATALOG_FILTER_OPTIONS } from "@/features/games/lib/catalog-filters";
+import {
+  CATALOG_FILTER_OPTIONS,
+  DEFAULT_PLATFORM,
+  EMPTY_EXTRA_FILTERS,
+  extraFiltersActive,
+  isPriceRangeActive,
+  isSteamPlatforms,
+  parseExtraFilters,
+  priceRangeLabel,
+  setExtraFilterParams,
+  yearRangeLabel,
+  type ExtraFilters,
+} from "@/features/games/lib/catalog-filters";
 import { IGNORE_GENRE_OPTIONS } from "@/features/games/lib/ignore-list";
 import { gameHasGenre } from "@/features/games/lib/genre-label";
 
@@ -9,16 +21,20 @@ export type InfiniteFilterState = {
   mode: string;
   players: string;
   crossplayOnly: boolean;
+  skipSeen: boolean;
+  extra: ExtraFilters;
 };
 
 export const INFINITE_GENRE_OPTIONS = IGNORE_GENRE_OPTIONS;
 
 export const EMPTY_INFINITE_FILTERS: InfiniteFilterState = {
   genres: [],
-  platforms: [],
+  platforms: [DEFAULT_PLATFORM],
   mode: "All",
   players: "All",
   crossplayOnly: false,
+  skipSeen: false,
+  extra: EMPTY_EXTRA_FILTERS,
 };
 
 const STORAGE_KEY = "swipy.infiniteFilters";
@@ -31,6 +47,24 @@ function matchesPlayers(game: Game, players: string): boolean {
   if (players === "3–4") return max >= 3 && max <= 4;
   if (players === "5+") return max >= 5;
   return true;
+}
+
+function parseExtra(value: unknown): ExtraFilters {
+  if (!value || typeof value !== "object") return EMPTY_EXTRA_FILTERS;
+  const params = new URLSearchParams();
+  setExtraFilterParams(params, {
+    ...EMPTY_EXTRA_FILTERS,
+    ...(value as Partial<ExtraFilters>),
+  });
+  return parseExtraFilters(params);
+}
+
+export function normalizeInfiniteFilters(
+  filters: InfiniteFilterState,
+): InfiniteFilterState {
+  return isSteamPlatforms(filters.platforms)
+    ? filters
+    : { ...filters, extra: EMPTY_EXTRA_FILTERS };
 }
 
 function parse(raw: string | null): InfiniteFilterState {
@@ -59,6 +93,8 @@ function parse(raw: string | null): InfiniteFilterState {
       mode,
       players,
       crossplayOnly: parsed.crossplayOnly === true,
+      skipSeen: parsed.skipSeen === true,
+      extra: parseExtra(parsed.extra),
     };
   } catch {
     return EMPTY_INFINITE_FILTERS;
@@ -107,10 +143,12 @@ export function sortActiveFirst<T extends string>(
 export function infiniteFiltersActive(filters: InfiniteFilterState): boolean {
   return (
     filters.genres.length > 0 ||
-    filters.platforms.length > 0 ||
+    !isSteamPlatforms(filters.platforms) ||
     filters.mode !== "All" ||
     filters.players !== "All" ||
-    filters.crossplayOnly
+    filters.crossplayOnly ||
+    filters.skipSeen ||
+    extraFiltersActive(filters.extra)
   );
 }
 
@@ -142,13 +180,56 @@ export function gameMatchesInfiniteFilters(
 }
 
 export function filtersToKey(filters: InfiniteFilterState): string {
+  const extra = new URLSearchParams();
+  setExtraFilterParams(extra, {
+    ...filters.extra,
+    multi: [...filters.extra.multi].sort(),
+    vibe: [...filters.extra.vibe].sort(),
+  });
+  extra.sort();
   return JSON.stringify({
     g: [...filters.genres].sort(),
     p: [...filters.platforms].sort(),
     m: filters.mode,
     n: filters.players,
     c: filters.crossplayOnly,
+    k: filters.skipSeen,
+    x: extra.toString(),
   });
+}
+
+function optionLabel(
+  options: readonly { value: string; label: string }[],
+  value: string,
+): string {
+  return options.find((option) => option.value === value)?.label ?? value;
+}
+
+function extraLabelParts(extra: ExtraFilters): string[] {
+  const parts: string[] = [];
+  for (const value of extra.multi) {
+    parts.push(optionLabel(CATALOG_FILTER_OPTIONS.multi, value));
+  }
+  for (const value of extra.vibe) {
+    parts.push(optionLabel(CATALOG_FILTER_OPTIONS.vibes, value));
+  }
+  if (isPriceRangeActive(extra)) {
+    parts.push(priceRangeLabel(extra.priceMin, extra.priceMax));
+  }
+  if (extra.onSale) parts.push("On sale");
+  if (extra.reviews !== "any") {
+    parts.push(optionLabel(CATALOG_FILTER_OPTIONS.reviews, extra.reviews));
+  }
+  if (extra.era === "range") {
+    parts.push(yearRangeLabel(extra.yearMin, extra.yearMax));
+  } else if (extra.era === "recent") {
+    parts.push("New & upcoming");
+  } else if (extra.era !== "any") {
+    parts.push(optionLabel(CATALOG_FILTER_OPTIONS.eras, extra.era));
+  }
+  if (extra.demo) parts.push("Has demo");
+  if (extra.deck) parts.push("Steam Deck");
+  return parts;
 }
 
 export function infiniteFilterLabel(filters: InfiniteFilterState): string | null {
@@ -168,6 +249,8 @@ export function infiniteFilterLabel(filters: InfiniteFilterState): string | null
   }
   parts.push(...filters.platforms);
   if (filters.crossplayOnly) parts.push("Crossplay");
+  if (filters.skipSeen) parts.push("Skip viewed");
+  parts.push(...extraLabelParts(filters.extra));
   parts.push(...filters.genres);
   return parts.join(" · ");
 }
@@ -192,5 +275,8 @@ export function infiniteFilterSearchParams(
     params.set("players", filters.players);
   }
   if (filters.crossplayOnly) params.set("crossplay", "1");
+  if (isSteamPlatforms(filters.platforms)) {
+    setExtraFilterParams(params, filters.extra);
+  }
   return params;
 }

@@ -1,14 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { GameFavoriteButton } from "@/features/games/components/GameFavoriteButton";
 import { GamePriceBadge } from "@/features/games/components/GamePriceBadge";
 import { SteamStoreButton } from "@/features/games/components/SteamStoreButton";
 import type { Game } from "@/features/games/data/games";
 import {
   getCachedSteamMedia,
-  setCachedSteamMedia,
+  loadSteamMedia,
   type SteamMedia,
 } from "@/features/games/lib/steam-media";
 import { ScreenshotGallery } from "@/features/session/components/ScreenshotGallery";
@@ -16,13 +15,19 @@ import styles from "./GameInfoSidebar.module.css";
 
 type Props = {
   game: Game;
+  compact?: boolean;
+  headerAction?: ReactNode;
 };
 
 function stripHtml(html: string) {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-export function GameInfoSidebar({ game }: Props) {
+export function GameInfoSidebar({
+  game,
+  compact = false,
+  headerAction,
+}: Props) {
   const [steam, setSteam] = useState<SteamMedia | null>(null);
   const [steamReady, setSteamReady] = useState(!game.steamAppId);
   const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
@@ -50,24 +55,12 @@ export function GameInfoSidebar({ game }: Props) {
     setSteamReady(false);
     let cancelled = false;
 
-    void fetch(`/api/steam/media?appId=${appId}`)
-      .then(async (res) => {
-        if (!res.ok) return null;
-        return (await res.json()) as SteamMedia;
-      })
-      .then((data) => {
-        if (data) setCachedSteamMedia(appId, data);
-        if (!cancelled) {
-          setSteam(data);
-          setSteamReady(true);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setSteam(null);
-          setSteamReady(true);
-        }
-      });
+    void loadSteamMedia(appId).then((data) => {
+      if (!cancelled) {
+        setSteam(data);
+        setSteamReady(true);
+      }
+    });
 
     return () => {
       cancelled = true;
@@ -76,12 +69,16 @@ export function GameInfoSidebar({ game }: Props) {
 
   const shots = useMemo(() => {
     if (game.steamAppId && !steamReady) return [];
-    const urls = [
-      ...(steam?.screenshots.map((s) => s.full) ?? []),
-      ...(game.screenshots ?? []),
+    const list = [
+      ...(steam?.screenshots ?? []),
+      ...(game.screenshots ?? []).map((url) => ({ thumb: url, full: url })),
     ];
-    return [...new Set(urls)].slice(0, 6);
+    const seen = new Set<string>();
+    return list
+      .filter((s) => !seen.has(s.full) && seen.add(s.full))
+      .slice(0, 6);
   }, [steam, steamReady, game.steamAppId, game.screenshots]);
+  const fullShots = useMemo(() => shots.map((s) => s.full), [shots]);
 
   const about = stripHtml(steam?.about || game.description);
   const tags = game.genres.length > 0 ? game.genres : (game.modes ?? []);
@@ -94,14 +91,24 @@ export function GameInfoSidebar({ game }: Props) {
   const byline = [studio, game.year || null].filter(Boolean).join(" • ");
 
   return (
-    <aside className={styles.root} aria-label={`${game.title} details`}>
+    <aside
+      className={`${styles.root}${compact ? ` ${styles.compact}` : ""}`}
+      aria-label={`${game.title} details`}
+    >
       <div className={styles.titleRow}>
         <h2 className={styles.title}>{game.title}</h2>
-        <GameFavoriteButton gameId={game.id} />
+        {headerAction}
       </div>
 
       <div className={styles.scroll}>
-        {byline ? <p className={styles.byline}>{byline}</p> : null}
+        <div className={styles.metaRow}>
+          {byline ? <p className={styles.byline}>{byline}</p> : null}
+          <GameFavoriteButton
+            gameId={game.id}
+            size={14}
+            className={styles.favorite}
+          />
+        </div>
 
         {tags.length > 0 ? (
           <ul className={styles.tags}>
@@ -113,23 +120,40 @@ export function GameInfoSidebar({ game }: Props) {
           </ul>
         ) : null}
 
+        {game.steamAppId && !steamReady ? (
+          <div className={styles.shots} aria-hidden>
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className={styles.shot}>
+                <div className={`${styles.shotSkeleton} sw-shimmer`} />
+              </div>
+            ))}
+          </div>
+        ) : null}
+
         {shots.length > 0 ? (
           <div className={styles.shots}>
-            {shots.map((src, i) => (
+            {shots.map(({ thumb, full }, i) => (
               <button
-                key={src}
+                key={full}
                 type="button"
                 className={styles.shot}
                 onClick={() => setGalleryIndex(i)}
                 aria-label={`${game.title} screenshot ${i + 1}`}
               >
-                <Image
-                  src={src}
+                <div className={`${styles.shotSkeleton} sw-shimmer`} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  ref={(el) => {
+                    if (el?.complete && el.naturalWidth > 0) {
+                      el.dataset.loaded = "";
+                    }
+                  }}
+                  src={thumb}
                   alt=""
-                  fill
                   className={styles.shotImage}
-                  sizes="150px"
-                  unoptimized
+                  onLoad={(e) => {
+                    e.currentTarget.dataset.loaded = "";
+                  }}
                 />
               </button>
             ))}
@@ -140,16 +164,20 @@ export function GameInfoSidebar({ game }: Props) {
       </div>
 
       {game.steamAppId ? (
-        <div className={styles.buy}>
-          <GamePriceBadge appId={game.steamAppId} variant="buy" />
-          <SteamStoreButton appId={game.steamAppId} className={styles.steam} />
+        <div className={styles.footer}>
+          <div className={styles.buy}>
+            <div className={styles.price}>
+              <GamePriceBadge appId={game.steamAppId} variant="buy" />
+            </div>
+            <SteamStoreButton appId={game.steamAppId} className={styles.steam} />
+          </div>
         </div>
       ) : null}
 
       {galleryIndex != null && shots[galleryIndex] ? (
         <ScreenshotGallery
           title={game.title}
-          images={shots}
+          images={fullShots}
           index={galleryIndex}
           onClose={() => setGalleryIndex(null)}
           onIndex={setGalleryIndex}

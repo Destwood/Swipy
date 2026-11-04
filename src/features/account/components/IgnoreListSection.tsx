@@ -20,7 +20,7 @@ export function IgnoreListSection() {
         platform hides titles exclusive to it: ignore PlayStation and a PC + PS
         game still appears; a PS-only game does not.
       </p>
-      <Link href="/ignored" className={styles.gamesLink}>
+      <Link href="/account/ignored" className={styles.gamesLink}>
         Ignored games
       </Link>
 

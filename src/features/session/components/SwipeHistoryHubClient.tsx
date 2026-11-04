@@ -24,6 +24,7 @@ import {
 } from "@/features/session/lib/sessions";
 import {
   listStoredMemberships,
+  removeMembership,
   setActiveSession,
 } from "@/features/session/lib/session-context";
 import {
@@ -74,7 +75,7 @@ export function SwipeHistoryHubClient() {
           }),
         );
       } catch {
-        /* skip stale membership */
+        removeMembership(membership.code);
       }
     }
 

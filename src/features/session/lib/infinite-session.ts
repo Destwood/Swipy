@@ -10,9 +10,26 @@ export type InfiniteSessionState = {
   requeueFifo: string[];
   catalogPage: number;
   catalogHasMore: boolean;
+  frozenCount?: number;
   finishedHistoryId?: string;
   updatedAt: string;
 };
+
+type InfiniteSessionPatch = Partial<
+  Pick<
+    InfiniteSessionState,
+    | "votes"
+    | "streamIndex"
+    | "loadedGameIds"
+    | "requeueFifo"
+    | "catalogPage"
+    | "catalogHasMore"
+    | "frozenCount"
+    | "finishedHistoryId"
+    | "label"
+    | "filterKey"
+  >
+>;
 
 const STORAGE_KEY = "swipy.infiniteSession";
 const CHANGE_EVENT = "swipy:infinite-session";
@@ -120,20 +137,24 @@ export function startNewInfiniteSession(input: {
   return session;
 }
 
+export function rebaseInfiniteSession(input: {
+  label: string;
+  filterKey: string;
+  seenIds: string[];
+}) {
+  return patchInfiniteSession({
+    label: input.label.trim() || "Infinite",
+    filterKey: input.filterKey,
+    loadedGameIds: input.seenIds,
+    frozenCount: input.seenIds.length,
+    streamIndex: input.seenIds.length,
+    catalogPage: 0,
+    catalogHasMore: true,
+  });
+}
+
 export function patchInfiniteSession(
-  patch: Partial<
-    Pick<
-      InfiniteSessionState,
-      | "votes"
-      | "streamIndex"
-      | "loadedGameIds"
-      | "requeueFifo"
-      | "catalogPage"
-      | "catalogHasMore"
-      | "finishedHistoryId"
-      | "label"
-    >
-  > & { clearFinishedHistory?: boolean },
+  patch: InfiniteSessionPatch & { clearFinishedHistory?: boolean },
 ) {
   const session = readInfiniteSession();
   if (!session) return null;
@@ -155,19 +176,7 @@ export function patchInfiniteSession(
 
 function sessionPatchChanged(
   session: InfiniteSessionState,
-  patch: Partial<
-    Pick<
-      InfiniteSessionState,
-      | "votes"
-      | "streamIndex"
-      | "loadedGameIds"
-      | "requeueFifo"
-      | "catalogPage"
-      | "catalogHasMore"
-      | "finishedHistoryId"
-      | "label"
-    >
-  >,
+  patch: InfiniteSessionPatch,
 ): boolean {
   for (const key of Object.keys(patch) as Array<keyof typeof patch>) {
     const nextVal = patch[key];

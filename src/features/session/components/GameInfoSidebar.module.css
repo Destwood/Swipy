@@ -1,23 +1,106 @@
 @reference "../../../app/globals.css";
 
 .root {
-  @apply hidden h-full min-h-0 w-[min(360px,32vw)] shrink-0 flex-col overflow-hidden border-l border-white/[0.06] bg-sw-surface/80 px-4 py-5 backdrop-blur-[12px] lg:flex;
+  @apply hidden h-full min-h-0 w-[min(360px,32vw)] shrink-0 flex-col overflow-hidden border-l border-white/[0.075] bg-sw-surface/80 px-4 pt-4 pb-4 backdrop-blur-[12px] lg:flex;
+  transition:
+    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.root.compact {
+  @apply w-[min(310px,27vw)];
+}
+
+.compact .title {
+  @apply text-[17px];
+}
+
+.compact .shots {
+  @apply grid-cols-1;
+}
+
+.compact .scroll {
+  @apply flex flex-col;
+}
+
+.compact .scroll > * {
+  @apply shrink-0;
+}
+
+.compact .scroll > .shots {
+  order: 1;
+}
+
+.compact .scroll > .tags {
+  order: 2;
+}
+
+.compact .scroll > .about {
+  order: 3;
 }
 
 .titleRow {
   @apply mb-1 flex shrink-0 items-start gap-2 overflow-visible;
 }
 
+.metaRow {
+  @apply mb-3 flex items-center gap-2;
+}
+
+.metaRow > .favorite {
+  @apply ml-auto h-7 w-7 shrink-0 rounded-lg border-white/[0.075] bg-transparent text-[rgba(244,201,93,0.6)];
+}
+
+.metaRow > .favorite:hover,
+.metaRow > .favorite[aria-pressed="true"] {
+  @apply border-[rgba(244,201,93,0.35)] bg-[rgba(244,201,93,0.06)] text-[#f4c95d];
+}
+
+.metaRow > .favorite svg {
+  @apply h-3.5 w-3.5;
+}
+
 .title {
-  @apply m-0 min-w-0 flex-1 font-display text-[22px] leading-tight font-extrabold tracking-[-0.03em] text-sw-text;
+  @apply m-0 min-w-0 flex-1 pt-[5px] font-display text-[22px] leading-tight font-extrabold tracking-[-0.03em] text-sw-text;
 }
 
 .scroll {
   @apply min-h-0 flex-1 overflow-x-hidden overflow-y-auto;
+  animation: sidebarSettleA 0.34s ease-out;
+}
+
+.compact .scroll {
+  animation-name: sidebarSettleB;
+}
+
+@keyframes sidebarSettleA {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sidebarSettleB {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .scroll {
+    animation: none;
+    transition: none;
+  }
 }
 
 .byline {
-  @apply m-0 mb-3 font-mono text-[11px] text-white/40;
+  @apply m-0 min-w-0 font-mono text-[11px] text-white/40;
 }
 
 .tags {
@@ -33,7 +116,11 @@
 }
 
 .shot {
-  @apply relative aspect-video cursor-pointer overflow-hidden rounded-md border border-white/[0.06] bg-black p-0;
+  @apply relative aspect-video cursor-pointer overflow-hidden rounded-md border border-white/[0.06] bg-white/[0.04] p-0;
+}
+
+.shotSkeleton {
+  @apply absolute inset-0;
 }
 
 .shot:hover .shotImage {
@@ -41,7 +128,11 @@
 }
 
 .shotImage {
-  @apply object-cover;
+  @apply absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-200;
+}
+
+.shotImage[data-loaded] {
+  @apply opacity-100;
 }
 
 .about {
@@ -52,14 +143,18 @@
   overflow: hidden;
 }
 
+.footer {
+  @apply mt-3 shrink-0;
+}
+
 .buy {
-  @apply mt-3 flex shrink-0 flex-col items-end gap-3 border-t border-white/[0.08] pt-4;
+  @apply flex items-stretch overflow-hidden rounded-xl border border-white/[0.075] bg-white/[0.025];
 }
 
-.buy [data-price-badge] {
-  @apply pr-3;
+.price {
+  @apply flex min-h-[46px] min-w-0 flex-1 items-center px-3.5;
 }
 
-.steam {
-  @apply w-full;
+.buy > .steam {
+  @apply w-[124px] shrink-0 rounded-none border-0 border-l border-white/[0.075] bg-white/[0.06] px-3.5 py-3 hover:bg-white/[0.1];
 }

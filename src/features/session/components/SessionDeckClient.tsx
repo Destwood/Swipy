@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import ChevronLeftIcon from "@/assets/icons/chevron-left.svg";
+import HeartIcon from "@/assets/icons/heart.svg";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppTopBar } from "@/features/shell/components/AppTopBar";
 import { SwipeDeckPageSkeleton } from "@/features/session/components/skeletons/SwipeDeckPageSkeleton";
@@ -22,7 +24,10 @@ import {
   fetchSessionGames,
   markMemberDone,
 } from "@/features/session/lib/sessions";
-import { DeckSwipeStage } from "@/features/session/components/DeckSwipeStage";
+import {
+  DeckSwipeStage,
+  type DeckSwipeHandle,
+} from "@/features/session/components/DeckSwipeStage";
 import { SwipeUndoChip } from "@/features/session/components/SwipeUndoChip";
 import { useSwipeUndo } from "@/features/session/lib/use-swipe-undo";
 import { PageBackLink } from "@/shared/ui/PageBackLink";
@@ -37,7 +42,13 @@ export function SessionDeckClient() {
   const [members, setMembers] = useState<SessionMember[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [voting, setVoting] = useState(false);
+  const [finishing, setFinishing] = useState(false);
+  const indexRef = useRef(0);
+  const finishingRef = useRef(false);
+  const failedIndexRef = useRef<number | null>(null);
+  const pendingVotesRef = useRef(new Set<Promise<boolean>>());
   const [swipeKey, setSwipeKey] = useState(0);
+  const stageRef = useRef<DeckSwipeHandle>(null);
   const undo = useSwipeUndo();
 
   useEffect(() => {
@@ -63,7 +74,7 @@ export function SessionDeckClient() {
         setDeckName(deck?.name ?? session.deck_id);
         setGames(list);
       }
-      setIndex(0);
+      goTo(0);
 
       const dbMembers = await fetchMembers(active.sessionId);
       setMembers(dbMembers.map(toUiMember));
@@ -76,39 +87,77 @@ export function SessionDeckClient() {
     });
   }, []);
 
-  async function vote(value: "like" | "dislike") {
-    if (voting || games.length === 0) return;
+  function goTo(next: number) {
+    indexRef.current = next;
+    setIndex(next);
+  }
+
+  function rollbackFailedVotes() {
+    const failedAt = failedIndexRef.current;
+    failedIndexRef.current = null;
+    finishingRef.current = false;
+    setFinishing(false);
+    if (failedAt == null) return;
+    goTo(Math.min(indexRef.current, failedAt));
+    setSwipeKey((key) => key + 1);
+  }
+
+  function vote(value: "like" | "dislike"): boolean {
+    if (finishingRef.current || games.length === 0) return false;
     const active = getActiveSession();
-    const current = games[index];
-    if (!active || !current) return;
+    const votedIndex = indexRef.current;
+    const game = games[votedIndex];
+    if (!active || !game) return false;
 
-    setVoting(true);
     setError(null);
-    try {
-      await castVote({
-        sessionId: active.sessionId,
-        memberId: active.memberId,
-        gameId: current.id,
-        value,
-      });
-      undo.record(index);
+    undo.record(votedIndex);
 
-      if (index >= games.length - 1) {
-        await markMemberDone(active.memberId);
-        router.push("/session/matches");
-        return;
-      }
-      setIndex((currentIndex) => currentIndex + 1);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Vote failed");
-      setSwipeKey((key) => key + 1);
-    } finally {
-      setVoting(false);
+    const task: Promise<boolean> = castVote({
+      sessionId: active.sessionId,
+      memberId: active.memberId,
+      gameId: game.id,
+      value,
+    }).then(
+      () => true,
+      (e: unknown) => {
+        setError(e instanceof Error ? e.message : "Vote failed");
+        failedIndexRef.current = Math.min(
+          failedIndexRef.current ?? votedIndex,
+          votedIndex,
+        );
+        if (!finishingRef.current) rollbackFailedVotes();
+        return false;
+      },
+    );
+    const tracked = task.finally(() => pendingVotesRef.current.delete(tracked));
+    pendingVotesRef.current.add(tracked);
+
+    if (votedIndex >= games.length - 1) {
+      finishingRef.current = true;
+      setFinishing(true);
+      void (async () => {
+        const results = await Promise.all([...pendingVotesRef.current]);
+        if (!results.every(Boolean)) {
+          rollbackFailedVotes();
+          return;
+        }
+        try {
+          await markMemberDone(active.memberId);
+          router.push("/session/matches");
+        } catch (e) {
+          setError(e instanceof Error ? e.message : "Vote failed");
+          rollbackFailedVotes();
+        }
+      })();
+      return true;
     }
+
+    goTo(votedIndex + 1);
+    return true;
   }
 
   async function undoLast() {
-    if (voting) return;
+    if (voting || finishingRef.current) return;
     const prev = undo.back();
     if (prev == null) return;
     const game = games[prev];
@@ -116,6 +165,7 @@ export function SessionDeckClient() {
     setVoting(true);
     setError(null);
     try {
+      await Promise.all([...pendingVotesRef.current]);
       if (active && game) {
         try {
           await deleteVote({
@@ -127,7 +177,7 @@ export function SessionDeckClient() {
           /* keep going — recast upserts */
         }
       }
-      setIndex(prev);
+      goTo(prev);
       setSwipeKey((key) => key + 1);
     } finally {
       setVoting(false);
@@ -137,8 +187,12 @@ export function SessionDeckClient() {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (document.body.dataset.galleryOpen) return;
-      if (e.key === "ArrowRight" || e.key === "l") void vote("like");
-      if (e.key === "ArrowLeft" || e.key === "a") void vote("dislike");
+      if (!e.repeat && (e.key === "ArrowRight" || e.key === "l")) {
+        stageRef.current?.swipe("like");
+      }
+      if (!e.repeat && (e.key === "ArrowLeft" || e.key === "a")) {
+        stageRef.current?.swipe("dislike");
+      }
       if (e.key === "Backspace" || e.key === "u" || e.key === "U") {
         e.preventDefault();
         void undoLast();
@@ -150,7 +204,6 @@ export function SessionDeckClient() {
 
   const current = games[index];
   const next = games[index + 1];
-  const remaining = games.length - index;
   const lobbyHref = (() => {
     const active = getActiveSession();
     return active?.code
@@ -195,7 +248,8 @@ export function SessionDeckClient() {
           <div className={styles.chromeStart}>
             <div className={styles.chromeNav}>
               <PageBackLink href={lobbyHref} className={styles.chromeChip}>
-                ← Lobby
+                <ChevronLeftIcon className={styles.chipGlyph} aria-hidden />
+                Lobby
               </PageBackLink>
               <div className={styles.members}>
                 {members.slice(0, 4).map((m) => (
@@ -210,17 +264,11 @@ export function SessionDeckClient() {
                 ))}
               </div>
               <span className={styles.deckName}>{deckName}</span>
+              <SwipeUndoChip
+                disabled={voting || finishing || !undo.canUndo}
+                onUndo={() => void undoLast()}
+              />
             </div>
-            <SwipeUndoChip
-              disabled={voting || !undo.canUndo}
-              onUndo={() => void undoLast()}
-            />
-          </div>
-          <div className={styles.chromeEnd}>
-            <span className={styles.remainingLabel}>{remaining} left</span>
-            <Link href="/session/matches" className={styles.chromeChip}>
-              Matches
-            </Link>
           </div>
         </div>
 
@@ -229,10 +277,19 @@ export function SessionDeckClient() {
         <DeckSwipeStage
           current={current}
           next={next}
-          enabled={!voting}
+          preload={games.slice(index + 2, index + 6)}
+          enabled={!voting && !finishing}
+          hideCurrent={finishing}
           swipeKey={swipeKey}
-          onLike={() => void vote("like")}
-          onSkip={() => void vote("dislike")}
+          dock={
+            <Link href="/session/matches" className={styles.chromeChip}>
+              <HeartIcon className={styles.chipIcon} aria-hidden />
+              Matches
+            </Link>
+          }
+          handleRef={stageRef}
+          onLike={() => vote("like")}
+          onSkip={() => vote("dislike")}
         />
       </div>
     </div>

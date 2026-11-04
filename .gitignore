@@ -44,3 +44,10 @@ supabase/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI agent tooling
+.agents/
+.claude/
+AGENTS.md
+CLAUDE.md
+skills-lock.json

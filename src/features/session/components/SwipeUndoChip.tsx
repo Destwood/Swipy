@@ -1,3 +1,4 @@
+import UndoIcon from "@/assets/icons/undo.svg";
 import styles from "./SessionDeckClient.module.css";
 
 type Props = {
@@ -9,11 +10,12 @@ export function SwipeUndoChip({ disabled = false, onUndo }: Props) {
   return (
     <button
       type="button"
-      className={`${styles.chromeChip} ${styles.undoChip}`}
+      className={styles.chromeChip}
       disabled={disabled}
       onClick={onUndo}
     >
-      ← Previous
+      <UndoIcon className={styles.chipGlyph} aria-hidden />
+      Previous
     </button>
   );
 }

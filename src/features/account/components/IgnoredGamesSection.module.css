@@ -1,0 +1,37 @@
+@reference "../../../app/globals.css";
+
+.toolbar {
+  @apply mb-4 flex items-center gap-3;
+}
+
+.search {
+  @apply min-w-0 flex-1 rounded-[9px] border border-white/[0.08] bg-sw-surface px-3.5 py-2 font-body text-sm text-sw-text outline-none transition-colors placeholder:text-white/25 focus:border-sw-accent/40;
+}
+
+.count {
+  @apply shrink-0 font-mono text-xs text-white/25;
+}
+
+.noMatches {
+  @apply m-0 py-8 text-center font-body text-sm text-sw-muted;
+}
+
+.list {
+  @apply m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2;
+}
+
+.empty {
+  @apply rounded-2xl border border-dashed border-white/10 px-6 py-16 text-center;
+}
+
+.emptyTitle {
+  @apply m-0 mb-2 font-display text-base font-bold text-sw-text;
+}
+
+.emptyText {
+  @apply m-0 mb-5 font-body text-sm text-sw-muted;
+}
+
+.emptyLink {
+  @apply font-body text-sm font-medium text-sw-accent no-underline hover:underline;
+}

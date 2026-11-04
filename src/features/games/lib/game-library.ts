@@ -107,9 +107,13 @@ export async function ensureGamesInLibrary(ids: string[]): Promise<Game[]> {
         .filter((n) => Number.isFinite(n) && n > 0),
     ),
   ];
+  const remoteIds = [
+    ...igdbIds.map(String),
+    ...new Set(missing.filter((id) => /^steam-\d+$/.test(id))),
+  ];
 
-  for (let i = 0; i < igdbIds.length; i += 50) {
-    const chunk = igdbIds.slice(i, i + 50);
+  for (let i = 0; i < remoteIds.length; i += 50) {
+    const chunk = remoteIds.slice(i, i + 50);
     try {
       const res = await fetch(`/api/games/by-ids?ids=${chunk.join(",")}`);
       const data = (await res.json()) as { results?: Game[] };

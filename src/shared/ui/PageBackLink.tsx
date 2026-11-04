@@ -1,9 +1,10 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import styles from "./PageBackLink.module.css";
 
 type Props = {
   href: string;
-  children: string;
+  children: ReactNode;
   className?: string;
 };
 

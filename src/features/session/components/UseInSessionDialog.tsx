@@ -4,7 +4,6 @@ import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { setActiveDeckId } from "@/features/decks/lib/deck-store";
-import { startSoloSession } from "@/features/session/lib/start-solo-session";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import styles from "./UseInSessionDialog.module.css";
 
@@ -68,7 +67,7 @@ export function UseInSessionDialog({
     router.push("/session");
   }
 
-  async function startSolo() {
+  function startSolo() {
     if (!canStart || busy) return;
     setBusyMode("solo");
     setError(null);
@@ -78,14 +77,9 @@ export function UseInSessionDialog({
       return;
     }
     if (!deckId) return;
-    try {
-      await startSoloSession(deckId);
-      onClose();
-      router.push("/session/deck");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to start solo session");
-      setBusyMode(null);
-    }
+    setActiveDeckId(deckId);
+    onClose();
+    router.push("/deck");
   }
 
   if (!open || typeof document === "undefined") return null;
@@ -122,7 +116,7 @@ export function UseInSessionDialog({
           <div className={styles.modeRow}>
             <Button
               type="button"
-              onClick={() => void startSolo()}
+              onClick={startSolo}
               disabled={busy || !canStart}
               variant={ButtonVariant.Accent}
               size={ButtonSize.Sm}

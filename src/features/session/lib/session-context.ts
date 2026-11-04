@@ -58,6 +58,12 @@ export function saveMembership(code: string, membership: StoredMembership) {
   writeMemberships(map);
 }
 
+export function removeMembership(code: string) {
+  const map = readMemberships();
+  delete map[normalizeCode(code)];
+  writeMemberships(map);
+}
+
 export function listStoredMemberships(): Array<
   StoredMembership & { code: string }
 > {

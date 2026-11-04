@@ -102,19 +102,22 @@ export async function buildCoopHistoryItem(input: {
   const completedAt = latestIso(
     input.votes.map((vote) => vote.created_at).concat(input.sessionCreatedAt),
   );
+  const solo = input.memberCount <= 1;
 
   return {
     id: input.sessionId,
-    kind: "coop",
+    kind: solo ? "solo" : "coop",
     title: input.deckName,
     completedAt,
     covers,
     tags: [
-      "With friends",
+      solo ? "Solo" : "With friends",
       "Deck",
-      genre ?? `${input.memberCount} players`,
+      genre ?? (solo ? `${likedIds.length} liked` : `${input.memberCount} players`),
     ],
-    stats: `${input.code} · ${input.memberCount} players · ${input.votes.length} votes`,
+    stats: solo
+      ? `${input.votes.length} swipes · ${likedIds.length} liked`
+      : `${input.code} · ${input.memberCount} players · ${input.votes.length} votes`,
     href: "/session/matches",
     coopCode: input.code,
     sessionId: input.sessionId,

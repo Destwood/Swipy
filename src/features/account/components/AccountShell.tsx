@@ -11,7 +11,7 @@ import styles from "./AccountShell.module.css";
 const NAV = [
   { href: "/account", label: "Profile", exact: true },
   { href: "/account/preferences", label: "Preferences", exact: false },
-  { href: "/ignored", label: "Ignored games", exact: true },
+  { href: "/account/ignored", label: "Ignored games", exact: false },
   { href: "/account/integrations", label: "Integrations", exact: false },
 ] as const;
 

@@ -2,6 +2,19 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Supabase may land the OAuth PKCE code on Site URL root instead of /auth/callback.
+  if (
+    pathname !== "/auth/callback" &&
+    searchParams.has("code") &&
+    !searchParams.has("error")
+  ) {
+    const callback = request.nextUrl.clone();
+    callback.pathname = "/auth/callback";
+    return NextResponse.redirect(callback);
+  }
+
   let response = NextResponse.next({
     request,
   });

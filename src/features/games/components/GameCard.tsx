@@ -1,12 +1,21 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import type { Game } from "@/features/games/data/games";
 import { gameCoverSrc } from "@/features/games/lib/igdb/image";
+import { GamePriceBadge } from "./GamePriceBadge";
 import { GenreTag } from "./GenreTag";
 import styles from "./GameCard.module.css";
 
 interface Props {
   game: Game;
   dimmed?: boolean;
+}
+
+function steamPortraitSrc(game: Game): string | null {
+  if (!game.steamAppId || !game.image.includes("images.igdb.com")) return null;
+  return `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.steamAppId}/library_600x900_2x.jpg`;
 }
 
 function cardBlurb(text: string) {
@@ -25,18 +34,23 @@ export function GameCard({ game, dimmed = false }: Props) {
       : null;
   const byline = [studio, game.year || null].filter(Boolean).join(" · ");
   const description = cardBlurb(game.description);
+  const [failedSteamId, setFailedSteamId] = useState<string | null>(null);
+  const steamSrc = failedSteamId === game.id ? null : steamPortraitSrc(game);
 
   return (
     <div className={`${styles.root} ${dimmed ? styles.dimmed : ""}`}>
+      <div aria-hidden className={`${styles.skeleton} sw-shimmer`} />
       <Image
-        src={gameCoverSrc(game.image, "hero")}
+        src={steamSrc ?? gameCoverSrc(game.image, "hero")}
         alt={`${game.title} cover`}
         fill
         className={styles.cover}
         sizes="(max-height: 900px) 70vh, 420px"
         quality={90}
         priority={!dimmed}
+        loading={dimmed ? "eager" : undefined}
         draggable={false}
+        onError={steamSrc ? () => setFailedSteamId(game.id) : undefined}
       />
 
       {!dimmed && (
@@ -44,11 +58,18 @@ export function GameCard({ game, dimmed = false }: Props) {
           <div className={styles.gradient} />
 
           <div className={styles.footer}>
-            {genres.length > 0 ? (
+            {genres.length > 0 || game.steamAppId ? (
               <div className={styles.genreRow}>
-                {genres.map((g) => (
-                  <GenreTag key={g} label={g} compact />
-                ))}
+                {genres.length > 0 ? (
+                  <div className={styles.genreTags}>
+                    {genres.map((g) => (
+                      <GenreTag key={g} label={g} compact />
+                    ))}
+                  </div>
+                ) : null}
+                {game.steamAppId ? (
+                  <GamePriceBadge appId={game.steamAppId} size="xs" />
+                ) : null}
               </div>
             ) : null}
 

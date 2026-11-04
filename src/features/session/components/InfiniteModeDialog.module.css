@@ -11,7 +11,44 @@
 }
 
 .header {
-  @apply shrink-0 border-b border-white/[0.06] px-6 py-5;
+  @apply flex shrink-0 items-center justify-between gap-4 border-b border-white/[0.06] px-6 py-5;
+}
+
+.switchRow {
+  @apply flex shrink-0 cursor-pointer items-center gap-2.5 border-0 bg-transparent p-0;
+}
+
+.switchLabel {
+  @apply font-body text-xs text-sw-muted transition-colors duration-150;
+}
+
+.switchRow:hover .switchLabel,
+.switchRow[aria-checked="true"] .switchLabel {
+  @apply text-sw-text;
+}
+
+.switchTrack {
+  @apply relative h-5 w-9 shrink-0 rounded-full border border-white/10 bg-white/[0.06] transition-colors duration-150;
+}
+
+.switchTrackOn {
+  @apply border-[rgba(45,212,191,0.45)] bg-[rgba(45,212,191,0.28)];
+}
+
+.switchThumb {
+  @apply absolute top-1/2 left-[3px] h-3.5 w-3.5 -translate-y-1/2 rounded-full bg-white/70 transition-[transform,background-color] duration-150;
+}
+
+.switchTrackOn .switchThumb {
+  @apply translate-x-4 bg-sw-accent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switchTrack,
+  .switchThumb,
+  .switchLabel {
+    transition: none;
+  }
 }
 
 .title {
@@ -19,15 +56,15 @@
 }
 
 .scroll {
-  @apply min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5;
+  @apply min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-1;
 }
 
-.group + .group {
-  @apply mt-6;
+.note {
+  @apply m-0 font-body text-xs leading-relaxed text-sw-muted;
 }
 
-.groupLabel {
-  @apply m-0 mb-2.5 font-mono text-[10px] tracking-[0.12em] text-sw-muted uppercase;
+.subChips {
+  @apply pt-0.5;
 }
 
 .chips {

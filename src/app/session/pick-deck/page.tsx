@@ -7,9 +7,7 @@ import { AppTopBar } from "@/features/shell/components/AppTopBar";
 import { PageLoadingShell } from "@/features/shell/components/PageLoadingShell";
 import { setSessionCreateDeckId } from "@/features/session/lib/session-create-deck";
 import { setActiveDeckId } from "@/features/decks/lib/deck-store";
-import { startSoloSession } from "@/features/session/lib/start-solo-session";
 import { PageBackLink } from "@/shared/ui/PageBackLink";
-import { toast } from "@/shared/ui/toast";
 import styles from "./page.module.css";
 
 function SessionPickDeckPageInner() {
@@ -23,15 +21,7 @@ function SessionPickDeckPageInner() {
     picking.current = true;
     setActiveDeckId(deckId);
     if (solo) {
-      try {
-        await startSoloSession(deckId);
-        router.push("/session/deck");
-      } catch (e) {
-        picking.current = false;
-        toast(
-          e instanceof Error ? e.message : "Failed to start solo session",
-        );
-      }
+      router.push("/deck");
       return;
     }
     setSessionCreateDeckId(deckId);

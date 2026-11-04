@@ -1,5 +1,6 @@
 "use client";
 
+import ExternalIcon from "@/assets/icons/external.svg";
 import SteamIcon from "@/assets/icons/steam.svg";
 import { openSteamStore, steamStoreUrl } from "@/features/games/lib/steam";
 import styles from "./SteamStoreButton.module.css";
@@ -19,6 +20,7 @@ export function SteamStoreButton({ appId, size = "md", className }: Props) {
       target="_blank"
       rel="noopener noreferrer"
       title="Open in Steam"
+      aria-label="Open in Steam (new tab)"
       onClick={(e) => {
         e.preventDefault();
         openSteamStore(appId);
@@ -30,7 +32,10 @@ export function SteamStoreButton({ appId, size = "md", className }: Props) {
         className={styles.icon}
         aria-hidden
       />
-      Open in Steam
+      {size === "md" ? "Steam" : "Open in Steam"}
+      {size === "md" ? (
+        <ExternalIcon className={styles.external} aria-hidden />
+      ) : null}
     </a>
   );
 }
