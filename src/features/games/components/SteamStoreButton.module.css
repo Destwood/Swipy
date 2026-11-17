@@ -7,7 +7,7 @@
 .sm,
 .row,
 .md {
-  @apply text-white;
+  @apply text-sw-onimage;
   background: #0c1015;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -44,9 +44,9 @@
 }
 
 .md .icon {
-  @apply h-5 w-5 text-white;
+  @apply h-5 w-5 text-sw-onimage;
 }
 
 .external {
-  @apply ml-auto h-3.5 w-3.5 shrink-0 text-white/45;
+  @apply ml-auto h-3.5 w-3.5 shrink-0 text-sw-onimage/45;
 }

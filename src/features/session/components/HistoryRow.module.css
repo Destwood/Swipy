@@ -5,7 +5,7 @@
 }
 
 .row:hover {
-  @apply border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.06)];
+  @apply border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.45),0_0_0_1px_color-mix(in_srgb,var(--color-white)_6%,transparent)];
 }
 
 .rowMenuOpen {
@@ -25,7 +25,7 @@
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 1px;
-  background: #0c0e12;
+  background: var(--color-sw-bg);
   min-height: 72px;
 }
 
@@ -44,7 +44,7 @@
 }
 
 .openIcon {
-  @apply h-4 w-4 text-white/90;
+  @apply h-4 w-4 text-sw-onimage/90;
 }
 
 .mosaicLink:hover .mosaicOverlay,
@@ -108,13 +108,13 @@
 
 .menu {
   @apply absolute top-[calc(100%+6px)] right-0 z-[60] w-[168px] overflow-hidden rounded-[10px] border border-white/10 p-1 shadow-[0_16px_40px_rgba(0,0,0,0.55)];
-  background-color: #1a1e27;
+  background-color: var(--color-sw-surface2);
   isolation: isolate;
 }
 
 .menuItem {
-  @apply block w-full cursor-pointer rounded-[7px] border-none px-2.5 py-1.5 text-left font-body text-[13px] text-sw-text no-underline transition-colors hover:bg-[#252a36] disabled:cursor-not-allowed disabled:opacity-50;
-  background-color: #1a1e27;
+  @apply block w-full cursor-pointer rounded-[7px] border-none px-2.5 py-1.5 text-left font-body text-[13px] text-sw-text no-underline transition-colors hover:bg-sw-surface3 disabled:cursor-not-allowed disabled:opacity-50;
+  background-color: var(--color-sw-surface2);
 }
 
 .menuItemDanger {
@@ -123,5 +123,5 @@
 
 .menuDivider {
   @apply mx-1 my-0.5 h-px bg-white/10;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: color-mix(in srgb, var(--color-white) 10%, transparent);
 }

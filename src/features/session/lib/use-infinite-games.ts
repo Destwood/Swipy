@@ -28,9 +28,17 @@ import {
   readInfiniteSession,
 } from "@/features/session/lib/infinite-session";
 import { readSeenSkipSet } from "@/features/session/lib/seen-games";
+import {
+  gameMatchesLibraryFilter,
+  type LibraryFilter,
+} from "@/features/steam/lib/library-filter";
+import { useLibraryFilter } from "@/features/steam/lib/use-steam";
 
 export const INFINITE_PAGE_SIZE = 20;
-export const INFINITE_PREFETCH_REMAINING = 10;
+export const INFINITE_PREFETCH_REMAINING = 15;
+const LOAD_MORE_TARGET = 15;
+const LOAD_MORE_MAX_ROUNDS = 6;
+const LIBRARY_PAGES_PER_BATCH = 4;
 
 type CatalogResponse = {
   results?: Game[];
@@ -42,6 +50,7 @@ function filterGames(
   games: Game[],
   infinite: InfiniteFilterState,
   ignore: IgnoreList,
+  library: LibraryFilter,
   banned: Set<string>,
   frozen: Set<string>,
   skip: Set<string>,
@@ -50,6 +59,7 @@ function filterGames(
     (game) =>
       !banned.has(game.id) &&
       !gameIsIgnored(game, ignore) &&
+      gameMatchesLibraryFilter(game, library) &&
       (frozen.has(game.id) ||
         (!skip.has(game.id) && gameMatchesInfiniteFilters(game, infinite))),
   );
@@ -86,6 +96,7 @@ export function useInfiniteGames(bannedIds: string[]) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const loadingMoreRef = useRef(false);
+  const library = useLibraryFilter();
   const bannedKey = bannedIds.join(",");
 
   useEffect(() => {
@@ -99,14 +110,18 @@ export function useInfiniteGames(bannedIds: string[]) {
     };
   }, []);
 
+  const bannedSet = new Set(bannedIds);
   const games = filterGames(
     rawGames,
     filters,
     ignore,
-    new Set(bannedIds),
+    library,
+    bannedSet,
     frozen,
     skipIds,
   );
+  const filterCtxRef = useRef({ ignore, library, bannedSet, frozen, skipIds });
+  filterCtxRef.current = { ignore, library, bannedSet, frozen, skipIds };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -196,38 +211,75 @@ export function useInfiniteGames(bannedIds: string[]) {
     return () => controller.abort();
   }, [filters, ignore.genres, ignore.platforms]);
 
+  const libraryMode = library.mode;
   const loadMore = useCallback(() => {
     if (loading || loadingMoreRef.current || !hasMore) return;
     loadingMoreRef.current = true;
     setLoadingMore(true);
-    const nextPage = page + 1;
+    const batch =
+      libraryMode === "only-owned" || libraryMode === "only-wishlist"
+        ? LIBRARY_PAGES_PER_BATCH
+        : 1;
 
     void (async () => {
       try {
-        const params = infiniteFilterSearchParams(
-          filters,
-          nextPage,
-          INFINITE_PAGE_SIZE,
-        );
-        const res = await fetch(`/api/games?${params.toString()}`);
-        const data = (await res.json()) as CatalogResponse;
-        if (!res.ok) {
-          setError(data.error ?? "Could not load more games");
-          setHasMore(false);
-          return;
+        let lastPage = page;
+        let added = 0;
+        let more = true;
+        for (
+          let round = 0;
+          round < LOAD_MORE_MAX_ROUNDS && more && added < LOAD_MORE_TARGET;
+          round++
+        ) {
+          const pages = Array.from({ length: batch }, (_, k) => lastPage + 1 + k);
+          const responses = await Promise.all(
+            pages.map(async (pageNumber) => {
+              const params = infiniteFilterSearchParams(
+                filters,
+                pageNumber,
+                INFINITE_PAGE_SIZE,
+              );
+              const res = await fetch(`/api/games?${params.toString()}`);
+              return {
+                pageNumber,
+                ok: res.ok,
+                data: (await res.json()) as CatalogResponse,
+              };
+            }),
+          );
+          for (const { pageNumber, ok, data } of responses) {
+            if (!ok) {
+              setError(data.error ?? "Could not load more games");
+              setHasMore(false);
+              return;
+            }
+            const results = data.results ?? [];
+            upsertGames(results);
+            setRawGames((prev) => {
+              const seen = new Set(prev.map((game) => game.id));
+              return [...prev, ...results.filter((game) => !seen.has(game.id))];
+            });
+            const ctx = filterCtxRef.current;
+            added += filterGames(
+              results,
+              filters,
+              ctx.ignore,
+              ctx.library,
+              ctx.bannedSet,
+              ctx.frozen,
+              ctx.skipIds,
+            ).length;
+            more = Boolean(data.next) && results.length > 0;
+            lastPage = pageNumber;
+            setPage(pageNumber);
+            setHasMore(more);
+            patchInfiniteSession({
+              catalogPage: pageNumber,
+              catalogHasMore: more,
+            });
+            if (!more) break;
+          }
         }
-        const results = data.results ?? [];
-        upsertGames(results);
-        setRawGames((prev) => {
-          const seen = new Set(prev.map((game) => game.id));
-          return [...prev, ...results.filter((game) => !seen.has(game.id))];
-        });
-        setPage(nextPage);
-        setHasMore(Boolean(data.next) && results.length > 0);
-        patchInfiniteSession({
-          catalogPage: nextPage,
-          catalogHasMore: Boolean(data.next) && results.length > 0,
-        });
       } catch {
         setError("Network error — could not load more games");
       } finally {
@@ -235,7 +287,7 @@ export function useInfiniteGames(bannedIds: string[]) {
         setLoadingMore(false);
       }
     })();
-  }, [filters, page, hasMore, loading]);
+  }, [filters, page, hasMore, loading, libraryMode]);
 
   const applyFilters = useCallback(
     (next: InfiniteFilterState, seenIds: string[]) => {

@@ -125,6 +125,10 @@ export async function finalizeActiveSwipeRun(): Promise<SwipeHistoryEntry | null
   const infinite = readInfiniteSession();
   if (infinite) return finalizeInfiniteSession();
 
+  return finalizeSwipeRun();
+}
+
+export async function finalizeSwipeRun(): Promise<SwipeHistoryEntry | null> {
   const run = readActiveSwipeRun();
   if (!run) return null;
 

@@ -264,6 +264,84 @@ export type Database = {
         };
         Relationships: [];
       };
+      steam_links: {
+        Row: {
+          user_id: string;
+          steam_id: string;
+          persona_name: string | null;
+          avatar_url: string | null;
+          profile_url: string | null;
+          library_status: string;
+          wishlist_status: string;
+          linked_at: string;
+          last_synced_at: string | null;
+        };
+        Insert: {
+          user_id: string;
+          steam_id: string;
+          persona_name?: string | null;
+          avatar_url?: string | null;
+          profile_url?: string | null;
+          library_status?: string;
+          wishlist_status?: string;
+          linked_at?: string;
+          last_synced_at?: string | null;
+        };
+        Update: {
+          user_id?: string;
+          steam_id?: string;
+          persona_name?: string | null;
+          avatar_url?: string | null;
+          profile_url?: string | null;
+          library_status?: string;
+          wishlist_status?: string;
+          linked_at?: string;
+          last_synced_at?: string | null;
+        };
+        Relationships: [];
+      };
+      steam_library: {
+        Row: {
+          user_id: string;
+          app_id: string;
+          playtime_minutes: number;
+          synced_at: string;
+        };
+        Insert: {
+          user_id: string;
+          app_id: string;
+          playtime_minutes?: number;
+          synced_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          app_id?: string;
+          playtime_minutes?: number;
+          synced_at?: string;
+        };
+        Relationships: [];
+      };
+      steam_wishlist: {
+        Row: {
+          user_id: string;
+          app_id: string;
+          added_at: string | null;
+          synced_at: string;
+        };
+        Insert: {
+          user_id: string;
+          app_id: string;
+          added_at?: string | null;
+          synced_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          app_id?: string;
+          added_at?: string | null;
+          synced_at?: string;
+        };
+        Relationships: [];
+      };
       session_games: {
         Row: {
           session_id: string;

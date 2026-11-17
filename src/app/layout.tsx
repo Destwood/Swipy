@@ -3,6 +3,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { Bricolage_Grotesque, DM_Sans, DM_Mono } from "next/font/google";
 import { Grain } from "@/features/shell/components/Grain";
 import { CustomCursor } from "@/features/custom-cursor";
+import { SteamBackgroundSync } from "@/features/steam/components/SteamBackgroundSync";
+import { THEME_INIT_SCRIPT } from "@/features/theme/theme-script";
 import { ToastHost } from "@/shared/ui/ToastHost";
 import "./globals.css";
 import styles from "./layout.module.css";
@@ -38,13 +40,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${bricolage.variable} ${dmSans.variable} ${dmMono.variable} ${styles.html}`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className={styles.body}>
         <Grain />
         <CustomCursor />
         <div className={styles.main}>{children}</div>
         <ToastHost />
+        <SteamBackgroundSync />
         <Analytics />
       </body>
     </html>

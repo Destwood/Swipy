@@ -70,6 +70,8 @@ export function getLibraryGamesByIds(ids: string[]): Game[] {
     .filter((g): g is Game => g !== undefined);
 }
 
+const steamLookupAttempted = new Set<string>();
+
 export async function ensureGamesInLibrary(ids: string[]): Promise<Game[]> {
   const library = readLibrary();
   const present = new Set<string>();
@@ -79,7 +81,11 @@ export async function ensureGamesInLibrary(ids: string[]): Promise<Game[]> {
     const game = library[id];
     if (!game) continue;
     present.add(id);
-    if (id.startsWith("igdb-") && !game.steamAppId) {
+    if (
+      id.startsWith("igdb-") &&
+      !game.steamAppId &&
+      !steamLookupAttempted.has(id)
+    ) {
       staleSteamIds.push(id);
     }
   }
@@ -92,13 +98,19 @@ export async function ensureGamesInLibrary(ids: string[]): Promise<Game[]> {
       upsertGames(fromDb);
       for (const game of fromDb) {
         present.add(game.id);
-        if (game.id.startsWith("igdb-") && !game.steamAppId) {
+        if (
+          game.id.startsWith("igdb-") &&
+          !game.steamAppId &&
+          !steamLookupAttempted.has(game.id)
+        ) {
           staleSteamIds.push(game.id);
         }
       }
       missing = ids.filter((id) => !present.has(id));
     }
   }
+
+  for (const id of staleSteamIds) steamLookupAttempted.add(id);
 
   const igdbIds = [
     ...new Set(

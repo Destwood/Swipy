@@ -61,7 +61,7 @@
 }
 
 .skeletonMosaic {
-  @apply grid h-40 gap-px bg-[#0c0e12];
+  @apply grid h-40 gap-px bg-sw-bg;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
 }
@@ -95,7 +95,7 @@
 }
 
 .card:hover {
-  @apply border-white/10 shadow-[0_20px_48px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.08)];
+  @apply border-white/10 shadow-[0_20px_48px_rgba(0,0,0,0.55),0_0_0_1px_color-mix(in_srgb,var(--color-white)_8%,transparent)];
 }
 
 .card:hover .mosaicImage {
@@ -116,7 +116,7 @@
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 1px;
-  background: #0c0e12;
+  background: var(--color-sw-bg);
 }
 
 .mosaicCell {
@@ -147,15 +147,15 @@
 }
 
 .iconButton {
-  @apply flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-[7px] border border-white/12 bg-[rgba(12,14,18,0.7)] text-sm text-white/65 backdrop-blur-[8px] transition-all;
+  @apply flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-[7px] border border-white/12 bg-sw-bg/70 text-sm text-white/65 backdrop-blur-[8px] transition-all;
 }
 
 .favButton {
-  @apply border-[#f5c451]/35 text-[#f5c451]/80 hover:border-[#f5c451]/55 hover:text-[#f5c451];
+  @apply border-sw-gold/35 text-sw-gold/80 hover:border-sw-gold/55 hover:text-sw-gold;
 }
 
 .iconButtonFav {
-  @apply border-[#f5c451]/55 bg-[#f5c451]/14 text-[#f5c451];
+  @apply border-sw-gold/55 bg-sw-gold/14 text-sw-gold;
 }
 
 .favIcon {
@@ -167,7 +167,7 @@
 }
 
 .menu {
-  @apply absolute top-9 right-0 z-50 w-[148px] overflow-hidden rounded-[10px] border border-white/10 bg-[#1a1e27] p-1 shadow-[0_16px_40px_rgba(0,0,0,0.5)];
+  @apply absolute top-9 right-0 z-50 w-[148px] overflow-hidden rounded-[10px] border border-white/10 bg-sw-surface2 p-1 shadow-[0_16px_40px_rgba(0,0,0,0.5)];
 }
 
 .menuItem {
@@ -199,7 +199,7 @@
 }
 
 .favDot {
-  @apply mt-1 h-3.5 w-3.5 shrink-0 text-[#f5c451];
+  @apply mt-1 h-3.5 w-3.5 shrink-0 text-sw-gold;
 }
 
 .tagsSlot {

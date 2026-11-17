@@ -22,13 +22,13 @@
 
 .menu {
   @apply absolute top-[calc(100%+6px)] right-0 z-[60] w-[180px] overflow-hidden rounded-[10px] border border-white/10 p-1 shadow-[0_16px_40px_rgba(0,0,0,0.55)];
-  background-color: #1a1e27;
+  background-color: var(--color-sw-surface2);
   isolation: isolate;
 }
 
 .menuItem {
-  @apply block w-full cursor-pointer rounded-[7px] border-none px-2.5 py-1.5 text-left font-body text-[13px] text-sw-text no-underline transition-colors hover:bg-[#252a36] disabled:cursor-not-allowed disabled:opacity-50;
-  background-color: #1a1e27;
+  @apply block w-full cursor-pointer rounded-[7px] border-none px-2.5 py-1.5 text-left font-body text-[13px] text-sw-text no-underline transition-colors hover:bg-sw-surface3 disabled:cursor-not-allowed disabled:opacity-50;
+  background-color: var(--color-sw-surface2);
 }
 
 .menuDivider {

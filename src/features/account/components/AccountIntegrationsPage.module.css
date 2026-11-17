@@ -1,0 +1,13 @@
+@reference "../../../app/globals.css";
+
+.note {
+  @apply m-0 mt-3 font-body text-[13px] leading-relaxed text-white/45;
+}
+
+.groupLabel {
+  @apply m-0 mt-5 mb-2 font-mono text-[11px] tracking-[0.04em] text-white/35 uppercase;
+}
+
+.chips {
+  @apply flex flex-wrap gap-1.5;
+}

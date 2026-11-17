@@ -34,11 +34,23 @@ import {
   startNewInfiniteSession,
 } from "@/features/session/lib/infinite-session";
 import { finalizeInfiniteSession } from "@/features/session/lib/swipe-history";
+import {
+  STEAM_LIBRARY_MODES,
+  type SteamLibraryMode,
+} from "@/features/steam/lib/library-filter";
+import { useSteamConnection } from "@/features/steam/lib/use-steam";
 import { infiniteRunLabel } from "@/features/session/lib/swipe-run";
 import { Button, ButtonSize, ButtonVariant } from "@/shared/ui/Button";
 import { FilterAccordion } from "@/shared/ui/FilterAccordion";
 import { FilterChip } from "@/shared/ui/FilterChip";
 import styles from "./InfiniteModeDialog.module.css";
+
+const STEAM_MODE_LABEL: Record<SteamLibraryMode, string> = {
+  all: "All games",
+  "hide-owned": "Hide games I own",
+  "only-owned": "Only games I own",
+  "only-wishlist": "Only my wishlist",
+};
 
 type Props = {
   open: boolean;
@@ -58,6 +70,7 @@ function toggleMode(current: string, next: string): string {
 
 export function InfiniteModeDialog({ open, onClose, onApply }: Props) {
   const router = useRouter();
+  const steam = useSteamConnection();
   const titleId = useId();
   const [draft, setDraft] = useState<InfiniteFilterState>(EMPTY_INFINITE_FILTERS);
 
@@ -261,6 +274,25 @@ export function InfiniteModeDialog({ open, onClose, onApply }: Props) {
         </div>
 
         <div className={styles.scroll}>
+          {steam.ready && steam.link ? (
+            <FilterAccordion
+              title="Steam library"
+              summary={STEAM_MODE_LABEL[steam.mode]}
+              defaultOpen
+            >
+              <div className={styles.chips}>
+                {STEAM_LIBRARY_MODES.map((mode) => (
+                  <FilterChip
+                    key={mode}
+                    active={steam.mode === mode}
+                    onClick={() => steam.setMode(mode)}
+                  >
+                    {STEAM_MODE_LABEL[mode]}
+                  </FilterChip>
+                ))}
+              </div>
+            </FilterAccordion>
+          ) : null}
           <FilterAccordion
             title="Platforms"
             summary={platformSummary}

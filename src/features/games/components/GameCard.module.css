@@ -1,7 +1,7 @@
 @reference "../../../app/globals.css";
 
 .root {
-  @apply absolute inset-0 overflow-hidden rounded-2xl bg-sw-surface shadow-[0_0_0_1px_rgba(255,255,255,0.06)];
+  @apply absolute inset-0 overflow-hidden rounded-2xl bg-sw-surface shadow-[0_0_0_1px_color-mix(in_srgb,var(--color-white)_6%,transparent)];
 }
 
 .dimmed {
@@ -22,9 +22,9 @@
   background: linear-gradient(
     to bottom,
     transparent 48%,
-    rgba(12, 14, 18, 0.32) 68%,
-    rgba(12, 14, 18, 0.88) 86%,
-    rgba(12, 14, 18, 0.96) 100%
+    color-mix(in srgb, var(--color-sw-bg) 32%, transparent) 68%,
+    color-mix(in srgb, var(--color-sw-bg) 88%, transparent) 86%,
+    color-mix(in srgb, var(--color-sw-bg) 96%, transparent) 100%
   );
 }
 

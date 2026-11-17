@@ -11,8 +11,8 @@
 .radialOverlay {
   background: radial-gradient(
     ellipse 65% 65% at 50% 50%,
-    rgba(12, 14, 18, 0.35) 0%,
-    rgba(12, 14, 18, 0.9) 100%
+    color-mix(in srgb, var(--color-sw-bg) 35%, transparent) 0%,
+    color-mix(in srgb, var(--color-sw-bg) 90%, transparent) 100%
   );
   @apply absolute inset-0;
 }
@@ -26,7 +26,7 @@
 }
 
 .gameCard {
-  @apply mb-8 flex w-full max-w-xl items-center gap-6 rounded-2xl border border-white/[0.08] bg-[rgba(19,22,28,0.85)] p-5 backdrop-blur-md;
+  @apply mb-8 flex w-full max-w-xl items-center gap-6 rounded-2xl border border-white/[0.08] bg-sw-surface/85 p-5 backdrop-blur-md;
 }
 
 .cover {
