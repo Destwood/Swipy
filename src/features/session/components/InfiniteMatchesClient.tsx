@@ -14,7 +14,11 @@ import {
 } from "@/features/games/lib/game-library";
 import { MatchGameRow } from "@/features/session/components/MatchGameRow";
 import { ResultsPageToolbar } from "@/features/session/components/ResultsPageToolbar";
-import { buildHistoryShareUrl } from "@/features/session/lib/history-actions";
+import {
+  buildShareMatchesPayload,
+  buildShareMatchesUrl,
+  encodeShareMatchesToken,
+} from "@/features/session/lib/share-matches";
 import {
   convertSwipeHistoryToDeck,
   getSwipeHistoryEntry,
@@ -94,10 +98,21 @@ export function InfiniteMatchesClient() {
 
   async function handleShare() {
     if (!entry || shareBusy) return;
+    if (liked.length === 0) {
+      toast("Like at least one game to share");
+      return;
+    }
     setShareBusy(true);
     try {
+      const token = encodeShareMatchesToken(
+        buildShareMatchesPayload({
+          matches: liked,
+          likeCounts: Object.fromEntries(liked.map((game) => [game.id, 1])),
+          memberCount: 1,
+        }),
+      );
       await navigator.clipboard.writeText(
-        buildHistoryShareUrl({ kind: "solo", id: entry.id }),
+        buildShareMatchesUrl(window.location.origin, token),
       );
       toast("Link copied");
     } catch {
@@ -161,6 +176,7 @@ export function InfiniteMatchesClient() {
 
   const hasAny = liked.length > 0 || rejected.length > 0;
   const isPreview = entry?.preview === true;
+  const isDeck = entry?.mode === "deck";
 
   return (
     <div className={styles.root}>
@@ -168,10 +184,12 @@ export function InfiniteMatchesClient() {
 
       <div className={styles.scroll}>
         <div className={styles.page}>
-          <PageBackLink href="/infinite">← Infinite</PageBackLink>
+          <PageBackLink href={isDeck ? "/decks" : "/infinite"}>
+            {isDeck ? "← Decks" : "← Infinite"}
+          </PageBackLink>
           <div className={styles.headerRow}>
             <div className={styles.headerMain}>
-              <p className={styles.eyebrow}>Infinite mode</p>
+              <p className={styles.eyebrow}>{isDeck ? "Deck" : "Infinite mode"}</p>
               <h1 className={styles.title}>Results</h1>
               <p className={styles.subtitle}>
                 {entry
@@ -283,7 +301,7 @@ export function InfiniteMatchesClient() {
               </Button>
             ) : null}
             <Button
-              href="/infinite"
+              href={isDeck ? "/deck" : "/infinite"}
               variant={ButtonVariant.Dark}
               onClick={() => router.refresh()}
             >

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import CheckIcon from "@/assets/icons/check.svg";
 import { GameFavoriteButton } from "@/features/games/components/GameFavoriteButton";
 import { GameHoverPreview } from "@/features/games/components/GameHoverPreview";
 import type { Game } from "@/features/games/data/games";
@@ -36,9 +37,11 @@ function PriceOverlay({ appId }: { appId?: string }) {
 export function LibraryCard({
   game,
   priority,
+  selection,
 }: {
   game: Game;
   priority: boolean;
+  selection?: { selected: boolean; onToggle: () => void };
 }) {
   const hasArtTitle = game.id.startsWith("steam-");
   const appId = game.steamAppId;
@@ -69,6 +72,38 @@ export function LibraryCard({
       </span>
     </>
   );
+
+  if (selection) {
+    return (
+      <HoverLift
+        amount="sm"
+        className={`${styles.card} ${selection.selected ? styles.cardSelected : ""}`}
+      >
+        <button
+          type="button"
+          className={styles.tile}
+          aria-pressed={selection.selected}
+          aria-label={`${selection.selected ? "Remove" : "Add"} ${game.title}`}
+          onClick={(event) => {
+            if ((event.ctrlKey || event.metaKey) && appId) {
+              event.preventDefault();
+              openSteamStore(appId);
+              return;
+            }
+            selection.onToggle();
+          }}
+        >
+          {content}
+          <span
+            className={`${styles.check} ${selection.selected ? styles.checkOn : ""}`}
+            aria-hidden
+          >
+            {selection.selected ? <CheckIcon className={styles.checkIcon} /> : null}
+          </span>
+        </button>
+      </HoverLift>
+    );
+  }
 
   return (
     <GameHoverPreview game={game}>

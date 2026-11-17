@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import StarIcon from "@/assets/icons/star.svg";
 import { AuthMenu } from "@/features/auth/components/AuthMenu";
+import { ThemeToggle } from "@/features/theme";
 import { SwipyLogo } from "./SwipyLogo";
 import styles from "./AppTopBar.module.css";
 
@@ -23,6 +24,7 @@ export function AppTopBar() {
     <div className={styles.root}>
       <div className={styles.left}>
         <SwipyLogo size="bar" />
+        <ThemeToggle />
         <nav className={styles.nav} aria-label="Primary">
           {NAV.map((item) => {
             const active = item.match(pathname);

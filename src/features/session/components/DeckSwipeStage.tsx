@@ -74,7 +74,11 @@ function FlyingGhost({
           opacity: 0,
         },
       ],
-      { duration: FLY_MS, easing: "ease-in", fill: "forwards" },
+      {
+        duration: FLY_MS,
+        easing: fromX * dir < 0 ? FLY_EASING_OPPOSED : "ease-in",
+        fill: "forwards",
+      },
     );
     const timer = window.setTimeout(() => onDone(ghost.id), FLY_MS + 40);
     return () => {
@@ -118,6 +122,7 @@ const SIDEBAR_LABEL: Record<SidebarMode, string> = {
 const SIDEBAR_SLIDE_MS = 320;
 const FLY_PX = 460;
 const FLY_MS = 240;
+const FLY_EASING_OPPOSED = "cubic-bezier(0.3, 0.3, 0.9, 0.6)";
 const PROMOTE_MS = 220;
 const VISIBLE_BEHIND = 3;
 const STACK_SCALES = [1, 0.955, 0.925, 0.895];

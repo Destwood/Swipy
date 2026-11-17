@@ -2,27 +2,27 @@
 
 .root {
   @apply flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center overflow-visible rounded-md border p-0 transition-colors;
-  border-color: rgba(245, 196, 81, 0.35);
-  background-color: rgba(245, 196, 81, 0.08);
-  color: rgba(245, 196, 81, 0.75);
+  border-color: color-mix(in srgb, var(--color-sw-gold) 35%, transparent);
+  background-color: color-mix(in srgb, var(--color-sw-gold) 8%, transparent);
+  color: color-mix(in srgb, var(--color-sw-gold) 75%, transparent);
 }
 
 .root:hover {
-  border-color: rgba(245, 196, 81, 0.55);
-  background-color: rgba(245, 196, 81, 0.14);
-  color: #f5c451;
+  border-color: color-mix(in srgb, var(--color-sw-gold) 55%, transparent);
+  background-color: color-mix(in srgb, var(--color-sw-gold) 14%, transparent);
+  color: var(--color-sw-gold);
 }
 
 .on {
-  border-color: rgba(245, 196, 81, 0.7);
-  background-color: rgba(245, 196, 81, 0.22);
-  color: #f5c451;
+  border-color: color-mix(in srgb, var(--color-sw-gold) 70%, transparent);
+  background-color: color-mix(in srgb, var(--color-sw-gold) 22%, transparent);
+  color: var(--color-sw-gold);
 }
 
 .on:hover {
-  border-color: rgba(245, 196, 81, 0.9);
-  background-color: rgba(245, 196, 81, 0.28);
-  color: #f5c451;
+  border-color: color-mix(in srgb, var(--color-sw-gold) 90%, transparent);
+  background-color: color-mix(in srgb, var(--color-sw-gold) 28%, transparent);
+  color: var(--color-sw-gold);
 }
 
 .icon {

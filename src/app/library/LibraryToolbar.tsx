@@ -28,7 +28,7 @@ import styles from "./LibraryToolbar.module.css";
 
 const DEBOUNCE_MS = 500;
 const SUGGEST_LIMIT = 8;
-const FOCUSABLE = "button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex='-1'])";
+const FOCUSABLE = "button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1'])";
 
 type Props = {
   query: string;

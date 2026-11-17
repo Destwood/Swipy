@@ -1,7 +1,8 @@
 @reference "../../../app/globals.css";
 
 .form {
-  @apply mx-auto flex w-full max-w-[1200px] flex-col px-6 pt-4 pb-10 sm:px-10;
+  @apply mx-auto flex w-full max-w-[1200px] shrink-0 flex-col pt-4;
+  padding-inline: var(--sw-page-pad-x);
 }
 
 .toolbar {
@@ -33,111 +34,10 @@
 }
 
 
-.searchRow {
-  @apply flex flex-wrap items-center gap-3;
-}
-
-.searchBlock {
-  @apply mb-5 flex flex-col gap-3;
-}
-
-.searchInput {
-  @apply min-w-0 flex-1 rounded-xl border border-white/10 bg-sw-surface px-4 py-3 font-body text-sw-text outline-none placeholder:text-white/25 focus:border-sw-accent/40;
-}
-
-
-.filterToolbar {
-  @apply w-full;
-}
-
-.catalogMeta {
-  @apply font-mono text-xs text-white/30;
-}
-
 .apiHint {
   @apply mb-3 font-body text-sm text-sw-text/45;
 }
 
 .error {
   @apply mb-3 font-body text-sm text-sw-dislike;
-}
-
-.catalogGrid {
-  @apply m-0 grid list-none grid-cols-3 gap-2.5 p-0 sm:grid-cols-4 sm:gap-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8;
-}
-
-.card {
-  @apply relative w-full cursor-pointer overflow-hidden rounded-xl border border-white/[0.08] bg-sw-surface p-0 text-left transition-[border-color,box-shadow] duration-150;
-}
-
-.card:hover {
-  @apply border-white/15;
-}
-
-.card:hover .cardTitle {
-  opacity: 1;
-}
-
-.card:hover .cardFade {
-  opacity: 1;
-}
-
-.cardSelected {
-  @apply border-[rgba(45,212,191,0.55)] shadow-[0_0_0_1px_rgba(45,212,191,0.25)];
-}
-
-.coverWrap {
-  @apply relative aspect-[3/4] w-full overflow-hidden bg-sw-surface2;
-}
-
-.cover {
-  @apply object-cover;
-}
-
-.check {
-  @apply absolute top-2 right-2 z-[2] flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-black/45 text-transparent backdrop-blur-[4px] transition-all;
-}
-
-.checkOn {
-  @apply border-sw-accent bg-sw-accent text-sw-bg;
-}
-
-.checkIcon {
-  @apply h-3.5 w-3.5;
-}
-
-.cardFade {
-  @apply pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[55%] bg-gradient-to-t from-black/85 to-transparent opacity-80 transition-opacity;
-}
-
-.coverMeta {
-  @apply absolute inset-x-0 bottom-0 z-[2] p-2;
-}
-
-.cardTitle {
-  @apply mb-1 font-display text-[11px] leading-snug font-bold tracking-[-0.02em] text-white opacity-90 sm:text-xs;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-
-.coverRow {
-  @apply flex min-h-[12px] items-center justify-between gap-1;
-}
-
-.cardGenre {
-  @apply min-w-0 truncate font-body text-[9px] text-white/40;
-}
-
-.empty {
-  @apply mt-10 text-center font-body text-sm text-sw-text/40;
-}
-
-.skeletonCard {
-  @apply aspect-[3/4] rounded-xl border border-white/[0.06] bg-sw-surface;
-}
-
-.sentinel {
-  @apply col-span-full h-px list-none;
 }

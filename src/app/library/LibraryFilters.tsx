@@ -18,6 +18,8 @@ import {
   type CatalogFilterState,
 } from "@/features/games/lib/catalog-filters";
 import { FilterChip } from "@/shared/ui/FilterChip";
+import type { SteamLibraryMode } from "@/features/steam/lib/library-filter";
+import { useSteamConnection } from "@/features/steam/lib/use-steam";
 import { RangeSlider } from "./RangeSlider";
 import styles from "./LibraryFilters.module.css";
 
@@ -320,6 +322,7 @@ export function FiltersPanel({
   onClose,
   doneLabel,
 }: PanelProps) {
+  const steam = useSteamConnection();
   const steamOnly = filters.platform === DEFAULT_PLATFORM;
   const dirty = catalogFiltersActive(filters);
 
@@ -362,6 +365,22 @@ export function FiltersPanel({
       </div>
 
       <div className={styles.scroll}>
+
+        {steam.ready && steam.link ? (
+          <label className={styles.section}>
+            <span className={styles.sectionLabel}>Steam library</span>
+            <select
+              className={styles.steamSelect}
+              value={steam.mode}
+              onChange={(event) => steam.setMode(event.target.value as SteamLibraryMode)}
+            >
+              <option value="all">All games</option>
+              <option value="hide-owned">Hide games I own</option>
+              <option value="only-owned">Only games I own</option>
+              <option value="only-wishlist">Only my wishlist</option>
+            </select>
+          </label>
+        ) : null}
         <div className={styles.section}>
           <span className={styles.sectionLabel}>Genre</span>
           <div className={styles.chips}>

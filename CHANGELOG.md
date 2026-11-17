@@ -12,6 +12,30 @@ How to use:
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-17
+
+Steam account linking, a deck builder that reuses the library, and solo deck results.
+
+### Added
+
+- **Steam account linking** from Account → Integrations: sign in through Steam, no password shared with Swipy
+- Your **Steam library and wishlist** are synced automatically about twice a day and on demand with **Sync now**
+- **Games feed mode** for the Library, the deck builder and infinite swiping: show everything, hide games you own, only games you own, or only your wishlist (also selectable in the infinite mode dialog)
+- **Solo deck results**: swiping a whole deck now ends on a results page with liked and rejected games, and **Previous** really undoes the last swipe
+- **New deck** and **Edit deck** now use the same catalog as the Games library (search, sort, filters, pinned filters panel); clicking a game adds or removes it from the deck
+
+### Changed
+
+- Results **Copy link** now creates a public share link (valid 7 days) with the liked games
+- Infinite mode with a finite list (for example only games you own) ends on the results page after the last game
+- Catalog and infinite lists keep loading until at least 15 matching games are queued when a Steam filter hides most of a page
+- Discord integration is shown as coming soon
+
+### Fixed
+
+- The card no longer hesitates when you press the opposite like/skip button while hovering one side
+- The **Matches** popover opens from the local library instead of refetching games each time
+
 ### Roadmap (4.0)
 
 Full **Steam account linking**, library sync, and deeper store integration — building on the Steam prices / Open in Steam work in 0.4.x.

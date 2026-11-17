@@ -7,6 +7,8 @@ import type { User } from "@supabase/supabase-js";
 import { CustomCursorToggle } from "@/features/custom-cursor";
 import { googleAvatarUrl } from "@/features/auth/lib/google-avatar";
 import { useSteamOpenPreference } from "@/features/games/lib/use-steam-open-preference";
+import { useTheme } from "@/features/theme";
+import { THEME_SWITCH_ENABLED } from "@/features/theme/theme-script";
 import { createBrowserSupabaseClient } from "@/shared/supabase/client";
 import { PreferenceToggle } from "@/shared/ui/PreferenceToggle";
 import styles from "./AuthMenu.module.css";
@@ -18,6 +20,7 @@ export function AuthMenu() {
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
   const steam = useSteamOpenPreference();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const supabase = createBrowserSupabaseClient();
@@ -151,6 +154,13 @@ export function AuthMenu() {
           </div>
           <div className={styles.divider} />
           <div className={styles.section}>
+            {THEME_SWITCH_ENABLED ? (
+              <PreferenceToggle
+                label="Light theme"
+                checked={theme === "light"}
+                onChange={(next) => setTheme(next ? "light" : "dark")}
+              />
+            ) : null}
             <CustomCursorToggle />
             {steam.ready ? (
               <PreferenceToggle

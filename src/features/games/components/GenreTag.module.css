@@ -9,7 +9,7 @@
 }
 
 .default {
-  @apply border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.08)] text-[#aab4c2];
+  @apply border border-white/10 bg-white/8 text-sw-muted;
 }
 
 .compact {

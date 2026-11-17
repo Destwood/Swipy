@@ -5,11 +5,11 @@
 }
 
 .close {
-  @apply absolute top-1 right-1 z-20 flex h-14 w-14 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-white/80 hover:text-white;
+  @apply absolute top-1 right-1 z-20 flex h-14 w-14 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-sw-onimage/80 hover:text-sw-onimage;
 }
 
 .closeFace {
-  @apply flex h-10 w-10 items-center justify-center rounded-lg border border-white/15 bg-black/40 hover:bg-black/70;
+  @apply flex h-10 w-10 items-center justify-center rounded-lg border border-sw-onimage/15 bg-black/40 hover:bg-black/70;
 }
 
 .closeIcon {
@@ -29,11 +29,11 @@
 }
 
 .navFace {
-  @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white/85;
+  @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-sw-onimage/15 bg-black/45 text-sw-onimage/85;
 }
 
 .nav:hover .navFace {
-  @apply bg-black/70 text-white;
+  @apply bg-black/70 text-sw-onimage;
 }
 
 .navIcon {
@@ -49,5 +49,5 @@
 }
 
 .counter {
-  @apply mt-3 m-0 text-center font-mono text-[12px] text-white/45;
+  @apply mt-3 m-0 text-center font-mono text-[12px] text-sw-onimage/45;
 }

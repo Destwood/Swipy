@@ -12,7 +12,7 @@ export default async function EditDeckPage({ params }: Props) {
   return (
     <div className={styles.root}>
       <AppTopBar />
-      <div className={styles.content} data-deck-catalog-scroll>
+      <div className={styles.content}>
         <CreateDeckForm deckId={decodeURIComponent(id)} />
       </div>
     </div>

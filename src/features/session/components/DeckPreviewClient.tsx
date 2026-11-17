@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import ChevronLeftIcon from "@/assets/icons/chevron-left.svg";
 import HeartIcon from "@/assets/icons/heart.svg";
 import HomeIcon from "@/assets/icons/home.svg";
@@ -43,7 +44,17 @@ import {
   INFINITE_PREFETCH_REMAINING,
   useInfiniteGames,
 } from "@/features/session/lib/use-infinite-games";
-import { infiniteRunLabel } from "@/features/session/lib/swipe-run";
+import {
+  infiniteRunLabel,
+  popLastSwipeVote,
+  recordSwipeVote,
+  startSwipeRun,
+} from "@/features/session/lib/swipe-run";
+import {
+  finalizeInfiniteSession,
+  finalizeSwipeRun,
+} from "@/features/session/lib/swipe-history";
+import { toast } from "@/shared/ui/toast";
 import { markGameSeen } from "@/features/session/lib/seen-games";
 import { useSwipeUndo } from "@/features/session/lib/use-swipe-undo";
 import { PageBackLink } from "@/shared/ui/PageBackLink";
@@ -55,6 +66,9 @@ type Props = {
 
 export function DeckPreviewClient({ mode }: Props) {
   const infinite = mode === "infinite";
+  const router = useRouter();
+  const runStarted = useRef(false);
+  const finishing = useRef(false);
   const [deckGames, setDeckGames] = useState<Game[]>([]);
   const [deckName, setDeckName] = useState("Deck");
   const [deckReady, setDeckReady] = useState(false);
@@ -149,6 +163,10 @@ export function DeckPreviewClient({ mode }: Props) {
       setDeckName(deck?.name ?? "Deck");
       setDeckGames(next);
       setDeckIndex(0);
+      if (!runStarted.current) {
+        runStarted.current = true;
+        startSwipeRun({ mode: "deck", label: deck?.name ?? "Deck" });
+      }
       setDeckReady(true);
     })();
     return () => {
@@ -187,9 +205,45 @@ export function DeckPreviewClient({ mode }: Props) {
         : games[streamIndex + 1]
     : deckGames[deckIndex + 1];
 
-  function advanceDeck() {
+  async function finishDeckRun() {
+    try {
+      const entry = await finalizeSwipeRun();
+      router.push(
+        entry
+          ? `/infinite/matches?session=${encodeURIComponent(entry.id)}`
+          : "/infinite/matches",
+      );
+    } catch {
+      toast("Could not save results");
+    } finally {
+      finishing.current = false;
+    }
+  }
+
+  async function finishInfiniteRun() {
+    try {
+      const entry = await finalizeInfiniteSession();
+      router.push(
+        entry
+          ? `/infinite/matches?session=${encodeURIComponent(entry.id)}`
+          : "/infinite/matches",
+      );
+    } catch {
+      toast("Could not save results");
+    } finally {
+      finishing.current = false;
+    }
+  }
+
+  function advanceDeck(value: "like" | "dislike") {
+    if (!current || finishing.current) return false;
+    recordSwipeVote(current.id, value);
     undo.record(deckIndex);
-    if (deckIndex >= deckGames.length - 1) return false;
+    if (deckIndex >= deckGames.length - 1) {
+      finishing.current = true;
+      void finishDeckRun();
+      return false;
+    }
     setDeckIndex((i) => i + 1);
     return true;
   }
@@ -227,7 +281,14 @@ export function DeckPreviewClient({ mode }: Props) {
     }
 
     if (streamIndex >= games.length - 1) {
-      if (stream.hasMore) stream.loadMore();
+      if (stream.hasMore) {
+        stream.loadMore();
+        return false;
+      }
+      if (!stream.loadingMore && !finishing.current) {
+        finishing.current = true;
+        void finishInfiniteRun();
+      }
       return false;
     }
     persistStreamIndex(streamIndex + 1);
@@ -237,6 +298,12 @@ export function DeckPreviewClient({ mode }: Props) {
   function undoLast() {
     const prev = undo.back();
     if (prev == null) return;
+    if (!infinite) {
+      popLastSwipeVote();
+      setDeckIndex(prev);
+      setSwipeKey((key) => key + 1);
+      return;
+    }
     popLastInfiniteVote();
     refreshSession();
     persistStreamIndex(prev);
@@ -369,8 +436,8 @@ export function DeckPreviewClient({ mode }: Props) {
             swipeKey={swipeKey}
             dock={matchesDock}
             onIgnore={infinite ? trashCurrent : undefined}
-            onLike={() => (infinite ? swipe("like") : advanceDeck())}
-            onSkip={() => (infinite ? swipe("dislike") : advanceDeck())}
+            onLike={() => (infinite ? swipe("like") : advanceDeck("like"))}
+            onSkip={() => (infinite ? swipe("dislike") : advanceDeck("dislike"))}
           />
         ) : (
           <>

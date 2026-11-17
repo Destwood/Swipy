@@ -5,7 +5,7 @@
 }
 
 .high {
-  @apply bg-green-500 text-white;
+  @apply bg-green-500 text-sw-onimage;
 }
 
 .mid {
@@ -13,5 +13,5 @@
 }
 
 .low {
-  @apply bg-red-500 text-white;
+  @apply bg-red-500 text-sw-onimage;
 }

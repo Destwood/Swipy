@@ -56,14 +56,20 @@ export function InfiniteMatchesPopover({
       return;
     }
     const ids = current.votes.map((vote) => vote.gameId);
-    void ensureGamesInLibrary(ids).then((list) => {
-      const map: Record<string, Game> = {};
-      for (const game of list) map[game.id] = game;
-      for (const id of ids) {
-        const cached = getLibraryGameById(id);
-        if (cached) map[id] = cached;
-      }
-      setGames(map);
+    const known: Record<string, Game> = {};
+    for (const id of ids) {
+      const cached = getLibraryGameById(id);
+      if (cached) known[id] = cached;
+    }
+    setGames(known);
+    const missing = ids.filter((id) => !known[id]);
+    if (missing.length === 0) return;
+    void ensureGamesInLibrary(missing).then((list) => {
+      setGames((prev) => {
+        const map = { ...prev };
+        for (const game of list) map[game.id] = game;
+        return map;
+      });
     });
   }, [open]);
 

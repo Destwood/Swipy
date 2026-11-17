@@ -2,7 +2,7 @@
 
 .root {
   @apply relative inline-grid shrink-0 place-items-center overflow-hidden rounded-full font-body font-bold leading-none tracking-tight text-sw-bg;
-  box-shadow: 0 0 0 2px #0c0e12;
+  box-shadow: 0 0 0 2px var(--color-sw-bg);
 }
 
 .xs {

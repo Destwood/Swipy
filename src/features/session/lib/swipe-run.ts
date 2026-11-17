@@ -76,6 +76,21 @@ export function getOrCreateSwipeRun(input: {
   return run;
 }
 
+export function startSwipeRun(input: {
+  mode: SwipeRunMode;
+  label: string;
+}): SwipeRun {
+  const run: SwipeRun = {
+    id: `run-${Date.now()}`,
+    mode: input.mode,
+    label: input.label.trim() || (input.mode === "infinite" ? "Infinite" : "Deck"),
+    votes: [],
+    startedAt: new Date().toISOString(),
+  };
+  writeActiveSwipeRun(run);
+  return run;
+}
+
 export function recordSwipeVote(gameId: string, value: SwipeVoteValue) {
   const run = readActiveSwipeRun();
   if (!run) return;

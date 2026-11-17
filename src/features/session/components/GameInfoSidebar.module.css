@@ -48,12 +48,12 @@
 }
 
 .metaRow > .favorite {
-  @apply ml-auto h-7 w-7 shrink-0 rounded-lg border-white/[0.075] bg-transparent text-[rgba(244,201,93,0.6)];
+  @apply ml-auto h-7 w-7 shrink-0 rounded-lg border-white/[0.075] bg-transparent text-sw-gold/60;
 }
 
 .metaRow > .favorite:hover,
 .metaRow > .favorite[aria-pressed="true"] {
-  @apply border-[rgba(244,201,93,0.35)] bg-[rgba(244,201,93,0.06)] text-[#f4c95d];
+  @apply border-sw-gold/35 bg-sw-gold/6 text-sw-gold;
 }
 
 .metaRow > .favorite svg {
@@ -157,4 +157,13 @@
 
 .buy > .steam {
   @apply w-[124px] shrink-0 rounded-none border-0 border-l border-white/[0.075] bg-white/[0.06] px-3.5 py-3 hover:bg-white/[0.1];
+}
+
+.buy > .steam,
+.buy > .steam:hover {
+  color: var(--color-sw-text);
+}
+
+.buy > .steam svg {
+  color: inherit;
 }
